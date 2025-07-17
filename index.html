@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title data-i18n="pageTitle">MSC Book Collection</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <script src="https://kit.fontawesome.com/cd38709ddf.js" crossorigin="anonymous"></script>
+    <link rel="icon" href="Prepared Cooper.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="Prepared Cooper.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="Prepared Cooper.ico">
+</head>
+<body>
+    <header>
+        <h1 data-i18n="headerTitle"><img src="Prepared Cooper.ico" alt="MSC Book Collection Logo">MSC Book Collection</h1>
+    </header>
+
+    <div class="navbar">
+        <ul>
+            <li><a href="index.html" data-i18n="home">Home</a></li>
+            <li>
+                <select class="non-interactive-select">
+                    <option selected data-i18n="genres">Genres</option>
+                    <option data-i18n="fiction">Fiction</option>
+                    <option data-i18n="scienceFiction">Science Fiction</option>
+                    <option data-i18n="mystery">Mystery</option>
+                    <option data-i18n="fantasy">Fantasy</option>
+                    <option data-i18n="informationalText">Informational Text</option>
+                    <option data-i18n="biography">Biography</option>
+                </select>
+            </li>
+            <li><a href="BookReturn.html" data-i18n="bookReturn">Book Return</a></li>
+            <li><a href="HelpForum.html" data-i18n="help">Help</a></li>
+            <li><a href="library.html" data-i18n="search">Search</a></li>
+            <li><a href="#" id="openBorrowForm" data-i18n="borrowBook">Borrow Book</a></li>
+            <li><a href="login.html" id="AdminLogin" data-i18n="login">Login<i class="fa-solid fa-user-lock"></i></a></li>
+        </ul>
+    </div>
+
+    <div id="mainContent">
+        <section>
+            <div class="container">
+                <img src="Header-IMG.jpg" alt="Welcome to MSC School Library" class="responsive">
+                <div class="centered" data-i18n="mscSchoolLibrary">MSC School Library</div>
+            </div>
+
+            <div class="body-containers-items">
+                <div class="latest-update">
+                    <h2 data-i18n="latestUpdate">Latest Update<i class="fa-solid fa-download"></i></h2>
+                    <p data-i18n="welcomeText">Welcome to the MSC School Library website!</p>
+                </div>
+
+                <div class="book-of-the-month">
+                    <h2 data-i18n="bookOfTheMonth">Book of the Month<i class="fa-solid fa-book"></i></h2>
+                    <article>
+                        <p data-i18n="featuredBook">This month's featured book is:</p>
+                        <ul>
+                            <li id="botmTitleDisplay" data-i18n="harryPotterTitle"><strong>Title:</strong> Harry Potter and the Deathly Hallows</li>
+                            <li id="botmAuthorDisplay" data-i18n="jkRowling"><strong>Author:</strong> JK Rowling</li>
+                        </ul>
+                    </article>
+                </div>
+
+                <div class="delivery-chart">
+                    <h2 data-i18n="borrowingGuidelines">Borrowing Guidelines<i class="fa-solid fa-hand-holding-hand"></i></h2>
+                    <p data-i18n="borrowingInfo">Please see the chart below for information on borrowing periods for different user types:</p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th data-i18n="userType">User Type</th>
+                                <th data-i18n="maxBorrowingPeriod">Maximum Borrowing Period</th>
+                                <th data-i18n="renewalAllowed">Renewal Allowed</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td data-i18n="students">Students</td>
+                                <td>2 weeks</td>
+                                <td data-i18n="yesOnce">Yes (once)</td>
+                            </tr>
+                            <tr>
+                                <td data-i18n="faculty">Faculty</td>
+                                <td>As long as needed:)</td>
+                                <td data-i18n="yesPleaseKeep">Yes, but please try to keep book in stock!</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="explore-section">
+                    <h2 data-i18n="exploreCollection">Explore Our Collection<i class="fa fa-Search"></i></h2>
+                    <a href="library.html" class="explore-button" data-i18n="exploreBooks">Explore Books</a>
+                </div>
+
+
+                <div class="credits">
+                    <h2 data-i18n="credits">Credits</h2>
+                    <p>&copy; copyright @ 2024 <span>Coding credit: Atticus Herr</span> [all rights reserved!]</p>
+                    <p>5th grade class 2024-2025</p>
+                    <p><button class="online-books-button"><ul><li><a href="humans.txt">Click Me</a></li></ul></button></p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div id="borrowFormOverlay" class="overlay">
+        <div class="overlay-content">
+            <button type="button" class="close-button" id="closeBorrowForm">&times;</button>
+            <h2 data-i18n="borrowBookFormTitle">Borrow Book</h2>
+            <form id="borrowBookForm">
+                <div class="form-group">
+                    <label for="bookName" data-i18n="bookNameLabel">Book Name:</label>
+                    <input type="text" id="bookName" name="bookName" required>
+                </div>
+                <div class="form-group">
+                    <label for="genre" data-i18n="genreLabel">Genre (Optional):</label>
+                    <input type="text" id="genre" name="genre">
+                </div>
+                <div class="form-group">
+                    <label for="borrowerName" data-i18n="borrowerNameLabel">Person Borrowing:</label>
+                    <input type="text" id="borrowerName" name="borrowerName" required>
+                </div>
+                <p data-i18n="borrowNotice">NOTICE: Books are dropped off on Wednesday (exceptions can be made)! If the date is a day other than Wednesday, your book will be dropped off next Wednesday, regardless of your selected borrow duration. Write down the book name so you remember and try again on Wednesday, or try our Online Books (beta)!</p>
+                <div class="form-group">
+                    <label for="borrowDuration" data-i18n="borrowDurationLabel">Borrowing Duration:</label>
+                    <select id="borrowDuration" name="borrowDuration">
+                        <option value="1_week">1 Week</option>
+                        <option value="2_weeks">2 Weeks</option>
+                        <option value="3_weeks">3 Weeks</option>
+                        <option value="4_weeks">4 Weeks</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="disclaimer" data-i18n="disclaimerLabel">Disclaimer:</label>
+                    <textarea id="disclaimer" rows="3" readonly data-i18n="disclaimerText">I understand that I am responsible for the safe return of this book by the agreed-upon date. I will handle it with care and adhere to the library's borrowing policies.</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="signature" data-i18n="signatureLabel">Signature of Understanding:</label>
+                    <input type="text" id="signature" name="signature" required>
+                </div>
+                <button type="submit" data-i18n="submitRequest">Submit Borrow Request</button>
+                <button type="button" id="cancelBorrowForm" data-i18n="cancel">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const botmTitleDisplay = document.getElementById('botmTitleDisplay');
+            const botmAuthorDisplay = document.getElementById('botmAuthorDisplay');
+
+            const storedBookOfTheMonth = localStorage.getItem('bookOfTheMonth');
+            if (storedBookOfTheMonth) {
+                const { title, author } = JSON.parse(storedBookOfTheMonth);
+                botmTitleDisplay.innerHTML = `<strong>Title:</strong> ${title}`;
+                botmAuthorDisplay.innerHTML = `<strong>Author:</strong> ${author}`;
+            }
+        });
+    </script>
+</body>
+</html>

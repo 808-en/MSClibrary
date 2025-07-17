@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - MSC Book Collection</title>
+    <link rel="stylesheet" href="admin_style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            position: relative;
+            max-width: 500px;
+            width: 90%;
+            box-sizing: border-box;
+        }
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        .form-group input[type="text"],
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        button[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        button[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        .action-button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .action-button:hover {
+            background-color: #0056b3;
+        }
+        .delete-button {
+            background-color: #dc3545;
+        }
+        .delete-button:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Admin Dashboard - MSC Book Collection</h1>
+    </header>
+
+    <div class="navbar">
+        <ul>
+            <li><a href="index.html">Logout</a></li>
+        </ul>
+    </div>
+
+    <div class="dashboard-container">
+        <h2>Current Borrow Requests</h2>
+        <table id="borrowRequests">
+            <thead>
+                <tr>
+                    <th>Actions</th>
+                    <th>Request ID</th>
+                    <th>Book Name</th>
+                    <th>Genre</th>
+                    <th>Borrower Name</th>
+                    <th>Duration</th>
+                    <th>Delivered, Pickup In</th>
+                    <th>Signature</th>
+                </tr>
+            </thead>
+            <tbody id="requestList">
+                <tr>
+                    <td colspan="9" class="no-requests">No pending borrow requests.</td>
+                </tr>
+            </tbody>
+        </table>
+        <p style="color: #666; text-align:center; font-style:italic">*White boxes either need to be dropped off, or have not expired yet. Check the dates to ensure this.</p>
+    </div>
+
+    <div class="dashboard-container admin-book-actions">
+        <h2>Book Management</h2>
+        <div class="button-group">
+            <button id="openAddBookModal" class="action-button">Add New Book</button>
+            <button id="openDeleteBookModal" class="action-button delete-button">Delete Books</button>
+            <button id="openBookOfTheMonthModal" class="action-button">Set Book of the Month</button>
+        </div>
+    </div>
+
+    <div class="dashboard-container">
+        <p><h3>Staging File:</h3></p>
+        <a href="staging.books/staging.index.html">Click Here</a>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 MSC Book Collection - Admin Area</p>
+    </footer>
+
+    <div id="addBookModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="closeAddBookModal">&times;</span>
+            <h2>Add New Book</h2>
+            <form id="addBookFormAdmin">
+                <div class="form-group">
+                    <label for="bookCoverImage">Book Cover Image URL:</label>
+                    <input type="file" id="bookCoverImage" required>
+                </div>
+                <div class="form-group">
+                    <label for="bookTitle">Book Title:</label>
+                    <input type="text" id="bookTitle" required placeholder="e.g., The Adventures of Tom Sawyer">
+                </div>
+                <div class="form-group">
+                    <label for="bookAuthor">Book Author:</label>
+                    <input type="text" id="bookAuthor" required placeholder="e.g., Mark Twain">
+                </div>
+                <div class="form-group">
+                    <label for="bookGradeLevel">Grade Level:</label>
+                    <input type="text" id="bookGradeLevel" placeholder="e.g., 5-8">
+                </div>
+                <div class="form-group">
+                    <label for="bookGenre">Genre:</label>
+                    <select id="bookGenre" required>
+                        <option value="">Select Genre</option>
+                        <option value="Science Fiction">Science Fiction</option>
+                        <option value="Fantasy">Fantasy</option>
+                        <option value="Education">Education</option>
+                        <option value="Mystery Horror">Mystery Horror</option>
+                        <option value="Info Text">Informational Text</option>
+                        <option value="Biography">Biography</option>
+                        <option value="Action Adventure">Action Adventure</option>
+                        <option value="Fiction">Fiction</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="bookDescription">Book Description (Synopsis):</label>
+                    <textarea id="bookDescription" rows="4" required placeholder="A brief summary of the book..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="bookMetaName">Meta Name (for search):</label>
+                    <input type="text" id="bookMetaName" placeholder="e.g., tom-sawyer-adventure">
+                </div>
+                <button type="submit">Add Book</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="deleteBookModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="closeDeleteBookModal">&times;</span>
+            <h2>Delete Books</h2>
+            <form id="deleteBookFormAdmin">
+                <ul id="deleteBookList">
+                    <p class="no-books-delete">No books available for deletion.</p>
+                </ul>
+                <button type="submit" class="delete-selected-button">Delete Selected</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="bookOfTheMonthModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="closeBookOfTheMonthModal">&times;</span>
+            <h2>Set Book of the Month</h2>
+            <form id="bookOfTheMonthForm">
+                <div class="form-group">
+                    <label for="botmTitle">Book Title:</label>
+                    <input type="text" id="botmTitle" required placeholder="e.g., The Great Gatsby">
+                </div>
+                <div class="form-group">
+                    <label for="botmAuthor">Book Author:</label>
+                    <input type="text" id="botmAuthor" required placeholder="e.g., F. Scott Fitzgerald">
+                </div>
+                <button type="submit">Set Book of the Month</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="admin_script.js"></script>
+    <script src="library.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const openBookOfTheMonthModalBtn = document.getElementById('openBookOfTheMonthModal');
+            const bookOfTheMonthModal = document.getElementById('bookOfTheMonthModal');
+            const closeBookOfTheMonthModalBtn = document.getElementById('closeBookOfTheMonthModal');
+            const bookOfTheMonthForm = document.getElementById('bookOfTheMonthForm');
+
+            openBookOfTheMonthModalBtn.addEventListener('click', () => {
+                bookOfTheMonthModal.style.display = 'flex';
+            });
+
+            closeBookOfTheMonthModalBtn.addEventListener('click', () => {
+                bookOfTheMonthModal.style.display = 'none';
+            });
+
+            window.addEventListener('click', (event) => {
+                if (event.target == bookOfTheMonthModal) {
+                    bookOfTheMonthModal.style.display = 'none';
+                }
+            });
+
+            bookOfTheMonthForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+                const title = document.getElementById('botmTitle').value;
+                const author = document.getElementById('botmAuthor').value;
+                localStorage.setItem('bookOfTheMonth', JSON.stringify({ title, author }));
+                alert('Book of the Month updated successfully!');
+                bookOfTheMonthModal.style.display = 'none';
+                bookOfTheMonthForm.reset();
+            });
+        });
+    </script>
+</body>
+</html>

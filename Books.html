@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard - MSC Book Collection</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f8f8;
+            color: #333;
+        }
+
+        header {
+            background-color: #333;
+            color: white;
+            padding: 1em 0;
+            text-align: center;
+        }
+
+        .navbar {
+            background-color: #ddd;
+            padding: 0.5em 0;
+            text-align: center;
+        }
+
+        .navbar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: inline-block;
+        }
+
+        .navbar li {
+            display: inline;
+            margin: 0 15px;
+        }
+
+        .navbar a {
+            text-decoration: none;
+            color: #FF0000;
+            font-weight: bold;
+            padding: 8px 12px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .navbar a:hover {
+            background-color: #bbb;
+        }
+
+        .dashboard-container {
+            width: 90%;
+            margin: 20px auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #333;
+            margin-top: 0;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        #borrowRequests {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        #borrowRequests th, #borrowRequests td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        #borrowRequests th {
+            background-color: #f2f2f2;
+        }
+
+        .no-requests {
+            font-style: italic;
+            color: #777;
+        }
+
+        .admin-actions ul {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 15px;
+        }
+
+        .admin-actions ul li {
+            margin-bottom: 10px;
+        }
+
+        .admin-actions ul li a {
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        .admin-actions ul li a:hover {
+            color: #0056b3;
+        }
+
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 1em 0;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .pickup-ready {
+            background-color: #ffdddd !important;
+        }
+
+        .pickup-ready span {
+            color: green !important;
+            font-weight: bold;
+        }
+
+        .done-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.3s ease;
+        }
+
+        .done-button:hover {
+            background-color: #0056b3;
+        }
+
+        .status-flag {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border: 1px solid #ccc;
+            background-color: white;
+            margin-left: 5px;
+            border-radius: 50%;
+            vertical-align: middle;
+        }
+
+        .status-flag.done {
+            background-color: green;
+            border-color: green;
+        }
+
+        .request-row.done-row {
+            background-color: #e0f7de !important;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Admin Dashboard - MSC Book Collection</h1>
+    </header>
+
+    <div class="navbar">
+        <ul>
+            <li><a href="index.html">Logout</a></li>
+        </ul>
+    </div>
+
+    <div class="dashboard-container">
+        <h2>Current Borrow Requests</h2>
+        <table id="borrowRequests">
+            <thead>
+                <tr>
+                    <th>Actions</th>
+                    <th>Request ID</th>
+                    <th>Book Name</th>
+                    <th>Genre</th>
+                    <th>Borrower Name</th>
+                    <th>Duration</th>
+                    <th>Pickup In</th>
+                    <th>Signature</th>
+                </tr>
+            </thead>
+            <tbody id="requestList">
+                <tr>
+                    <td colspan="8" class="no-requests">No pending borrow requests.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+<p style="color: F2F2F2; text-align:center; font-style:italic">*White boxes either need to be dropped off, or have not expired yet. Check the dates to ensure this.</p>
+
+<div class="dashboard-container">
+<h2>How to add book</h2>
+<p>
+<textarea id="myInput" rows="10" cols="60" readonly style="white-space: pre-wrap; font-family: monospace;">
+        <div class="book-profile" data-genre="Fiction" data-title="The Secret Garden">
+            <h3>The Secret Garden</h3>
+            <p><strong>Author:</strong> Frances Hodgson Burnett</p>
+            <p><strong>Synopsis:</strong> A young, orphaned girl is sent to live with her uncle in a large, isolated house where she discovers a hidden, neglected garden.</p>
+            <p><span class="genre">Genre:</span> Fiction</p>
+            <p><span class="grade-level">Grade Level:</span> 3-7</p>
+            <p><span class="anchorLinkLearnMore">Learn More:</span> <a href="#">Book Profile</a>
+        </div>
+    </div>
+</textarea>
+<button onclick="myFunction()">Copy text</button>
+</p>
+<p>
+Copy the code above and paste it BELOW the last book profile. For access to the code visit our GitHub repositories (https://github.com/Base64-Encoded-Entity).
+</p>
+</div>
+    <footer>
+        <p>&copy; 2025 MSC Book Collection - Admin Area</p>
+    </footer>
+
+    <script>
+        const requestList = document.getElementById('requestList');
+        const localStorageKey = 'borrowRequests';
+
+        function calculatePickupTime(borrowDuration, timestamp) {
+            const requestDate = new Date(timestamp);
+            let pickupDate = new Date(requestDate);
+
+            switch (borrowDuration) {
+                case '1_day':
+                    pickupDate.setDate(requestDate.getDate() + 1);
+                    break;
+                case '3_days':
+                    pickupDate.setDate(requestDate.getDate() + 3);
+                    break;
+                case '1_week':
+                    pickupDate.setDate(requestDate.getDate() + 7);
+                    break;
+                case '2_weeks':
+                    pickupDate.setDate(requestDate.getDate() + 14);
+                    break;
+                case '3_weeks':
+                    pickupDate.setDate(requestDate.getDate() + 21);
+                    break;
+                case '4_weeks':
+                    pickupDate.setDate(requestDate.getDate() + 28);
+                    break;
+                default:
+                    return null;
+            }
+            return pickupDate;
+        }
+
+        function updateCountdown(pickupDateCell, pickupDate) {
+            const now = new Date();
+            const timeLeft = pickupDate.getTime() - now.getTime();
+
+            if (timeLeft <= 0) {
+                pickupDateCell.innerHTML = '<span style="color: green; font-weight: bold;">PICK UP TIME!</span>';
+                pickupDateCell.parentElement.classList.add('pickup-ready');
+            } else {
+                const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+                pickupDateCell.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+            }
+        }
+
+        function toggleDone(requestId, button, flag) {
+            const storedRequests = JSON.parse(localStorage.getItem(localStorageKey)) || [];
+
+            if (storedRequests[requestId]) {
+                storedRequests[requestId].done = !storedRequests[requestId].done;
+                localStorage.setItem(localStorageKey, JSON.stringify(storedRequests));
+                loadBorrowRequests();
+            }
+        }
+
+        function loadBorrowRequests() {
+            const storedRequests = JSON.parse(localStorage.getItem(localStorageKey)) || [];
+
+            requestList.innerHTML = '';
+
+            if (storedRequests.length === 0) {
+                const noRequestsRow = requestList.insertRow();
+                const noRequestsCell = noRequestsRow.insertCell();
+                noRequestsCell.colSpan = 8;
+                noRequestsCell.classList.add('no-requests');
+                noRequestsCell.textContent = 'No pending borrow requests.';
+                return;
+            }
+
+            storedRequests.forEach((request, index) => {
+                const row = requestList.insertRow();
+                row.classList.add('request-row');
+                if (request.done) {
+                    row.classList.add('done-row');
+                }
+
+                
+                const actionsCell = row.insertCell();
+                const doneButton = document.createElement('button');
+                doneButton.textContent = 'Mark as DONE';
+                doneButton.classList.add('done-button');
+                const statusFlag = document.createElement('span');
+                statusFlag.classList.add('status-flag');
+                statusFlag.innerHTML = '&#x25CB;';
+
+                if (request.done) {
+                    statusFlag.classList.add('done');
+                    statusFlag.innerHTML = '&#x25CF;';
+                }
+
+                doneButton.addEventListener('click', () => {
+                    toggleDone(index, doneButton, statusFlag);
+                });
+
+                actionsCell.appendChild(doneButton);
+                actionsCell.appendChild(statusFlag);
+
+                row.insertCell().textContent = index + 1;
+                row.insertCell().textContent = request.bookName;
+                row.insertCell().textContent = request.genre || 'N/A';
+                row.insertCell().textContent = request.borrowerName;
+                row.insertCell().textContent = request.borrowDuration.replace('_', ' ');
+                const pickupDateCell = row.insertCell();
+                const pickupDate = calculatePickupTime(request.borrowDuration, request.timestamp);
+                if (pickupDate) {
+                    updateCountdown(pickupDateCell, pickupDate);
+                    setInterval(() => updateCountdown(pickupDateCell, pickupDate), 1000);
+                } else {
+                    pickupDateCell.textContent = 'Invalid Duration';
+                }
+                row.insertCell().textContent = request.signature;
+
+                
+                const pickupCell = row.cells[6];
+                if (pickupCell && pickupCell.textContent.includes('PICK UP TIME!') && !request.done) {
+                    statusFlag.style.backgroundColor = 'green';
+                    statusFlag.style.borderColor = 'green';
+                    statusFlag.innerHTML = '&#x25CF;';
+                }
+            });
+        }
+
+        loadBorrowRequests();
+
+function myFunction() {
+  var copyText = document.getElementById("myInput");
+  copyText.select();
+  copyText.setSelectionRange(0, 99999);
+
+  navigator.clipboard.writeText(copyText.value);
+  alert("Copied The Code To Clipboard!");
+}
+    </script>
+</body>
+</html>

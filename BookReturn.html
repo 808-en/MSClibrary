@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Book Return</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f8f8;
+            color: #333;
+        }
+
+        header {
+            background-color: #333;
+            color: white;
+            padding: 1em 0;
+            text-align: center;
+        }
+
+        .navbar {
+            background-color: #ddd;
+            padding: 0.5em 0;
+            text-align: center;
+        }
+
+        .navbar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: inline-block;
+        }
+
+        .navbar li {
+            display: inline;
+            margin: 0 15px;
+        }
+
+        .navbar a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+            padding: 8px 12px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .navbar a:hover {
+            background-color: #bbb;
+        }
+
+        .dashboard-container {
+            width: 90%;
+            margin: 20px auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #333;
+            margin-top: 0;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        #borrowRequests {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        #borrowRequests th, #borrowRequests td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        #borrowRequests th {
+            background-color: #f2f2f2;
+        }
+
+        .no-requests {
+            font-style: italic;
+            color: #777;
+        }
+
+        .admin-actions ul {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 15px;
+        }
+
+        .admin-actions ul li {
+            margin-bottom: 10px;
+        }
+
+        .admin-actions ul li a {
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        .admin-actions ul li a:hover {
+            color: #0056b3;
+        }
+
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 1em 0;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+.Forum {
+    background-color: white;
+    padding: 20px;
+    margin: 20px auto;
+    width: 80%;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: center; /* Center the button */
+}
+
+.Forum Long {
+    background-color:#000000;
+    margin: 20px auto;
+    width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: center; /* Center the button */
+transform: translate(-50%)
+}
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Book Return</h1>
+    </header>
+    <div class="navbar">
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li>
+                <select class="genre-choice">
+                    <option selected>Genres</option>
+                    <option>Action-Adventure</option>
+                    <option>Science Fiction</option>
+                    <option>Mystery-Horror</option>
+                    <option>Fantasy</option>
+                    <option>Historical Fiction</option>
+                    <option>Informational Text</option>
+                    <option>Biography</option>
+                    </select>
+            </li>
+            <li><a href="BookReturn.html">Book Return</a></li>
+            <li><a href="HelpForum.html">Help</a></li>
+            <li><a href="LoginFork.html" id="ForkedLogin">Login</a></li>
+        </ul>
+    </div>
+
+            <div class="Forum">
+                <h2>What To Do</h2>
+                <p>To return a book to the MSC Library, you can put your book in the return box (located outside of rooms 5 and 10) and a pickup crew wil come pckup the book(s) on the following days.</p>
+            </div>
+            <div class="Forum Long">
+                <h2>When We Pick Up/Deliver</h2>
+                <img src="IMG_3891.jpg">
+            </div>
+    <footer>
+        <p>&copy; 2024 <span>coding credit: Atticus Herr</span></p>
+    </footer>
+</body>
+</html>

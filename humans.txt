@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<head>
+<style>
+
+body{
+background-color:black;
+color:white;
+font-size:30px;
+text-align:center;
+}
+
+b{
+font-size:50px;
+text-align:center;
+}
+
+.disclaimer{
+color:#FF0000;
+}
+
+.Warning{
+color:#FF5349;
+}
+
+.indent{
+font-size:60px;
+}
+
+</style>
+</head>
+<body>
+<li>Coding Credit: Atticus Herr</li>
+
+<li><p>Shoutout: Mr. Iyaka</p></li>
+
+<li><p><b>Class of Fifth Grade, 2024-2025</b></p></li>
+
+<li><p>Header image: Armaan Prasad</p></li>
+<li><p>Books property of Mrs. Jennifer Beck (5th grade homeroom teacher, ELA, Apple Certified)</p></li>
+<li><p>Online book files property of Atticus Herr</p></li>
+<li><p>Online book files brought to you by...</p></li>
+<li><p><i>Archive.org</i></p></li>
+
+<p class="disclaimer">In no way is <code>Archive.org</code> affiliated with msclibrary.com.</p>
+
+<p class="indent">-----------------------------------------------------</p>
+
+<li><p>Website code, files, and anything else affiliated with msclibrary.com copyright &copy; Atticus Herr, all rights reserved.</p></li>
+
+
+<footer>
+Copyright &copy; Atticus Herr -- <code>humans.txt</code>
+<p class="Warning"><code>humans.txt</code> is for human audiences only.</p>
+</footer>
+</body>
+</html>

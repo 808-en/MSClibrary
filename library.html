@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MSC Book Library</title>
+    <script src="https://kit.fontawesome.com/cd38709ddf.js" crossorigin="anonymous"></script>
+    <style>
+        /* Inlined library.css content */
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding-top: 100px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        .fixed-search-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%; /* Changed to 100% for full width responsiveness */
+            background-color: #ddd;
+            padding: 10px 20px; /* Added horizontal padding */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* Distribute items */
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+            box-sizing: border-box; /* Include padding in width */
+        }
+
+        .genre-filter {
+            margin-right: 15px;
+            flex-shrink: 0; /* Prevent shrinking */
+        }
+
+        .search-input-container {
+            display: flex;
+            flex-grow: 1;
+            align-items: center;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            overflow: hidden;
+            max-width: 400px; /* Limit search input width */
+        }
+
+        .search-input {
+            padding: 8px;
+            border: none;
+            outline: none;
+            flex-grow: 1;
+        }
+
+        .search-button {
+            background: none;
+            border: none;
+            padding: 8px 10px;
+            cursor: pointer;
+        }
+
+        .search-button img {
+            width: 20px;
+            height: 20px;
+        }
+
+        .add-button-container {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 101;
+        }
+
+        .add-button {
+            background-color: green;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 1.5em;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .tab-container {
+            background-color: #f0f0f0;
+            display: flex;
+            border-bottom: 1px solid #ccc;
+            width: 75%;
+            margin: 60px auto 0;
+        }
+
+        .tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            border: none;
+            background-color: transparent;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .bookList {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsive grid */
+            gap: 20px;
+            padding: 20px;
+            margin-top: 120px; /* Space for fixed search bar */
+            width: 90%; /* Adjusted for better responsiveness */
+            max-width: 1200px; /* Max width for large screens */
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .book-profile {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 10px; /* More rounded corners */
+            padding: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Stronger shadow */
+            display: flex; /* Use flexbox for layout inside book-profile */
+            align-items: flex-start; /* Align items to the top */
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .book-profile:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .book-cover-thumbnail {
+            width: 100px; /* Fixed width for thumbnail */
+            height: 150px; /* Fixed height for thumbnail */
+            object-fit: cover; /* Ensure image covers the area */
+            border-radius: 5px;
+            margin-right: 15px; /* Space between image and text */
+            flex-shrink: 0; /* Prevent image from shrinking */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+        }
+
+        .book-info {
+            flex-grow: 1; /* Allow text content to take remaining space */
+        }
+
+        .book-profile h3 {
+            margin-top: 0;
+            color: #337ab7;
+            font-size: 1.4em; /* Slightly larger title */
+        }
+
+        .book-profile p {
+            margin-bottom: 5px;
+            line-height: 1.4;
+        }
+
+        .genre {
+            font-style: italic;
+            color: #777;
+        }
+
+        .grade-level {
+            font-weight: bold;
+            color: #555;
+        }
+
+        .add-book-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 102;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .add-book-form {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 80%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .add-book-form h2 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #333;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input[type="text"],
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        .form-group select {
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg fill="currentColor" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>');
+            background-repeat: no-repeat;
+            background-position-x: 95%;
+            background-position-y: 50%;
+            padding-right: 30px;
+        }
+
+        .form-group button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        .form-group button:hover {
+            background-color: #0056b3;
+        }
+
+        .close-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1.5em;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: #777;
+        }
+
+        .close-button:hover {
+            color: #333;
+        }
+
+        .top-bar {
+            text-align: center;
+            list-style: none;
+            background-color: #333333;
+            color: #000000;
+            padding: 10px 0;
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .top-bar ul { /* Added styling for top-bar ul */
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .top-bar li { /* Added styling for top-bar li */
+            margin: 0 15px;
+        }
+
+        .top-bar span {
+            display: inline-block;
+            margin: 0 10px;
+        }
+
+        .top-bar-link {
+            font-size: 30px;
+            color: white;
+            text-decoration: none;
+        }
+
+        #top-bar-link-1 {}
+
+        #top-bar-link-2 {}
+
+        .zoominButton {
+            background-color: #00dd00;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .zoominButton:hover {
+            background-color: #00aa00;
+        }
+
+        .book-profile-content {
+            text-align: center;
+        }
+
+        .book-profile-content img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .pagination-button {
+            padding: 10px 20px;
+            margin: 0 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            cursor: pointer;
+        }
+
+        .pagination-button:hover {
+            background-color: #eee;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 20px;
+            background-color: #333;
+            color: white;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+
+        /* Responsive adjustments for fixed search bar */
+        @media (max-width: 768px) {
+            .fixed-search-bar {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 10px;
+            }
+
+            .genre-filter {
+                width: 100%;
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+
+            .genre-filter select {
+                width: 100%;
+                padding: 10px;
+                border-radius: 5px;
+                border: 1px solid #ccc;
+                box-sizing: border-box;
+            }
+
+            .search-input-container {
+                width: 100%;
+                max-width: none;
+            }
+
+            .search-input {
+                padding: 10px;
+            }
+
+            .bookList {
+                grid-template-columns: 1fr; /* Stack books on small screens */
+                width: 95%;
+                padding: 10px;
+            }
+
+            .book-profile {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .book-cover-thumbnail {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+
+            .book-info {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <ul>
+            <li><a href="index.html">Home</a></li>
+        </ul>
+    </div>
+
+    <div class="fixed-search-bar">
+        <div class="genre-filter">
+            <select id="genreSelect">
+                <option value="">All Genres</option>
+                <option value="Science Fiction">Science Fiction</option>
+                <option value="Fantasy">Fantasy</option>
+                <option value="Education">Education</option>
+                <option value="Mystery Horror">Mystery Horror</option>
+                <option value="Info Text">Informational Text</option>
+                <option value="Biography">Biography</option>
+                <option value="Action Adventure">Action Adventure</option>
+                <option value="Fiction">Fiction</option> <!-- Added Fiction option -->
+            </select>
+        </div>
+        <div class="search-input-container">
+            <input type="text" id="searchInput" class="search-input" placeholder="Search books here">
+            <button class="search-button">
+                <i class="fa fa-search" alt="Search" aria-hidden="true"></i>
+            </button>
+        </div>
+    </div>
+
+    <div id="bookList">
+        <!-- Existing book profile (example, will be managed by JS) -->
+        <!--
+        <div class="book-profile" data-genre="Fiction" data-title="The Secret Garden" data-metaname="secret-garden">
+            <img src="https://placehold.co/150x200?text=Book+Cover" alt="Book Cover" class="book-cover-thumbnail">
+            <div class="book-info">
+                <h3>The Secret Garden</h3>
+                <p><strong>Author:</strong> Frances Hodgson Burnett</p>
+                <p><strong>Synopsis:</strong> A young, orphaned girl is sent to live with her uncle in a large, isolated house where she discovers a hidden, neglected garden.</p>
+                <p><span class="genre">Genre:</span> Fiction</p>
+                <p><span class="grade-level">Grade Level:</span> 3-7</p>
+                <p><span class="anchorLinkLearnMore">Learn More:</span> <a href="index.html">Book Profile</a></p>
+            </div>
+        </div>
+        -->
+    </div>
+
+    <div id="imageContainer" class="hidden">
+    </div>
+
+    <!-- The Add Book Overlay will still be present but managed by admin_script.js -->
+    <div id="addBookOverlay" class="add-book-overlay">
+        <div class="add-book-form">
+            <span class="close-button" id="closeAddBookForm">&times;</span>
+            <h2>Add New Book (from Library Page)</h2>
+            <form id="addBookForm">
+                <div class="form-group">
+                    <label for="bookCover">Book Cover Image URL:</label>
+                    <input type="text" id="bookCover" required placeholder="e.g., https://placehold.co/150x200">
+                </div>
+                <div class="form-group">
+                    <label for="bookTitleAdd">Book Title:</label>
+                    <input type="text" id="bookTitleAdd" required placeholder="e.g., The Adventures of Tom Sawyer">
+                </div>
+                <div class="form-group">
+                    <label for="author">Book Author:</label>
+                    <input type="text" id="author" required placeholder="e.g., Mark Twain">
+                </div>
+                <div class="form-group">
+                    <label for="genre">Genre:</label>
+                    <select id="genre" required>
+                        <option value="">Select Genre</option>
+                        <option value="Science Fiction">Science Fiction</option>
+                        <option value="Fantasy">Fantasy</option>
+                        <option value="Education">Education</option>
+                        <option value="Mystery Horror">Mystery Horror</option>
+                        <option value="Info Text">Informational Text</option>
+                        <option value="Biography">Biography</option>
+                        <option value="Action Adventure">Action Adventure</option>
+                        <option value="Fiction">Fiction</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="synopsis">Synopsis:</label>
+                    <textarea id="synopsis" rows="4" required placeholder="A brief summary of the book..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="gradeLevelAdd">Grade Level:</label>
+                    <input type="text" id="gradeLevelAdd" placeholder="e.g., 5-8">
+                </div>
+                <div class="form-group">
+                    <label for="metaNameAdd">Meta Name (for search):</label>
+                    <input type="text" id="metaNameAdd" placeholder="e.g., tom-sawyer-adventure">
+                </div>
+                <button type="submit">Add Book</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        /* Inlined library.js content */
+        //Copyright Atticus Herr 2024
+        //Special Thanks: w3schools.com for outlining of JS syntax
+
+        const searchInput = document.getElementById('searchInput');
+        const genreSelect = document.getElementById('genreSelect');
+        const bookList = document.getElementById('bookList');
+
+        // Add Book Overlay elements (from library.html, still managed by library.js for the main library page)
+        const addBookButton = document.querySelector('.add-button'); // Assuming this button is still on library.html
+        const addBookOverlay = document.getElementById('addBookOverlay');
+        const closeAddBookForm = document.getElementById('closeAddBookForm');
+        const addBookForm = document.getElementById('addBookForm'); // This is the form in library.html
+
+        const tabContainer = document.querySelector('.tab-container'); // This might not exist in the new library.html, but keeping for compatibility
+        const tabs = document.querySelectorAll('.tab'); // Same as above
+        const imageContainer = document.getElementById('imageContainer'); // Same as above
+
+        // Key for local storage for book data, consistent with admin_script.js
+        const BOOKS_STORAGE_KEY = 'libraryBooks';
+
+        /**
+         * Filters books displayed on the page based on search term, genre, and meta name.
+         */
+        function filterBooks() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const selectedGenre = genreSelect.value;
+            const books = bookList.querySelectorAll('.book-profile');
+
+            books.forEach(book => {
+                const title = book.dataset.title.toLowerCase();
+                const genre = book.dataset.genre;
+                const synopsis = book.dataset.synopsis.toLowerCase(); // Get synopsis from data attribute
+                const author = book.dataset.author.toLowerCase(); // Get author from data attribute
+                const metaName = book.dataset.metaname ? book.dataset.metaname.toLowerCase() : ''; // New: Get metaName from data attribute
+
+                const titleMatch = title.includes(searchTerm);
+                const synopsisMatch = synopsis.includes(searchTerm);
+                const authorMatch = author.includes(searchTerm);
+                const metaNameMatch = metaName.includes(searchTerm); // New: Match against meta name
+                const genreMatch = selectedGenre === "" || genre === selectedGenre;
+
+                // Combine all search criteria
+                if ((titleMatch || synopsisMatch || authorMatch || metaNameMatch) && genreMatch) {
+                    book.style.display = 'flex'; // Display as flex to maintain layout
+                } else {
+                    book.style.display = 'none';
+                }
+            });
+        }
+
+        searchInput.addEventListener('input', filterBooks);
+        genreSelect.addEventListener('change', filterBooks);
+
+
+        /**
+         * Loads books from local storage and displays them in the bookList.
+         */
+        function loadAndDisplayBooks() {
+            bookList.innerHTML = ''; // Clear existing books
+            const existingBooks = JSON.parse(localStorage.getItem(BOOKS_STORAGE_KEY)) || [];
+
+            if (existingBooks.length === 0) {
+                bookList.innerHTML = '<p style="text-align: center; color: #777; margin-top: 50px;">No books available in the library yet.</p>';
+                return;
+            }
+
+            existingBooks.forEach(book => {
+                const newBookElement = document.createElement('div');
+                newBookElement.classList.add('book-profile');
+                // Add data attributes for filtering
+                newBookElement.dataset.genre = book.genre;
+                newBookElement.dataset.title = book.bookTitle;
+                newBookElement.dataset.author = book.author;
+                newBookElement.dataset.synopsis = book.synopsis;
+                newBookElement.dataset.gradelevel = book.gradeLevel || 'N/A';
+                newBookElement.dataset.metaname = book.metaName || '';
+
+
+                newBookElement.innerHTML = `
+                    <img src="${book.bookCover || 'https://placehold.co/100x150?text=No+Cover'}" alt="Book Cover" class="book-cover-thumbnail" onerror="this.onerror=null;this.src='https://placehold.co/100x150?text=No+Cover';">
+                    <div class="book-info">
+                        <h3>${book.bookTitle}</h3>
+                        <p><strong>Author:</strong> ${book.author}</p>
+                        <p><strong>Synopsis:</strong> ${book.synopsis}</p>
+                        <p><span class="genre">Genre:</span> ${book.genre}</p>
+                        <p><span class="grade-level">Grade Level:</span> ${book.gradeLevel || 'N/A'}</p>
+                    </div>
+                `;
+                bookList.appendChild(newBookElement);
+            });
+
+            // Apply filters after loading all books
+            filterBooks();
+        }
+
+        // Initial load of books when the library page loads
+        document.addEventListener('DOMContentLoaded', loadAndDisplayBooks);
+
+
+        // --- Add Book from Library Page (Existing functionality, slightly adapted) ---
+        // This section handles the "Add Book" button if it's still present on library.html
+        // and is separate from the admin panel's add book functionality.
+
+        // Check if the add book button exists on THIS page (library.html)
+        if (addBookButton) {
+            addBookButton.addEventListener('click', (event) => {
+                event.preventDefault();
+                // This logic seems to redirect to login.html to show the form.
+                // It should probably just open the modal directly if the user is already on library.html
+                // For now, I'll keep the existing redirection logic as it implies a login flow
+                // for adding books directly from the user-facing library.
+                localStorage.setItem('redirectAfterLogin', 'library.html');
+                localStorage.setItem('showAddBookForm', 'true'); // Flag to show form after login
+                // Assuming 'login.html' handles the actual login and then redirects back.
+                // If there's no login, this needs to be changed to just show the modal.
+                window.location.href = 'login.html'; // Assuming a login page exists
+            });
+        }
+
+        // Event listener for closing the Add Book form on the library page
+        if (closeAddBookForm) {
+            closeAddBookForm.addEventListener('click', () => {
+                addBookOverlay.style.display = 'none';
+            });
+        }
+
+
+        // Event listener for submitting the Add Book form on the library page
+        if (addBookForm) {
+            addBookForm.addEventListener('submit', (event) => {
+                event.preventDefault(); // Prevent default form submission
+
+                // Get values from the form on library.html
+                const bookCover = document.getElementById('bookCover').value;
+                const bookTitle = document.getElementById('bookTitleAdd').value; // Changed ID to avoid conflict
+                const author = document.getElementById('author').value;
+                const genre = document.getElementById('genre').value;
+                const synopsis = document.getElementById('synopsis').value;
+                const gradeLevel = document.getElementById('gradeLevelAdd').value; // New field
+                const metaName = document.getElementById('metaNameAdd').value; // New field
+
+                const newBook = {
+                    bookCover,
+                    bookTitle,
+                    author,
+                    genre,
+                    synopsis,
+                    gradeLevel, // Include new field
+                    metaName: metaName.toLowerCase().replace(/\s/g, '-') // Include new field, format it
+                };
+
+                let existingBooks = JSON.parse(localStorage.getItem(BOOKS_STORAGE_KEY)) || [];
+                existingBooks.push(newBook);
+                localStorage.setItem(BOOKS_STORAGE_KEY, JSON.stringify(existingBooks));
+
+                addBookOverlay.style.display = 'none'; // Hide modal
+                addBookForm.reset(); // Clear form
+
+                loadAndDisplayBooks(); // Refresh the list of displayed books
+            });
+        }
+
+        // Check if a redirect happened and if the add book form should be shown
+        document.addEventListener('DOMContentLoaded', () => {
+            const showAddBookFormFlag = localStorage.getItem('showAddBookForm');
+            if (showAddBookFormFlag === 'true' && addBookOverlay) {
+                addBookOverlay.style.display = 'flex';
+                localStorage.removeItem('showAddBookForm'); // Clear the flag
+            }
+            loadAndDisplayBooks(); // Ensure books are loaded on DOMContentLoaded
+        });
+
+
+        // --- Tab Handling (Existing Code, assuming tabs are still used for imageContainer) ---
+        function handleTabClick(event) {
+            const clickedTab = event.target;
+            const tabId = clickedTab.dataset.tab;
+
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+            clickedTab.classList.add('active');
+
+            if (tabId === 'bookInfo') {
+                bookList.style.display = 'grid'; // Changed to grid to match new layout
+                imageContainer.style.display = 'none';
+                filterBooks(); // Re-apply filters if switching back to book info
+            } else if (tabId === 'bookImages') {
+                bookList.style.display = 'none';
+                imageContainer.style.display = 'flex';
+                displayBookImages(); // Assuming this function exists for displaying images
+            }
+        }
+
+        // Attach event listeners to tabs if they exist
+        if (tabs && tabContainer) {
+            tabs.forEach(tab => {
+                tab.addEventListener('click', handleTabClick);
+            });
+        }
+
+        // Placeholder for displayBookImages if it's not defined elsewhere
+        function displayBookImages() {
+            // Implement logic to display images if the 'Book Images' tab is used
+            // For now, it will just show an empty container or existing image elements.
+            console.log("Displaying book images (functionality not fully implemented here).");
+        }
+    </script>
+</body>
+</html>

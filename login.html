@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MSC Book Collection Admin Login</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .login-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+            text-align: left;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="password"] {
+            width: calc(100% - 16px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .login-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            width: 100%;
+        }
+
+        .login-button:hover {
+            background-color: #0056b3;
+        }
+
+        .error-message {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2>Admin Login</h2>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username">
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password">
+            </div>
+            <button type="submit" class="login-button">Log In</button>
+            <div id="errorMessage" class="error-message" style="display: none;">Invalid username or password.</div>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault(); 
+
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+            const errorMessageDiv = document.getElementById('errorMessage');
+
+            const enteredUsername = usernameInput.value;
+            const enteredPassword = passwordInput.value;
+
+const validCredentials = {
+    '5thGrade': 'Mrs.Beck',
+    'UserAlp1': 'CodeBet2',
+    'UserGam3': 'CodeDel4',
+    'UserEpsl5': 'CodeZeta6',
+    'UserEta7': 'CodeThet8',
+    'UserIota9': 'CodeKapp10',
+    'UserLamd11': 'CodeMu12',
+    'UserNu13': 'CodeXi14',
+    'UserOmic15': 'CodePi16',
+    'UserRho17': 'CodeSigm18',
+    'UserTau19': 'CodeUpsi20',
+    'UserPhi21': 'CodeChi22',
+    'UserPsi23': 'CodeOmeg24',
+    'UserYen25': 'CodeYen26',
+    'UserPound27': 'CodePound28',
+    'UserEuro29': 'CodeEuro30',
+    'UserRupee31': 'CodeRup32',
+    'UserWon33': 'CodeWon34',
+    'UserFranc35': 'CodeFran36',
+    'UserDinar37': 'CodeDina38',
+    'UserLira39': 'CodeLira40',
+    'UserPeso41': 'CodePeso42',
+    'UserRuble43': 'CodeRubl44',
+    'UserKrone45': 'CodeKron46',
+    'UserZloty47': 'CodeZlot48',
+    'UserBaht49': 'CodeBaht50',
+    'UserRingg51': 'CodeRing52',
+    'UserDirh53': 'CodeDirh54',
+    'UserRand55': 'CodeRand56',
+    'UserForint57': 'CodeFori58',
+    'UserKrona59': 'CodeKrona60',
+    'UserLeu61': 'CodeLeu62',
+    'UserDram63': 'CodeDram64',
+    'UserCedi65': 'CodeCedi66',
+    'UserNaira67': 'CodeNair68',
+    'UserShill69': 'CodeShil70',
+    'UserQuetz71': 'CodeQuet72',
+    'UserColon73': 'CodeColo74',
+    'UserBoliv75': 'CodeBoli76',
+    'UserGuara77': 'CodeGuar78'
+};
+
+            if (validCredentials[enteredUsername] && validCredentials[enteredUsername] === enteredPassword) {
+                // Redirect to the admin panel upon successful login
+                window.location.href = 'admin.html'; 
+            } else {
+                errorMessageDiv.style.display = 'block';
+                usernameInput.value = '';
+                passwordInput.value = '';
+            }
+        });
+    </script>
+</body>
+</html>

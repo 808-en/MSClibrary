@@ -1,0 +1,445 @@
+
+  /* Copyright Atticus Herr 2024 */
+
+  body {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #333;
+  }
+
+  header {
+    background-color: #333;
+    color: white;
+    padding: 1em 0;
+    text-align: center;
+  }
+
+  .navbar {
+    background-color: #ddd;
+    padding: 0.5em 0;
+    text-align: center;
+    color: black;
+  }
+
+  .navbar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: inline-block;
+  }
+
+  .navbar li {
+    display: inline;
+    margin: 0 15px;
+  }
+
+  .navbar a {
+    text-decoration: none;
+    color: black;
+    font-weight: bold;
+    padding: 8px 12px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+  }
+
+  .navbar a:hover {
+    background-color: #bbb;
+  }
+
+  .navbar2 {
+    background-color: #333;
+    color: black;
+    padding: 0.5em 0;
+    text-align: center;
+    position: relative;
+  }
+
+  .navbar2 ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: inline-block;
+  }
+
+  .navbar2 li {
+    display: inline;
+    margin: 0 15px;
+  }
+
+  .navbar2 a {
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+    padding: 8px 12px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+  }
+
+  .navbar2 a:hover {
+    background-color: #111;
+  }
+
+  .container {
+    position: relative;
+    width: 90%;
+    margin: 20px auto;
+    overflow: hidden;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+
+  .container img {
+    width: 100%;
+    display: block;
+  }
+
+  .centered {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 15px 25px;
+    border-radius: 8px;
+    font-size: 2em;
+    text-align: center;
+  }
+
+  .body-containers-items {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 90%;
+    margin: 20px auto;
+  }
+
+  .latest-update,
+  .book-of-the-month,
+  .delivery-chart,
+  .credits,
+  .explore-section,
+  .online-books-container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+
+  .latest-update h2,
+  .book-of-the-month h2,
+  .delivery-chart h2,
+  .credits h2,
+  .explore-section h2,
+  .online-books-container h2 {
+    color: #333;
+    margin-top: 0;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+  }
+
+  .book-of-the-month article {
+    padding-left: 20px;
+  }
+
+  footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 1em 0;
+    position: sticky;
+    bottom: 0;
+    width: 100%;
+  }
+
+  footer span {
+    color: #ff8c00;
+  }
+
+  .delivery-chart table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 15px;
+  }
+
+  .delivery-chart th,
+  .delivery-chart td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+
+  .delivery-chart th {
+    background-color: #f2f2f2;
+  }
+
+  .borrow-form-container {
+    background-color: white;
+    padding: 20px;
+    margin: 20px auto;
+    width: 80%;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+
+  .borrow-form-container h2 {
+    color: #333;
+    margin-top: 0;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+  }
+
+  .form-group {
+    margin-bottom: 15px;
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+
+  .form-group input[type="text"],
+  .form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+
+  .form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+    resize: vertical;
+  }
+
+  .form-group input[type="checkbox"] {
+    margin-right: 5px;
+  }
+
+  button[type="submit"],
+  button[type="button"] {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
+  }
+
+  button[type="submit"]:hover,
+  button[type="button"]:hover {
+    background-color: #0056b3;
+  }
+
+  #borrowFormOverlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 10;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .overlay-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 80%;
+    max-width: 600px;
+    position: relative;
+  }
+
+  .close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 1.5em;
+    cursor: pointer;
+    color: #555;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+
+  .close-button:hover {
+    color: #333;
+  }
+
+  #mainContent {}
+
+  #borrowFormOverlay.active {
+    display: flex;
+  }
+
+  #borrowFormOverlay.active ~ body > *:not(header):not(.navbar):not(.navbar2):not(footer) {
+    filter: blur(5px);
+  }
+
+  .update-log-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 10;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .update-log-modal.active {
+    display: flex;
+  }
+
+  .update-log-modal .modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+  }
+
+  .update-log-modal .close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 1.5em;
+    cursor: pointer;
+    color: #555;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+
+  .update-log-modal .close-button:hover {
+    color: #333;
+  }
+
+  .update-log-item {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+  }
+
+  .update-log-item h3 {
+    color: #333;
+    margin-top: 0;
+    margin-bottom: 10px;
+  }
+
+  .update-log-item .date {
+    color: #888;
+    font-size: 0.9em;
+    margin-bottom: 5px;
+  }
+
+  .update-log-modal iframe {
+    margin-bottom: 20px;
+  }
+
+  .online-books-container {
+    display: flex;
+    flex-direction: column;
+    /* Changed to column */
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 20px;
+    background-color: #e0f7fa;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .online-books-container.beta-feature::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: linear-gradient(45deg, rgba(0, 123, 255, 0.1) 0%,
+        rgba(255, 255, 255, 0.1) 50%,
+        rgba(0, 123, 255, 0.1) 100%);
+    background-size: 200% 200%;
+    animation: moveGradient 2s linear infinite;
+  }
+
+  @keyframes moveGradient {
+    0% {
+      background-position: 0% 0%;
+    }
+
+    100% {
+      background-position: 100% 100%;
+    }
+  }
+
+  .online-books-button {
+    background-color: #42a5f5;
+    color: white;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.2em;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+    z-index: 1;
+    width: fit-content;
+    /* Adjust width to content */
+    margin: 0 auto;
+    /* Center the button */
+    list-style: none;
+  }
+
+  .online-books-button ul {
+    list-style: none;
+  }
+
+  .online-books-button:hover {
+    background-color: #1e88e5;
+    transform: translateY(-2px);
+  }
+
+  .online-books-button:active {
+    background-color: #1565c0;
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  .beta-feature {
+    color: gold;
+    font-size: 1.5em;
+    z-index: 2;
+    text-align: center;
+    /* Center the crown */
+    margin-bottom: 10px;
+    /* Add space between crown and link */
+  }
