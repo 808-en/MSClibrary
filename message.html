@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome Newcomers!</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+            color: #333;
+            overflow: hidden; /* Prevent scrollbars from showing up unexpectedly */
+            position: relative; /* For absolute positioning of timer */
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+            box-sizing: border-box;
+            opacity: 1;
+            transition: opacity 1s ease-out;
+        }
+
+        .container.hidden {
+            opacity: 0;
+            pointer-events: none; /* Disable interactions when hidden */
+        }
+
+        h1 {
+            color: #2c3e50;
+            font-size: 2.8em;
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
+        }
+
+        p {
+            font-size: 1.2em;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .start-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .start-button:hover {
+            background-color: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .start-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .countdown-timer {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 0.9em;
+            font-weight: bold;
+            display: none; /* Hidden by default, shown when countdown starts */
+            z-index: 100;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+            p {
+                font-size: 1em;
+            }
+            .container {
+                padding: 30px;
+            }
+            .countdown-timer {
+                top: 10px;
+                left: 10px;
+                padding: 8px 12px;
+                font-size: 0.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="countdown-timer" id="countdownTimer">
+        Message disappearing in: <span id="timeRemaining"></span>
+    </div>
+
+    <div class="container" id="welcomeMessageContainer">
+        <h1>Welcome, Newcomers!</h1>
+        <p>We're thrilled to have you here. This special welcome message will be visible for two months from the moment you start the countdown. Enjoy exploring our collection!</p>
+        <button class="start-button" id="startButton">Start Countdown</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const welcomeMessageContainer = document.getElementById('welcomeMessageContainer');
+            const startButton = document.getElementById('startButton');
+            const countdownTimer = document.getElementById('countdownTimer');
+            const timeRemainingSpan = document.getElementById('timeRemaining');
+
+            // New localStorage keys
+            const START_TIME_KEY = 'mscWelcomeCountdownStartTime';
+            const MESSAGE_HIDDEN_KEY = 'mscWelcomeMessageHidden';
+
+            const COUNTDOWN_DURATION_MS = 60 * 24 * 60 * 60 * 1000; // Approximately 2 months in milliseconds (60 days)
+            let countdownInterval;
+
+            // Function to format time
+            function formatTime(ms) {
+                if (ms < 0) return "0d 0h 0m 0s";
+
+                const days = Math.floor(ms / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((ms % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((ms % (1000 * 60)) / 1000);
+
+                return `${days}d ${hours}h ${minutes}m ${seconds}s`;
+            }
+
+            // Function to update the countdown display
+            function updateCountdown() {
+                const startTime = localStorage.getItem(START_TIME_KEY);
+                const messageHidden = localStorage.getItem(MESSAGE_HIDDEN_KEY) === 'true';
+
+                if (messageHidden) {
+                    welcomeMessageContainer.classList.add('hidden');
+                    countdownTimer.style.display = 'none';
+                    clearInterval(countdownInterval);
+                    return;
+                }
+
+                if (startTime) {
+                    const startTimestamp = parseInt(startTime, 10);
+                    const endTime = startTimestamp + COUNTDOWN_DURATION_MS;
+                    const now = Date.now();
+                    const timeLeft = endTime - now;
+
+                    startButton.style.display = 'none'; // Hide start button once countdown has begun
+                    countdownTimer.style.display = 'block'; // Show timer
+
+                    if (timeLeft <= 0) {
+                        timeRemainingSpan.textContent = "0d 0h 0m 0s";
+                        welcomeMessageContainer.classList.add('hidden');
+                        countdownTimer.style.display = 'none';
+                        localStorage.setItem(MESSAGE_HIDDEN_KEY, 'true');
+                        clearInterval(countdownInterval); // Stop the countdown
+                    } else {
+                        timeRemainingSpan.textContent = formatTime(timeLeft);
+                    }
+                } else {
+                    // If no start time, and not hidden, show the start button
+                    startButton.style.display = 'block';
+                    countdownTimer.style.display = 'none';
+                }
+            }
+
+            // Event listener for the start button
+            startButton.addEventListener('click', () => {
+                // Only set start time if it's not already set
+                if (!localStorage.getItem(START_TIME_KEY)) {
+                    localStorage.setItem(START_TIME_KEY, Date.now().toString());
+                    localStorage.setItem(MESSAGE_HIDDEN_KEY, 'false'); // Ensure it's not marked as hidden
+                }
+                updateCountdown(); // Update immediately
+                countdownInterval = setInterval(updateCountdown, 1000); // Start interval
+            });
+
+            // Initial check and setup when the page loads
+            const initialStartTime = localStorage.getItem(START_TIME_KEY);
+            const initialMessageHidden = localStorage.getItem(MESSAGE_HIDDEN_KEY) === 'true';
+
+            if (initialMessageHidden) {
+                welcomeMessageContainer.classList.add('hidden');
+                countdownTimer.style.display = 'none';
+            } else if (initialStartTime) {
+                // If a start time exists, and message is not hidden, start the countdown
+                updateCountdown();
+                countdownInterval = setInterval(updateCountdown, 1000);
+            } else {
+                // Otherwise, show the start button
+                startButton.style.display = 'block';
+                countdownTimer.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

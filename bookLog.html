@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Book Log</title>
+<style>
+body {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+header {
+    background-color: #333;
+    color: white;
+    padding: 1em 0;
+    text-align: center;
+}
+
+.navbar {
+    background-color: #ddd;
+    padding: 0.5em 0;
+    text-align: center;
+}
+
+.navbar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: inline-block;
+}
+
+.navbar li {
+    display: inline;
+    margin: 0 15px;
+}
+
+.navbar a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    padding: 8px 12px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.navbar a:hover {
+    background-color: #bbb;
+}
+
+footer{
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 1em 0;
+    position: sticky;
+    bottom: 0;
+    width: 100%;
+}
+
+#updateLogContent{
+    text-align: center;
+    float: center;
+}
+
+h2{
+    text-align:center;
+}
+</style>
+</head>
+<body>
+<header><h1>
+Book Log
+</header></h1>
+    <div class="navbar">
+        <ul>
+            <li><a href="index.html">Home</a></li>
+        </ul>
+    </div>
+                <div id="updateLogModal" class="update-log-modal">
+                    <div class="modal-content">
+                        <span class="close-button" id="closeUpdateLog" href="index.html">&times;</span>
+                        <iframe src="ClockCETPST.html" style="width: 100%; height: 25%; border: none; margin-bottom: 10px;"></iframe>
+<h2>Books</h2>
+                        <div id="updateLogContent">
+<span><img src="UpdateIMG_IMG_3922.jpg"></span>
+<p><b>Name:</b></p>
+<p><b>Credit:</b></p>
+<p><b>Description:</b>All new books will appear here! Check in regularly to see what we have!</p>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+</body>
+<script src="script.js"></script>
+</html>

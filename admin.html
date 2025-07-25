@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="admin_style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        /* General modal styling */
         .modal {
             display: none;
             position: fixed;
@@ -99,6 +100,33 @@
         .delete-button:hover {
             background-color: #c82333;
         }
+
+        /* Chart specific styling to remove offset */
+        .dashboard-container {
+            margin: 20px auto; /* Center the container and add vertical margin */
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-width: 90%; /* Adjust max-width as needed */
+            box-sizing: border-box; /* Include padding in the element's total width and height */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
     </style>
 </head>
 <body>
@@ -142,18 +170,15 @@
             <button id="openAddBookModal" class="action-button">Add New Book</button>
             <button id="openDeleteBookModal" class="action-button delete-button">Delete Books</button>
             <button id="openBookOfTheMonthModal" class="action-button">Set Book of the Month</button>
+            <button id="openUpdateLatestUpdateModal" class="action-button">Update Latest Update</button>
         </div>
-    </div>
-
-    <div class="dashboard-container">
-        <p><h3>Staging File:</h3></p>
-        <a href="staging.books/staging.index.html">Click Here</a>
     </div>
 
     <footer>
         <p>&copy; 2025 MSC Book Collection - Admin Area</p>
     </footer>
 
+    <!-- Add Book Modal -->
     <div id="addBookModal" class="modal">
         <div class="modal-content">
             <span class="close-button" id="closeAddBookModal">&times;</span>
@@ -202,6 +227,7 @@
         </div>
     </div>
 
+    <!-- Delete Book Modal -->
     <div id="deleteBookModal" class="modal">
         <div class="modal-content">
             <span class="close-button" id="closeDeleteBookModal">&times;</span>
@@ -215,6 +241,7 @@
         </div>
     </div>
 
+    <!-- Book of the Month Modal -->
     <div id="bookOfTheMonthModal" class="modal">
         <div class="modal-content">
             <span class="close-button" id="closeBookOfTheMonthModal">&times;</span>
@@ -233,10 +260,26 @@
         </div>
     </div>
 
+    <!-- Update Latest Update Modal -->
+    <div id="updateLatestUpdateModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="closeUpdateLatestUpdateModal">&times;</span>
+            <h2>Update Latest Update</h2>
+            <form id="updateLatestUpdateForm">
+                <div class="form-group">
+                    <label for="latestUpdateText">Latest Update Message:</label>
+                    <textarea id="latestUpdateText" rows="4" required placeholder="e.g., New books added to the collection!"></textarea>
+                </div>
+                <button type="submit">Update Message</button>
+            </form>
+        </div>
+    </div>
+
     <script src="admin_script.js"></script>
     <script src="library.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // Book of the Month Modal Logic
             const openBookOfTheMonthModalBtn = document.getElementById('openBookOfTheMonthModal');
             const bookOfTheMonthModal = document.getElementById('bookOfTheMonthModal');
             const closeBookOfTheMonthModalBtn = document.getElementById('closeBookOfTheMonthModal');
@@ -250,6 +293,7 @@
                 bookOfTheMonthModal.style.display = 'none';
             });
 
+            // Close modal when clicking outside
             window.addEventListener('click', (event) => {
                 if (event.target == bookOfTheMonthModal) {
                     bookOfTheMonthModal.style.display = 'none';
@@ -261,9 +305,47 @@
                 const title = document.getElementById('botmTitle').value;
                 const author = document.getElementById('botmAuthor').value;
                 localStorage.setItem('bookOfTheMonth', JSON.stringify({ title, author }));
-                alert('Book of the Month updated successfully!');
+                // Replace alert with a custom message box or visual feedback
+                console.log('Book of the Month updated successfully!');
                 bookOfTheMonthModal.style.display = 'none';
                 bookOfTheMonthForm.reset();
+            });
+
+            // Latest Update Modal Logic
+            const openUpdateLatestUpdateModalBtn = document.getElementById('openUpdateLatestUpdateModal');
+            const updateLatestUpdateModal = document.getElementById('updateLatestUpdateModal');
+            const closeUpdateLatestUpdateModalBtn = document.getElementById('closeUpdateLatestUpdateModal');
+            const updateLatestUpdateForm = document.getElementById('updateLatestUpdateForm');
+            const latestUpdateTextInput = document.getElementById('latestUpdateText');
+
+            openUpdateLatestUpdateModalBtn.addEventListener('click', () => {
+                // Pre-fill with current latest update if available
+                const storedLatestUpdate = localStorage.getItem('latestUpdate');
+                if (storedLatestUpdate) {
+                    latestUpdateTextInput.value = storedLatestUpdate;
+                }
+                updateLatestUpdateModal.style.display = 'flex';
+            });
+
+            closeUpdateLatestUpdateModalBtn.addEventListener('click', () => {
+                updateLatestUpdateModal.style.display = 'none';
+            });
+
+            // Close modal when clicking outside
+            window.addEventListener('click', (event) => {
+                if (event.target == updateLatestUpdateModal) {
+                    updateLatestUpdateModal.style.display = 'none';
+                }
+            });
+
+            updateLatestUpdateForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+                const message = latestUpdateTextInput.value;
+                localStorage.setItem('latestUpdate', message);
+                // Replace alert with a custom message box or visual feedback
+                console.log('Latest Update message updated successfully!');
+                updateLatestUpdateModal.style.display = 'none';
+                updateLatestUpdateForm.reset();
             });
         });
     </script>

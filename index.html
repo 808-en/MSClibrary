@@ -45,9 +45,12 @@
             </div>
 
             <div class="body-containers-items">
+                <div style="text-align: center;">
+<iframe src="message.html" width="800" height="600"></iframe>
+                </div>
                 <div class="latest-update">
                     <h2 data-i18n="latestUpdate">Latest Update<i class="fa-solid fa-download"></i></h2>
-                    <p data-i18n="welcomeText">Welcome to the MSC School Library website!</p>
+                    <p id="latestUpdateDisplay" data-i18n="welcomeText">Welcome to the MSC School Library website!</p>
                 </div>
 
                 <div class="book-of-the-month">
@@ -103,6 +106,7 @@
         </section>
     </div>
 
+    <!-- Borrow Form Overlay -->
     <div id="borrowFormOverlay" class="overlay">
         <div class="overlay-content">
             <button type="button" class="close-button" id="closeBorrowForm">&times;</button>
@@ -147,6 +151,7 @@
     <script src="script.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // Book of the Month display logic
             const botmTitleDisplay = document.getElementById('botmTitleDisplay');
             const botmAuthorDisplay = document.getElementById('botmAuthorDisplay');
 
@@ -155,6 +160,13 @@
                 const { title, author } = JSON.parse(storedBookOfTheMonth);
                 botmTitleDisplay.innerHTML = `<strong>Title:</strong> ${title}`;
                 botmAuthorDisplay.innerHTML = `<strong>Author:</strong> ${author}`;
+            }
+
+            // Latest Update display logic
+            const latestUpdateDisplay = document.getElementById('latestUpdateDisplay');
+            const storedLatestUpdate = localStorage.getItem('latestUpdate');
+            if (storedLatestUpdate) {
+                latestUpdateDisplay.textContent = storedLatestUpdate;
             }
         });
     </script>
