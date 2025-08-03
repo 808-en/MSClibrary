@@ -32,6 +32,8 @@ font-size:60px;
 <li>Coding Credit: Atticus Herr</li>
 
 <li><p>Shoutout: Mr. Iyaka</p></li>
+<li><p>Thank you, Ms. Sam for the Cooper drawing:)</p></li>
+
 
 <li><p><b>Class of Fifth Grade, 2024-2025</b></p></li>
 
