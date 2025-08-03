@@ -115,7 +115,14 @@
 
     <div class="container" id="welcomeMessageContainer">
         <h1>Welcome, Newcomers!</h1>
-        <p>We're thrilled to have you here. This special welcome message will be visible for two months from the moment you start the countdown. Enjoy exploring our collection!</p>
+        <p>We're thrilled to have you here. Thank you very much for using this website and supporting MSC Online Books. Updates will continue coming in even after the 2024-2025 school year; generally coming in around every 2 months, some subtle; some dramatic. Enjoy exploring our collection!</p>
+        <p>Thank you very much
+        <li>Ms. Sam (for the Cooper drawing)</li>
+            <li>Mr.Iyaka</li>
+        
+        
+        
+        </p>
         <button class="start-button" id="startButton">Start Countdown</button>
     </div>
 
@@ -126,7 +133,7 @@
             const countdownTimer = document.getElementById('countdownTimer');
             const timeRemainingSpan = document.getElementById('timeRemaining');
 
-            // New localStorage keys
+        
             const START_TIME_KEY = 'mscWelcomeCountdownStartTime';
             const MESSAGE_HIDDEN_KEY = 'mscWelcomeMessageHidden';
 
@@ -176,7 +183,6 @@
                         timeRemainingSpan.textContent = formatTime(timeLeft);
                     }
                 } else {
-                    // If no start time, and not hidden, show the start button
                     startButton.style.display = 'block';
                     countdownTimer.style.display = 'none';
                 }
@@ -193,7 +199,6 @@
                 countdownInterval = setInterval(updateCountdown, 1000); // Start interval
             });
 
-            // Initial check and setup when the page loads
             const initialStartTime = localStorage.getItem(START_TIME_KEY);
             const initialMessageHidden = localStorage.getItem(MESSAGE_HIDDEN_KEY) === 'true';
 
@@ -201,11 +206,9 @@
                 welcomeMessageContainer.classList.add('hidden');
                 countdownTimer.style.display = 'none';
             } else if (initialStartTime) {
-                // If a start time exists, and message is not hidden, start the countdown
                 updateCountdown();
                 countdownInterval = setInterval(updateCountdown, 1000);
             } else {
-                // Otherwise, show the start button
                 startButton.style.display = 'block';
                 countdownTimer.style.display = 'none';
             }
