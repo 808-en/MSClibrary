@@ -108,42 +108,14 @@
 
     <!-- Borrow Form Overlay -->
     <div id="borrowFormOverlay" class="overlay">
+        <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfm1sqrGPhMdTSe8w55Nu9lD-ME-uMm6QFNEiBOG-fuZUXvhQ/viewform?embedded=true" width="640" height="1144" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
         <div class="overlay-content">
-            <button type="button" class="close-button" id="closeBorrowForm">&times;</button>
-            <h2 data-i18n="borrowBookFormTitle">Borrow Book</h2>
-            <form id="borrowBookForm">
-                <div class="form-group">
-                    <label for="bookName" data-i18n="bookNameLabel">Book Name:</label>
-                    <input type="text" id="bookName" name="bookName" required>
-                </div>
-                <div class="form-group">
-                    <label for="genre" data-i18n="genreLabel">Genre (Optional):</label>
-                    <input type="text" id="genre" name="genre">
-                </div>
-                <div class="form-group">
-                    <label for="borrowerName" data-i18n="borrowerNameLabel">Person Borrowing:</label>
-                    <input type="text" id="borrowerName" name="borrowerName" required>
-                </div>
                 <p data-i18n="borrowNotice">NOTICE: Books are dropped off on Wednesday (exceptions can be made)! If the date is a day other than Wednesday, your book will be dropped off next Wednesday, regardless of your selected borrow duration. Write down the book name so you remember and try again on Wednesday, or try our Online Books (beta)!</p>
-                <div class="form-group">
-                    <label for="borrowDuration" data-i18n="borrowDurationLabel">Borrowing Duration:</label>
-                    <select id="borrowDuration" name="borrowDuration">
-                        <option value="1_week">1 Week</option>
-                        <option value="2_weeks">2 Weeks</option>
-                        <option value="3_weeks">3 Weeks</option>
-                        <option value="4_weeks">4 Weeks</option>
-                    </select>
-                </div>
                 <div class="form-group">
                     <label for="disclaimer" data-i18n="disclaimerLabel">Disclaimer:</label>
                     <textarea id="disclaimer" rows="3" readonly data-i18n="disclaimerText">I understand that I am responsible for the safe return of this book by the agreed-upon date. I will handle it with care and adhere to the library's borrowing policies.</textarea>
                 </div>
-                <div class="form-group">
-                    <label for="signature" data-i18n="signatureLabel">Signature of Understanding:</label>
-                    <input type="text" id="signature" name="signature" required>
-                </div>
-                <button type="submit" data-i18n="submitRequest">Submit Borrow Request</button>
-                <button type="button" id="cancelBorrowForm" data-i18n="cancel">Cancel</button>
+                <button type="button" id="cancelBorrowForm" data-i18n="cancel">Close</button>
             </form>
         </div>
     </div>
