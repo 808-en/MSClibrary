@@ -21,6 +21,11 @@ function loggedincheck() {
 
 window.addEventListener("DOMContentLoaded", loggedincheck);
 
+function logout() {
+  window.location.href = "index.html";
+localStorage.removeItem("loggedInState");
+    localStorage.removeItem("loggedInExpiry");
+}
 
 async function fetchData() {
   try {
