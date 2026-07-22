@@ -145,7 +145,8 @@ const validCredentials = {
 
             if (validCredentials[enteredUsername] && validCredentials[enteredUsername] === enteredPassword) {
                 // Redirect to the admin panel upon successful login
-                window.location.href = 'admin.html'; 
+                window.location.href = 'admin.html';
+                localStorage.setItem("loggedInState", "loggedInIdentifierRNBN480H39A=");
             } else {
                 errorMessageDiv.style.display = 'block';
                 usernameInput.value = '';
