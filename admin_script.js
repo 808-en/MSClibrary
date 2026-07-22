@@ -1,6 +1,8 @@
 const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRtBuoQR6ILdtAoCm6yNbDQVtEnWzgg4RJ9DPoqy8pewREj77wwojp_URuetdQW_9_Hyc2-91iQ9uOM/pub?output=csv';
 const dataContainer = document.getElementById('data-container');
 
+
+
 async function fetchData() {
   try {
     const response = await fetch(sheetUrl);
