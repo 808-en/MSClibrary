@@ -144,14 +144,20 @@ const validCredentials = {
 };
 
             if (validCredentials[enteredUsername] && validCredentials[enteredUsername] === enteredPassword) {
-                // Redirect to the admin panel upon successful login
-                window.location.href = 'admin.html';
-                localStorage.setItem("loggedInState", "loggedInIdentifierRNBN480H39A=");
+                const TOKEN_VALUE = "loggedInIdentifierRNBN480H39A=";
+const TOKEN_TTL_MS = 20 * 60 * 1000; // 20 minutes
+
+window.location.href = "admin.html";
+
+localStorage.setItem("loggedInState", TOKEN_VALUE);
+localStorage.setItem("loggedInExpiry", String(Date.now() + TOKEN_TTL_MS));
+
             } else {
                 errorMessageDiv.style.display = 'block';
                 usernameInput.value = '';
                 passwordInput.value = '';
             }
+            
         });
     </script>
 </body>
