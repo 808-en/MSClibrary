@@ -406,9 +406,27 @@
 </head>
 <body>
     <div class="top-bar">
+        <div class="navbar">
         <ul>
-            <li><a href="index.html">Home</a></li>
+            <li><a href="index.html" data-i18n="home">Home</a></li>
+            <li>
+                <select class="non-interactive-select">
+                    <option selected data-i18n="genres">Genres</option>
+                    <option data-i18n="fiction">Fiction</option>
+                    <option data-i18n="scienceFiction">Science Fiction</option>
+                    <option data-i18n="mystery">Mystery</option>
+                    <option data-i18n="fantasy">Fantasy</option>
+                    <option data-i18n="informationalText">Informational Text</option>
+                    <option data-i18n="biography">Biography</option>
+                </select>
+            </li>
+            <li><a href="BookReturn.html" data-i18n="bookReturn">Book Return</a></li>
+            <li><a href="HelpForum.html" data-i18n="help">Help</a></li>
+            <li><a href="library.html" data-i18n="search">Search</a></li>
+            <li><a href="#" id="openBorrowForm" data-i18n="borrowBook">Borrow Book</a></li>
+            <li><a href="login.html" id="AdminLogin" data-i18n="login">Login<i class="fa-solid fa-user-lock"></i></a></li>
         </ul>
+    </div>
     </div>
 
     <div class="fixed-search-bar">
