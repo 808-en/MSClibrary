@@ -1,6 +1,25 @@
 const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRtBuoQR6ILdtAoCm6yNbDQVtEnWzgg4RJ9DPoqy8pewREj77wwojp_URuetdQW_9_Hyc2-91iQ9uOM/pub?output=csv';
 const dataContainer = document.getElementById('data-container');
 
+const TOKEN_VALUE = "loggedInIdentifierRNBN480H39A=";
+
+function loggedincheck() {
+  const token = localStorage.getItem("loggedInState");
+  const expiry = Number(localStorage.getItem("loggedInExpiry"));
+
+  const isValid = token === TOKEN_VALUE && Number.isFinite(expiry) && Date.now() <= expiry;
+
+  if (!isValid) {
+    localStorage.removeItem("loggedInState");
+    localStorage.removeItem("loggedInExpiry");
+    window.location.href = "login.html";
+    return;
+  }
+
+  // If valid: do nothing (stay on admin page)
+}
+
+window.addEventListener("DOMContentLoaded", loggedincheck);
 
 
 async function fetchData() {
