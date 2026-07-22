@@ -155,7 +155,7 @@
                     <th>Signature</th>
                 </tr>
             </thead>
-            <tbody id="requestList">
+            <div id="data-container"></div>
                 <tr>
                     <td colspan="9" class="no-requests">No pending borrow requests.</td>
                 </tr>
@@ -276,78 +276,5 @@
     </div>
 
     <script src="admin_script.js"></script>
-    <script src="library.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Book of the Month Modal Logic
-            const openBookOfTheMonthModalBtn = document.getElementById('openBookOfTheMonthModal');
-            const bookOfTheMonthModal = document.getElementById('bookOfTheMonthModal');
-            const closeBookOfTheMonthModalBtn = document.getElementById('closeBookOfTheMonthModal');
-            const bookOfTheMonthForm = document.getElementById('bookOfTheMonthForm');
-
-            openBookOfTheMonthModalBtn.addEventListener('click', () => {
-                bookOfTheMonthModal.style.display = 'flex';
-            });
-
-            closeBookOfTheMonthModalBtn.addEventListener('click', () => {
-                bookOfTheMonthModal.style.display = 'none';
-            });
-
-            // Close modal when clicking outside
-            window.addEventListener('click', (event) => {
-                if (event.target == bookOfTheMonthModal) {
-                    bookOfTheMonthModal.style.display = 'none';
-                }
-            });
-
-            bookOfTheMonthForm.addEventListener('submit', (event) => {
-                event.preventDefault();
-                const title = document.getElementById('botmTitle').value;
-                const author = document.getElementById('botmAuthor').value;
-                localStorage.setItem('bookOfTheMonth', JSON.stringify({ title, author }));
-                // Replace alert with a custom message box or visual feedback
-                console.log('Book of the Month updated successfully!');
-                bookOfTheMonthModal.style.display = 'none';
-                bookOfTheMonthForm.reset();
-            });
-
-            // Latest Update Modal Logic
-            const openUpdateLatestUpdateModalBtn = document.getElementById('openUpdateLatestUpdateModal');
-            const updateLatestUpdateModal = document.getElementById('updateLatestUpdateModal');
-            const closeUpdateLatestUpdateModalBtn = document.getElementById('closeUpdateLatestUpdateModal');
-            const updateLatestUpdateForm = document.getElementById('updateLatestUpdateForm');
-            const latestUpdateTextInput = document.getElementById('latestUpdateText');
-
-            openUpdateLatestUpdateModalBtn.addEventListener('click', () => {
-                // Pre-fill with current latest update if available
-                const storedLatestUpdate = localStorage.getItem('latestUpdate');
-                if (storedLatestUpdate) {
-                    latestUpdateTextInput.value = storedLatestUpdate;
-                }
-                updateLatestUpdateModal.style.display = 'flex';
-            });
-
-            closeUpdateLatestUpdateModalBtn.addEventListener('click', () => {
-                updateLatestUpdateModal.style.display = 'none';
-            });
-
-            // Close modal when clicking outside
-            window.addEventListener('click', (event) => {
-                if (event.target == updateLatestUpdateModal) {
-                    updateLatestUpdateModal.style.display = 'none';
-                }
-            });
-
-            updateLatestUpdateForm.addEventListener('submit', (event) => {
-                event.preventDefault();
-                const message = latestUpdateTextInput.value;
-                localStorage.setItem('latestUpdate', message);
-                // Replace alert with a custom message box or visual feedback
-                console.log('Latest Update message updated successfully!');
-                updateLatestUpdateModal.style.display = 'none';
-                updateLatestUpdateForm.reset();
-            });
-        });
-    </script>
 </body>
 </html>
