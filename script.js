@@ -1,13 +1,9 @@
-// Copyright Atticus Herr 2024
-// Merged Admin & Frontend logic 
-
 const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRtBuoQR6ILdtAoCm6yNbDQVtEnWzgg4RJ9DPoqy8pewREj77wwojp_URuetdQW_9_Hyc2-91iQ9uOM/pub?output=csv';
 const TOKEN_VALUE = "loggedInIdentifierRNBN480H39A=";
 
 document.addEventListener('DOMContentLoaded', function() {
     setupModalHandlers();
     
-    // Prominent buttons and Navbar Overrides
     const btnProminentBorrow = document.getElementById('btnProminentBorrow');
     const btnProminentReturn = document.getElementById('btnProminentReturn');
     const openBorrowNav = document.getElementById('openBorrowForm');
@@ -18,7 +14,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (openBorrowNav) openBorrowNav.addEventListener('click', (e) => { e.preventDefault(); openModal('borrowChoiceModal'); });
     if (openReturnNav) openReturnNav.addEventListener('click', (e) => { e.preventDefault(); openModal('returnChoiceModal'); });
 
-    // Handle Forms
     const borrowIsbnForm = document.getElementById('borrowIsbnForm');
     const returnIsbnForm = document.getElementById('returnIsbnForm');
 
@@ -44,7 +39,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const data = {
                 type: 'Return',
                 isbn: document.getElementById('returnIsbnInput').value,
-                name: document.getElementById('returnName').value,
+                nameAndRoom: document.getElementById('returnName').value,
+                signature: '',
                 timestamp: new Date().getTime()
             };
             submitToGoogleSheet(data);
@@ -53,14 +49,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Modal background click close
     window.addEventListener('click', (event) => {
         if (event.target.classList.contains('modal')) {
             event.target.style.display = 'none';
         }
     });
 
-    // Check login for admin page if dataContainer exists
     const dataContainer = document.getElementById('data-container');
     if (dataContainer) {
         loggedincheck();
@@ -68,30 +62,20 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-
-// Google Sheet mock submission
 function submitToGoogleSheet(data) {
-    // NOTE: To securely write to a Google Sheet directly from JS, you must pass this to a 
-    // Google Apps Script Web App set to run as yourself. Replace `scriptUrl` with your macro link.
     const scriptUrl = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL';
     
-    console.log("Submitting the following payload to Google Sheets:", data);
-    
-    // Example POST request framework
-    /*
     fetch(scriptUrl, {
         method: 'POST',
         mode: 'no-cors',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     }).then(() => {
-        alert("Success! Request logged.");
+        alert("Request successfully recorded!");
     }).catch(error => {
         console.error('Error!', error.message);
+        alert("There was an error saving your request.");
     });
-    */
-   
-    alert("Request successfully recorded!");
 }
 
 function openModal(modalId) {
@@ -109,7 +93,6 @@ function closeModal(modalId) {
 }
 
 function setupModalHandlers() {
-    // Setup for admin handlers if elements exist on page
     const openAdd = document.getElementById('openAddBookModal');
     const openDel = document.getElementById('openDeleteBookModal');
     const openUpd = document.getElementById('openUpdateBotmModal');
@@ -119,8 +102,6 @@ function setupModalHandlers() {
     if(openUpd) openUpd.addEventListener('click', () => openModal('updateBotmModal'));
 }
 
-
-// --- Admin Functions ---
 function loggedincheck() {
     const token = localStorage.getItem("loggedInState");
     const expiry = Number(localStorage.getItem("loggedInExpiry"));
@@ -167,8 +148,6 @@ async function fetchData(container) {
     }
 }
 
-
-// --- Navigation Alert Logic ---
 let shouldNavigate = false;
 
 function alertRec() {
