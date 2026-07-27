@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function submitToGoogleSheet(data) {
-    const scriptUrl = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL';
+    const scriptUrl = 'https://script.google.com/macros/s/AKfycbwFx6ZQAM6HihvByM3TUzWivwIGfyZBH29hZG6Z7vsWFVcxZKaNaVwzXhRxxUm265bh/exec';
     
     fetch(scriptUrl, {
         method: 'POST',
