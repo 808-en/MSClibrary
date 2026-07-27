@@ -18,7 +18,7 @@
     <div class="navbar">
         <ul>
             <li><a href="index.html" data-i18n="home">Home</a></li>
-            <li><a href="BookReturn.html" data-i18n="bookReturn">Book Return</a></li>
+            <li><a href="#" id="openReturnForm" data-i18n="bookReturn">Book Return</a></li>
             <li><a href="HelpForum.html" data-i18n="help">Help</a></li>
             <li><a href="#" id="openBorrowForm" data-i18n="borrowBook">Borrow Book</a></li>
             <li><a href="login.html" id="AdminLogin" data-i18n="login">Login<i class="fa-solid fa-user-lock"></i></a></li>
@@ -30,6 +30,12 @@
             <div class="container">
                 <img src="Header-IMG.jpg" alt="Welcome to MSC School Library" class="responsive">
                 <div class="centered" data-i18n="mscSchoolLibrary">MSC School Library</div>
+            </div>
+
+            <!-- Prominent Actions Section -->
+            <div class="prominent-actions">
+                <button id="btnProminentBorrow" class="action-btn borrow-btn"><i class="fa-solid fa-book-open"></i> Borrow a Book</button>
+                <button id="btnProminentReturn" class="action-btn return-btn"><i class="fa-solid fa-book-bookmark"></i> Return a Book</button>
             </div>
 
             <div class="body-containers-items">
@@ -80,7 +86,6 @@
                     <a href="library.html" class="explore-button" data-i18n="exploreBooks">Explore Books</a>
                 </div>
 
-
                 <div class="credits">
                     <h2 data-i18n="credits">Credits</h2>
                     <p>&copy; copyright @ 2024 <span>Coding credit: Atticus Herr</span> [all rights reserved!]</p>
@@ -91,13 +96,86 @@
         </section>
     </div>
 
-    <!-- Borrow Form Overlay -->
-    <div id="borrowFormOverlay" class="overlay">
-        
-        <div class="overlay-content">
-            <iframe src="https://forms.gle/MnnT75DgHWQ4WGQr7" width="640" height="700" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
-                <button type="button" id="cancelBorrowForm" data-i18n="cancel">Close</button>
+    <!-- Modals -->
+
+    <!-- 1. Borrow Choice Modal -->
+    <div id="borrowChoiceModal" class="modal">
+        <div class="modal-content choice-modal-content">
+            <span class="close-button" onclick="closeModal('borrowChoiceModal')">&times;</span>
+            <h2>How would you like to borrow?</h2>
+            <button class="choice-btn" onclick="openModal('borrowIsbnModal'); closeModal('borrowChoiceModal')">By ISBN/Barcode</button>
+            <button class="choice-btn" onclick="openModal('borrowManualModal'); closeModal('borrowChoiceModal')">Manual Input</button>
+        </div>
     </div>
+
+    <!-- 2. Return Choice Modal -->
+    <div id="returnChoiceModal" class="modal">
+        <div class="modal-content choice-modal-content">
+            <span class="close-button" onclick="closeModal('returnChoiceModal')">&times;</span>
+            <h2>How would you like to return?</h2>
+            <button class="choice-btn" onclick="openModal('returnIsbnModal'); closeModal('returnChoiceModal')">By ISBN/Barcode</button>
+            <button class="choice-btn" onclick="openModal('returnManualModal'); closeModal('returnChoiceModal')">Manual Input</button>
+        </div>
+    </div>
+
+    <!-- 3. Borrow ISBN Modal -->
+    <div id="borrowIsbnModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal('borrowIsbnModal')">&times;</span>
+            <h2>Borrow by ISBN</h2>
+            <form id="borrowIsbnForm">
+                <div class="form-group">
+                    <label>ISBN (10, 13, or Barcode)</label>
+                    <input type="text" id="borrowIsbnInput" required>
+                </div>
+                <div class="form-group">
+                    <label>Full Name and Room Number</label>
+                    <input type="text" id="borrowNameRoom" placeholder="e.g. Billy Bob Joe, room 6" required>
+                </div>
+                <div class="form-group">
+                    <label>Disclaimer Signature</label>
+                    <p style="font-size: 0.85em; color: #666; margin-top:0;">Please recognize that you are fully accountable for the care and return of the book.</p>
+                    <input type="text" id="borrowSignature" placeholder="Type full name to sign" required>
+                </div>
+                <button type="submit">Submit Borrow Request</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 4. Return ISBN Modal -->
+    <div id="returnIsbnModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal('returnIsbnModal')">&times;</span>
+            <h2>Return by ISBN</h2>
+            <form id="returnIsbnForm">
+                <div class="form-group">
+                    <label>ISBN (10, 13, or Barcode)</label>
+                    <input type="text" id="returnIsbnInput" required>
+                </div>
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="returnName" required>
+                </div>
+                <button type="submit">Submit Return Request</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 5. Borrow Manual Modal (Google Form) -->
+    <div id="borrowManualModal" class="modal overlay">
+        <div class="overlay-content">
+            <span class="close-button" onclick="closeModal('borrowManualModal')">&times;</span>
+            <iframe src="https://forms.gle/MnnT75DgHWQ4WGQr7" width="100%" height="700" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
+        </div>
+    </div>
+
+    <!-- 6. Return Manual Modal (Placeholder) -->
+    <div id="returnManualModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal('returnManualModal')">&times;</span>
+            <h2>Manual Return Input</h2>
+            <p>Form coming soon.</p>
+        </div>
     </div>
 
     <script src="script.js"></script>
