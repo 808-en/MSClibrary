@@ -32,7 +32,6 @@
                 <div class="centered" data-i18n="mscSchoolLibrary">MSC School Library</div>
             </div>
 
-            <!-- Prominent Actions Section -->
             <div class="prominent-actions">
                 <button id="btnProminentBorrow" class="action-btn borrow-btn"><i class="fa-solid fa-book-open"></i> Borrow a Book</button>
                 <button id="btnProminentReturn" class="action-btn return-btn"><i class="fa-solid fa-book-bookmark"></i> Return a Book</button>
@@ -96,9 +95,6 @@
         </section>
     </div>
 
-    <!-- Modals -->
-
-    <!-- 1. Borrow Choice Modal -->
     <div id="borrowChoiceModal" class="modal">
         <div class="modal-content choice-modal-content">
             <span class="close-button" onclick="closeModal('borrowChoiceModal')">&times;</span>
@@ -108,7 +104,6 @@
         </div>
     </div>
 
-    <!-- 2. Return Choice Modal -->
     <div id="returnChoiceModal" class="modal">
         <div class="modal-content choice-modal-content">
             <span class="close-button" onclick="closeModal('returnChoiceModal')">&times;</span>
@@ -118,7 +113,6 @@
         </div>
     </div>
 
-    <!-- 3. Borrow ISBN Modal -->
     <div id="borrowIsbnModal" class="modal">
         <div class="modal-content">
             <span class="close-button" onclick="closeModal('borrowIsbnModal')">&times;</span>
@@ -142,7 +136,6 @@
         </div>
     </div>
 
-    <!-- 4. Return ISBN Modal -->
     <div id="returnIsbnModal" class="modal">
         <div class="modal-content">
             <span class="close-button" onclick="closeModal('returnIsbnModal')">&times;</span>
@@ -161,7 +154,6 @@
         </div>
     </div>
 
-    <!-- 5. Borrow Manual Modal (Google Form) -->
     <div id="borrowManualModal" class="modal overlay">
         <div class="overlay-content">
             <span class="close-button" onclick="closeModal('borrowManualModal')">&times;</span>
@@ -169,7 +161,6 @@
         </div>
     </div>
 
-    <!-- 6. Return Manual Modal (Placeholder) -->
     <div id="returnManualModal" class="modal">
         <div class="modal-content">
             <span class="close-button" onclick="closeModal('returnManualModal')">&times;</span>
@@ -181,7 +172,6 @@
     <script src="script.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Book of the Month display logic
             const botmTitleDisplay = document.getElementById('botmTitleDisplay');
             const botmAuthorDisplay = document.getElementById('botmAuthorDisplay');
 
@@ -192,7 +182,6 @@
                 botmAuthorDisplay.innerHTML = `<strong>Author:</strong> ${author}`;
             }
 
-            // Latest Update display logic
             const latestUpdateDisplay = document.getElementById('latestUpdateDisplay');
             const storedLatestUpdate = localStorage.getItem('latestUpdate');
             if (storedLatestUpdate) {
