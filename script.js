@@ -136,8 +136,21 @@ async function fetchData(container) {
         tableHtml += '</tr></thead><tbody>';
 
         rows.slice(1).forEach(rowData => {
-            tableHtml += '<tr>';
-            rowData.forEach(cell => { tableHtml += `<td>${cell}</td>`; });
+            const statusIndex = 5; 
+            const isReturned = rowData[statusIndex] && rowData[statusIndex].trim() === 'RETURNED';
+            const rowStyle = isReturned ? 'text-decoration: line-through; color: #666;' : '';
+
+            tableHtml += `<tr style="${rowStyle}">`;
+            
+            rowData.forEach((cell, index) => { 
+                if (index === statusIndex && isReturned) {
+                    tableHtml += `<td style="color: blue; font-weight: bold; font-size: 1.2em; text-decoration: none;">${cell}</td>`;
+                } else if (index === statusIndex && cell.trim() === 'BORROWED') {
+                    tableHtml += `<td style="color: green; font-weight: bold;">${cell}</td>`;
+                } else {
+                    tableHtml += `<td>${cell}</td>`; 
+                }
+            });
             tableHtml += '</tr>';
         });
         tableHtml += '</tbody></table>';
