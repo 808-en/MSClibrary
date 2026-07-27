@@ -6,132 +6,6 @@
     <title>Admin Dashboard - MSC Book Collection</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.5);
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-content {
-            background-color: #fefefe;
-            margin: auto;
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            position: relative;
-            max-width: 700px;
-            width: 90%;
-            max-height: 90vh;
-            display: flex;
-            flex-direction: column;
-            box-sizing: border-box;
-        }
-
-        .modal-body {
-            flex: 1;
-            overflow-y: auto;
-            margin-bottom: 20px;
-        }
-
-        .modal-footer {
-            display: flex;
-            justify-content: flex-start;
-            padding-top: 10px;
-            border-top: 1px solid #eee;
-        }
-
-        .close-popup-btn {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 15px;
-            font-weight: bold;
-            transition: background-color 0.2s ease;
-        }
-
-        .close-popup-btn:hover {
-            background-color: #0056b3;
-        }
-
-        .chart-scroll-container {
-            width: 100%;
-            height: 400px;
-            overflow: auto;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        .chart-scroll-container table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .chart-scroll-container th, 
-        .chart-scroll-container td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-            white-space: nowrap;
-        }
-
-        .chart-scroll-container th {
-            background-color: #f2f2f2;
-            position: sticky;
-            top: 0;
-            z-index: 1;
-        }
-
-        .dashboard-container {
-            margin: 20px auto;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            max-width: 90%;
-            box-sizing: border-box;
-        }
-
-        .action-button {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            margin-right: 10px;
-            transition: background-color 0.3s ease;
-        }
-
-        .action-button:hover {
-            background-color: #0056b3;
-        }
-
-        .delete-button {
-            background-color: #dc3545;
-        }
-
-        .delete-button:hover {
-            background-color: #c82333;
-        }
-
-        iframe {
-            max-width: 100%;
-            border: none;
-        }
-    </style>
 </head>
 <body>
     <header>
@@ -140,21 +14,23 @@
 
     <div class="navbar">
         <ul>
-            <li><button onclick="logout()">Logout</button></li>
+            <li><button onclick="logout()" style="background: none; border: none; font-size: 1rem; color: #FF0000; font-weight: bold; cursor: pointer; padding: 10px;">Logout</button></li>
         </ul>
     </div>
 
     <div class="dashboard-container">
-        <h2>Current Borrow Requests</h2>
-        <div id="data-container"></div>
+        <h2>Current Borrow & Return Requests</h2>
+        <div id="data-container" style="overflow-x: auto; width: 100%;">
+            <p>Loading collection data...</p>
+        </div>
     </div>
 
     <div class="dashboard-container admin-book-actions">
         <h2>Book Management</h2>
-        <div class="button-group">
-            <button id="openAddBookModal" class="action-button">Add New Book</button>
-            <button id="openDeleteBookModal" class="action-button delete-button">Delete Books</button>
-            <button id="openUpdateBotmModal" class="action-button">Update Latest Update / BotM</button>
+        <div class="prominent-actions">
+            <button id="openAddBookModal" class="action-btn return-btn" style="font-size: 1.1rem; padding: 15px;">Add New Book</button>
+            <button id="openDeleteBookModal" class="action-btn delete-button" style="background-color: #dc3545; font-size: 1.1rem; padding: 15px;">Delete Books</button>
+            <button id="openUpdateBotmModal" class="action-btn borrow-btn" style="font-size: 1.1rem; padding: 15px;">Update Latest / BotM</button>
         </div>
     </div>
 
@@ -164,39 +40,27 @@
 
     <div id="addBookModal" class="modal">
         <div class="modal-content">
-            <div class="modal-body">
-                <h2>Add New Book</h2>
-                <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdpxvArZsHA7UMjbv88oMnif2SPeAAdGlVrvWaEMJL8CDh0-w/viewform?embedded=true" width="100%" height="600" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
-            </div>
-            <div class="modal-footer">
-                <button class="close-popup-btn" onclick="closeModal('addBookModal')">Close</button>
-            </div>
+            <span class="close-button" onclick="closeModal('addBookModal')">&times;</span>
+            <h2>Add New Book</h2>
+            <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdpxvArZsHA7UMjbv88oMnif2SPeAAdGlVrvWaEMJL8CDh0-w/viewform?embedded=true" width="100%" height="600" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
         </div>
     </div>
 
     <div id="deleteBookModal" class="modal">
         <div class="modal-content">
-            <div class="modal-body">
-                <h2>Delete Books - Instructions</h2>
-                <div class="chart-scroll-container" id="deleteChartContainer">
-                    <p>Loading collection data...</p>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="close-popup-btn" onclick="closeModal('deleteBookModal')">Close</button>
+            <span class="close-button" onclick="closeModal('deleteBookModal')">&times;</span>
+            <h2>Delete Books - Instructions</h2>
+            <div id="deleteChartContainer" style="overflow-x: auto;">
+                <p>Loading collection data...</p>
             </div>
         </div>
     </div>
 
     <div id="updateBotmModal" class="modal">
         <div class="modal-content">
-            <div class="modal-body">
-                <h2>Update Latest Update / BotM</h2>
-                <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdvPbRVvckQ1wdYUAC2tcwTC3imxsuoSCA2SmYl_xiOL5LXaw/viewform?embedded=true" width="100%" height="500" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
-            </div>
-            <div class="modal-footer">
-                <button class="close-popup-btn" onclick="closeModal('updateBotmModal')">Close</button>
-            </div>
+            <span class="close-button" onclick="closeModal('updateBotmModal')">&times;</span>
+            <h2>Update Latest Update / BotM</h2>
+            <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdvPbRVvckQ1wdYUAC2tcwTC3imxsuoSCA2SmYl_xiOL5LXaw/viewform?embedded=true" width="100%" height="500" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
         </div>
     </div>
 
