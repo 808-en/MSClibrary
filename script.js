@@ -1,124 +1,210 @@
+// Copyright Atticus Herr 2024
+// Merged Admin & Frontend logic 
 
-  //Copyright Atticus Herr 2024
-  //Special Thanks: w3schools.com for outlining of some JS syntax on these webpages
+const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRtBuoQR6ILdtAoCm6yNbDQVtEnWzgg4RJ9DPoqy8pewREj77wwojp_URuetdQW_9_Hyc2-91iQ9uOM/pub?output=csv';
+const TOKEN_VALUE = "loggedInIdentifierRNBN480H39A=";
 
 document.addEventListener('DOMContentLoaded', function() {
-  const openBorrowFormLink = document.getElementById('openBorrowForm');
-  const borrowFormOverlay = document.getElementById('borrowFormOverlay');
-  const closeBorrowFormButton = document.getElementById('closeBorrowForm');
-  const cancelBorrowFormButton = document.getElementById('cancelBorrowForm');
-  const borrowBookForm = document.getElementById('borrowBookForm');
+    setupModalHandlers();
+    
+    // Prominent buttons and Navbar Overrides
+    const btnProminentBorrow = document.getElementById('btnProminentBorrow');
+    const btnProminentReturn = document.getElementById('btnProminentReturn');
+    const openBorrowNav = document.getElementById('openBorrowForm');
+    const openReturnNav = document.getElementById('openReturnForm');
+    
+    if (btnProminentBorrow) btnProminentBorrow.addEventListener('click', (e) => { e.preventDefault(); openModal('borrowChoiceModal'); });
+    if (btnProminentReturn) btnProminentReturn.addEventListener('click', (e) => { e.preventDefault(); openModal('returnChoiceModal'); });
+    if (openBorrowNav) openBorrowNav.addEventListener('click', (e) => { e.preventDefault(); openModal('borrowChoiceModal'); });
+    if (openReturnNav) openReturnNav.addEventListener('click', (e) => { e.preventDefault(); openModal('returnChoiceModal'); });
 
-  const openUpdateLogButton = document.getElementById('openUpdateLog');
-  const updateLogModal = document.getElementById('updateLogModal');
-  const closeUpdateLogButton = document.getElementById('closeUpdateLog');
-  const updateLogContent = document.getElementById('updateLogContent');
+    // Handle Forms
+    const borrowIsbnForm = document.getElementById('borrowIsbnForm');
+    const returnIsbnForm = document.getElementById('returnIsbnForm');
 
-
-  if (borrowFormOverlay) {
-    borrowFormOverlay.style.display = 'none';
-  }
-
-  if (openBorrowFormLink && borrowFormOverlay) {
-    openBorrowFormLink.addEventListener('click', function(event) {
-      event.preventDefault();
-      borrowFormOverlay.style.display = 'flex';
-
-      if (updateLogModal) {
-        updateLogModal.style.display = 'none';
-      }
-
-      if (signupModal) {
-        signupModal.style.display = 'none';
-      }
-    });
-  }
-
-  const closeForm = () => {
-    if (borrowFormOverlay) {
-      borrowFormOverlay.style.display = 'none';
-      if (borrowBookForm) {
-        borrowBookForm.reset();
-      }
+    if (borrowIsbnForm) {
+        borrowIsbnForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const data = {
+                type: 'Borrow',
+                isbn: document.getElementById('borrowIsbnInput').value,
+                nameAndRoom: document.getElementById('borrowNameRoom').value,
+                signature: document.getElementById('borrowSignature').value,
+                timestamp: new Date().getTime()
+            };
+            submitToGoogleSheet(data);
+            borrowIsbnForm.reset();
+            closeModal('borrowIsbnModal');
+        });
     }
-  };
 
-  if (closeBorrowFormButton) {
-    closeBorrowFormButton.addEventListener('click', closeForm);
-  }
+    if (returnIsbnForm) {
+        returnIsbnForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const data = {
+                type: 'Return',
+                isbn: document.getElementById('returnIsbnInput').value,
+                name: document.getElementById('returnName').value,
+                timestamp: new Date().getTime()
+            };
+            submitToGoogleSheet(data);
+            returnIsbnForm.reset();
+            closeModal('returnIsbnModal');
+        });
+    }
 
-  if (cancelBorrowFormButton) {
-    cancelBorrowFormButton.addEventListener('click', closeForm);
-  }
-
-  if (borrowBookForm) {
-    borrowBookForm.addEventListener('submit', function(event) {
-      event.preventDefault();
-
-      const bookName = document.getElementById('bookName').value;
-      const genre = document.getElementById('genre').value;
-      const borrowerName = document.getElementById('borrowerName').value;
-      const borrowDuration = document.getElementById('borrowDuration').value;
-      const signature = document.getElementById('signature').value;
-      const timestamp = new Date().getTime();
-
-      const newRequest = {
-        bookName: bookName,
-        genre: genre,
-        borrowerName: borrowerName,
-        borrowDuration: borrowDuration,
-        signature: signature,
-        timestamp: timestamp,
-        done: false,
-        delivered: false
-      };
-
-      const storedRequests = JSON.parse(localStorage.getItem('borrowRequests')) || [];
-      storedRequests.push(newRequest);
-      localStorage.setItem('borrowRequests', JSON.stringify(storedRequests));
-
-      alert('Borrow request submitted!');
-      closeForm();
+    // Modal background click close
+    window.addEventListener('click', (event) => {
+        if (event.target.classList.contains('modal')) {
+            event.target.style.display = 'none';
+        }
     });
-  }
 
+    // Check login for admin page if dataContainer exists
+    const dataContainer = document.getElementById('data-container');
+    if (dataContainer) {
+        loggedincheck();
+        fetchData(dataContainer);
+    }
 });
 
 
+// Google Sheet mock submission
+function submitToGoogleSheet(data) {
+    // NOTE: To securely write to a Google Sheet directly from JS, you must pass this to a 
+    // Google Apps Script Web App set to run as yourself. Replace `scriptUrl` with your macro link.
+    const scriptUrl = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL';
+    
+    console.log("Submitting the following payload to Google Sheets:", data);
+    
+    // Example POST request framework
+    /*
+    fetch(scriptUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    }).then(() => {
+        alert("Success! Request logged.");
+    }).catch(error => {
+        console.error('Error!', error.message);
+    });
+    */
+   
+    alert("Request successfully recorded!");
+}
+
+function openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'flex';
+    }
+}
+
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+function setupModalHandlers() {
+    // Setup for admin handlers if elements exist on page
+    const openAdd = document.getElementById('openAddBookModal');
+    const openDel = document.getElementById('openDeleteBookModal');
+    const openUpd = document.getElementById('openUpdateBotmModal');
+
+    if(openAdd) openAdd.addEventListener('click', () => openModal('addBookModal'));
+    if(openDel) openDel.addEventListener('click', () => { openModal('deleteBookModal'); fetchDeleteChartData(); });
+    if(openUpd) openUpd.addEventListener('click', () => openModal('updateBotmModal'));
+}
+
+
+// --- Admin Functions ---
+function loggedincheck() {
+    const token = localStorage.getItem("loggedInState");
+    const expiry = Number(localStorage.getItem("loggedInExpiry"));
+
+    const isValid = token === TOKEN_VALUE && Number.isFinite(expiry) && Date.now() <= expiry;
+
+    if (!isValid) {
+        localStorage.removeItem("loggedInState");
+        localStorage.removeItem("loggedInExpiry");
+        window.location.href = "login.html";
+        return;
+    }
+}
+
+function logout() {
+    localStorage.removeItem("loggedInState");
+    localStorage.removeItem("loggedInExpiry");
+    window.location.href = "index.html";
+}
+
+async function fetchData(container) {
+    try {
+        const response = await fetch(sheetUrl);
+        if (!response.ok) throw new Error('Network response was not ok');
+
+        const textData = await response.text();
+        const rows = textData.split('\n').map(row => row.split(','));
+
+        let tableHtml = '<table><thead><tr>';
+        rows[0].forEach(header => { tableHtml += `<th>${header}</th>`; });
+        tableHtml += '</tr></thead><tbody>';
+
+        rows.slice(1).forEach(rowData => {
+            tableHtml += '<tr>';
+            rowData.forEach(cell => { tableHtml += `<td>${cell}</td>`; });
+            tableHtml += '</tr>';
+        });
+        tableHtml += '</tbody></table>';
+
+        container.innerHTML = tableHtml;
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        container.innerHTML = '<p>Could not load data.</p>';
+    }
+}
+
+
+// --- Navigation Alert Logic ---
 let shouldNavigate = false;
 
 function alertRec() {
-  document.getElementById('alertTitle').textContent = 'Before You Proceed';
-  document.getElementById('alertMessage').textContent = 'Before you proceed, remember, reading a physical book is more supplemental than online reading. Do not spend too much time on a screen. We are working on a suggestions update, so that you can suggest online books to be purchased and available in the library. Have fun reading! <3';
+    document.getElementById('alertTitle').textContent = 'Before You Proceed';
+    document.getElementById('alertMessage').textContent = 'Before you proceed, remember, reading a physical book is more supplemental than online reading. Do not spend too much time on a screen. We are working on a suggestions update, so that you can suggest online books to be purchased and available in the library. Have fun reading! <3';
 
-  const alertBox = document.getElementById('customAlertBox');
-  const overlay = document.getElementById('overlay');
-  const okButton = document.getElementById('okButton');
-  const closeButton = document.getElementById('closeButton');
-  const getBookButton = document.getElementById('getBookButton');
-  const onlineBooksLink = document.querySelector('.online-books-button a');
+    const alertBox = document.getElementById('customAlertBox');
+    const overlay = document.getElementById('overlay');
+    const okButton = document.getElementById('okButton');
+    const closeButton = document.getElementById('closeButton');
+    const getBookButton = document.getElementById('getBookButton');
+    const onlineBooksLink = document.querySelector('.online-books-button a');
 
-  shouldNavigate = false;
+    shouldNavigate = false;
 
-  alertBox.style.display = 'block';
-  overlay.style.display = 'block';
+    if(alertBox && overlay) {
+        alertBox.style.display = 'block';
+        overlay.style.display = 'block';
+    }
 
-  okButton.onclick = function() {
-    shouldNavigate = true;
-    alertBox.style.display = 'none';
-    overlay.style.display = 'none';
-    onlineBooksLink.click();
-    window.location.href="onlineBooks.html";
-  };
+    if(okButton) okButton.onclick = function() {
+        shouldNavigate = true;
+        alertBox.style.display = 'none';
+        overlay.style.display = 'none';
+        if(onlineBooksLink) onlineBooksLink.click();
+        window.location.href="onlineBooks.html";
+    };
 
-  closeButton.onclick = function() {
-    alertBox.style.display = 'none';
-    overlay.style.display = 'none';
-  };
+    if(closeButton) closeButton.onclick = function() {
+        alertBox.style.display = 'none';
+        overlay.style.display = 'none';
+    };
 
-  getBookButton.onclick = function() {
-    window.location.href = 'library.html';
-  };
+    if(getBookButton) getBookButton.onclick = function() {
+        window.location.href = 'library.html';
+    };
 
-  return false;
+    return false;
 }
