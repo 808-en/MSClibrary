@@ -1,5 +1,6 @@
 const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRtBuoQR6ILdtAoCm6yNbDQVtEnWzgg4RJ9DPoqy8pewREj77wwojp_URuetdQW_9_Hyc2-91iQ9uOM/pub?output=csv';
 const TOKEN_VALUE = "loggedInIdentifierRNBN480H39A=";
+let shouldNavigate = false;
 
 document.addEventListener('DOMContentLoaded', function() {
     setupModalHandlers();
@@ -14,40 +15,42 @@ document.addEventListener('DOMContentLoaded', function() {
     if (openBorrowNav) openBorrowNav.addEventListener('click', (e) => { e.preventDefault(); openModal('borrowChoiceModal'); });
     if (openReturnNav) openReturnNav.addEventListener('click', (e) => { e.preventDefault(); openModal('returnChoiceModal'); });
 
-    const borrowIsbnForm = document.getElementById('borrowIsbnForm');
-    const returnIsbnForm = document.getElementById('returnIsbnForm');
+    setupFormSubmission('borrowIsbnForm', 'Borrow', () => ({
+        isbn: document.getElementById('borrowIsbnInput').value,
+        title: document.getElementById('borrowAutoTitle').value,
+        author: document.getElementById('borrowAutoAuthor').value,
+        nameAndRoom: document.getElementById('borrowNameRoom').value,
+        signature: document.getElementById('borrowSignature').value
+    }), 'borrowIsbnModal');
 
-    if (borrowIsbnForm) {
-        borrowIsbnForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const data = {
-                type: 'Borrow',
-                isbn: document.getElementById('borrowIsbnInput').value,
-                nameAndRoom: document.getElementById('borrowNameRoom').value,
-                signature: document.getElementById('borrowSignature').value,
-                timestamp: new Date().getTime()
-            };
-            submitToGoogleSheet(data);
-            borrowIsbnForm.reset();
-            closeModal('borrowIsbnModal');
-        });
-    }
+    setupFormSubmission('returnIsbnForm', 'Return', () => ({
+        isbn: document.getElementById('returnIsbnInput').value,
+        title: document.getElementById('returnAutoTitle').value,
+        author: document.getElementById('returnAutoAuthor').value,
+        nameAndRoom: document.getElementById('returnName').value,
+        signature: ''
+    }), 'returnIsbnModal');
 
-    if (returnIsbnForm) {
-        returnIsbnForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const data = {
-                type: 'Return',
-                isbn: document.getElementById('returnIsbnInput').value,
-                nameAndRoom: document.getElementById('returnName').value,
-                signature: '',
-                timestamp: new Date().getTime()
-            };
-            submitToGoogleSheet(data);
-            returnIsbnForm.reset();
-            closeModal('returnIsbnModal');
-        });
-    }
+    setupFormSubmission('borrowManualForm', 'Borrow', () => ({
+        isbn: 'Manual',
+        title: document.getElementById('borrowManualTitle').value,
+        author: document.getElementById('borrowManualAuthor').value,
+        nameAndRoom: document.getElementById('borrowManualNameRoom').value,
+        signature: document.getElementById('borrowManualSignature').value
+    }), 'borrowManualModal');
+
+    setupFormSubmission('returnManualForm', 'Return', () => ({
+        isbn: 'Manual',
+        title: document.getElementById('returnManualTitle').value,
+        author: document.getElementById('returnManualAuthor').value,
+        nameAndRoom: document.getElementById('returnManualName').value,
+        signature: ''
+    }), 'returnManualModal');
+
+    setupIsbnLookup('borrowLookupBtn', 'borrowIsbnInput', 'borrowAutoTitle', 'borrowAutoAuthor');
+    setupIsbnLookup('returnLookupBtn', 'returnIsbnInput', 'returnAutoTitle', 'returnAutoAuthor');
+    setupScanner('startBorrowScanner', 'borrowReader', 'borrowIsbnInput');
+    setupScanner('startReturnScanner', 'returnReader', 'returnIsbnInput');
 
     window.addEventListener('click', (event) => {
         if (event.target.classList.contains('modal')) {
@@ -62,8 +65,69 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+function setupFormSubmission(formId, type, dataExtractor, modalId) {
+    const form = document.getElementById(formId);
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const extracted = dataExtractor();
+            const data = {
+                type: type,
+                timestamp: new Date().getTime(),
+                ...extracted
+            };
+            submitToGoogleSheet(data);
+            form.reset();
+            closeModal(modalId);
+        });
+    }
+}
+
+async function lookupIsbn(isbn, titleInputId, authorInputId) {
+    if (!isbn) return;
+    try {
+        const response = await fetch(`https://openlibrary.org/api/books?bibkeys=ISBN:${isbn}&format=json&jscmd=data`);
+        const data = await response.json();
+        const book = data[`ISBN:${isbn}`];
+        if (book) {
+            document.getElementById(titleInputId).value = book.title || '';
+            document.getElementById(authorInputId).value = book.authors ? book.authors.map(a => a.name).join(', ') : '';
+        } else {
+            alert("Book details not found automatically. You can proceed with just the ISBN or use Manual Input.");
+        }
+    } catch (error) {
+        console.error(error);
+        alert("Error retrieving book information.");
+    }
+}
+
+function setupIsbnLookup(btnId, isbnInputId, titleInputId, authorInputId) {
+    const btn = document.getElementById(btnId);
+    if (btn) {
+        btn.addEventListener('click', () => {
+            const isbn = document.getElementById(isbnInputId).value.trim();
+            lookupIsbn(isbn, titleInputId, authorInputId);
+        });
+    }
+}
+
+function setupScanner(btnId, readerId, inputId) {
+    const btn = document.getElementById(btnId);
+    if (btn && typeof Html5QrcodeScanner !== 'undefined') {
+        btn.addEventListener('click', () => {
+            const readerDiv = document.getElementById(readerId);
+            readerDiv.style.display = 'block';
+            const scanner = new Html5QrcodeScanner(readerId, { fps: 10, qrbox: 250 });
+            scanner.render((decodedText) => {
+                document.getElementById(inputId).value = decodedText;
+                scanner.clear();
+                readerDiv.style.display = 'none';
+            }, (error) => {});
+        });
+    }
+}
+
 function submitToGoogleSheet(data) {
-    
     const scriptUrl = 'https://script.google.com/macros/s/AKfycbwtPLjj-FFoVB2faUKShZnPf94PSsL8TZ74-mqOtbNFPfKsSBjFIV326HISEJMFf9jE/exec';
     
     fetch(scriptUrl, {
@@ -106,7 +170,6 @@ function setupModalHandlers() {
 function loggedincheck() {
     const token = localStorage.getItem("loggedInState");
     const expiry = Number(localStorage.getItem("loggedInExpiry"));
-
     const isValid = token === TOKEN_VALUE && Number.isFinite(expiry) && Date.now() <= expiry;
 
     if (!isValid) {
@@ -131,8 +194,13 @@ async function fetchData(container) {
         const textData = await response.text();
         const rows = textData.split('\n').map(row => row.split(','));
 
+        let maxCols = 0;
+        rows.forEach(row => { if(row.length > maxCols) maxCols = row.length; });
+
         let tableHtml = '<table><thead><tr>';
-        rows[0].forEach(header => { tableHtml += `<th>${header}</th>`; });
+        for (let i = 0; i < maxCols; i++) {
+            tableHtml += `<th>${rows[0][i] || `Col ${i+1}`}</th>`;
+        }
         tableHtml += '</tr></thead><tbody>';
 
         rows.slice(1).forEach(rowData => {
@@ -142,15 +210,16 @@ async function fetchData(container) {
 
             tableHtml += `<tr style="${rowStyle}">`;
             
-            rowData.forEach((cell, index) => { 
-                if (index === statusIndex && isReturned) {
+            for (let i = 0; i < maxCols; i++) {
+                const cell = rowData[i] || '';
+                if (i === statusIndex && isReturned) {
                     tableHtml += `<td style="color: blue; font-weight: bold; font-size: 1.2em; text-decoration: none;">${cell}</td>`;
-                } else if (index === statusIndex && cell.trim() === 'BORROWED') {
+                } else if (i === statusIndex && cell.trim() === 'BORROWED') {
                     tableHtml += `<td style="color: green; font-weight: bold;">${cell}</td>`;
                 } else {
                     tableHtml += `<td>${cell}</td>`; 
                 }
-            });
+            }
             tableHtml += '</tr>';
         });
         tableHtml += '</tbody></table>';
@@ -161,8 +230,6 @@ async function fetchData(container) {
         container.innerHTML = '<p>Could not load data.</p>';
     }
 }
-
-let shouldNavigate = false;
 
 function alertRec() {
     document.getElementById('alertTitle').textContent = 'Before You Proceed';
