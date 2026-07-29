@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <script src="https://kit.fontawesome.com/cd38709ddf.js" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <link rel="icon" href="Prepared Cooper.ico" type="image/x-icon">
     <link rel="shortcut icon" href="Prepared Cooper.ico" type="image/x-icon">
     <link rel="apple-touch-icon" href="Prepared Cooper.ico">
@@ -26,17 +27,16 @@
     </div>
 
     <div id="mainContent">
-        <div class="prominent-actions">
-                <button id="btnProminentBorrow" class="action-btn borrow-btn"><i class="fa-solid fa-book-open"></i> Borrow a Book</button>
-                <button id="btnProminentReturn" class="action-btn return-btn"><i class="fa-solid fa-book-bookmark"></i> Return a Book</button>
-            </div>
         <section>
             <div class="container">
                 <img src="Header-IMG.jpg" alt="Welcome to MSC School Library" class="responsive">
                 <div class="centered" data-i18n="mscSchoolLibrary">MSC School Library</div>
             </div>
 
-            
+            <div class="prominent-actions">
+                <button id="btnProminentBorrow" class="action-btn borrow-btn"><i class="fa-solid fa-book-open"></i> Borrow a Book</button>
+                <button id="btnProminentReturn" class="action-btn return-btn"><i class="fa-solid fa-book-bookmark"></i> Return a Book</button>
+            </div>
 
             <div class="body-containers-items">
                 <div class="latest-update">
@@ -121,7 +121,20 @@
             <form id="borrowIsbnForm">
                 <div class="form-group">
                     <label>ISBN (10, 13, or Barcode)</label>
-                    <input type="text" id="borrowIsbnInput" required>
+                    <div style="display:flex; gap:10px;">
+                        <input type="text" id="borrowIsbnInput" required style="flex:1;">
+                        <button type="button" id="startBorrowScanner" style="width:auto; margin-top:0; background-color:#6c757d;"><i class="fas fa-camera"></i> Scan</button>
+                    </div>
+                    <div id="borrowReader" style="width:100%; display:none; margin-top:10px;"></div>
+                    <button type="button" id="borrowLookupBtn" style="margin-top:10px; background-color:#17a2b8;">Lookup Book Info</button>
+                </div>
+                <div class="form-group">
+                    <label>Book Title (Auto-filled)</label>
+                    <input type="text" id="borrowAutoTitle" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Author (Auto-filled)</label>
+                    <input type="text" id="borrowAutoAuthor" readonly>
                 </div>
                 <div class="form-group">
                     <label>Full Name and Room Number</label>
@@ -144,7 +157,20 @@
             <form id="returnIsbnForm">
                 <div class="form-group">
                     <label>ISBN (10, 13, or Barcode)</label>
-                    <input type="text" id="returnIsbnInput" required>
+                    <div style="display:flex; gap:10px;">
+                        <input type="text" id="returnIsbnInput" required style="flex:1;">
+                        <button type="button" id="startReturnScanner" style="width:auto; margin-top:0; background-color:#6c757d;"><i class="fas fa-camera"></i> Scan</button>
+                    </div>
+                    <div id="returnReader" style="width:100%; display:none; margin-top:10px;"></div>
+                    <button type="button" id="returnLookupBtn" style="margin-top:10px; background-color:#17a2b8;">Lookup Book Info</button>
+                </div>
+                <div class="form-group">
+                    <label>Book Title (Auto-filled)</label>
+                    <input type="text" id="returnAutoTitle" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Author (Auto-filled)</label>
+                    <input type="text" id="returnAutoAuthor" readonly>
                 </div>
                 <div class="form-group">
                     <label>Full Name</label>
@@ -156,9 +182,29 @@
     </div>
 
     <div id="borrowManualModal" class="modal overlay">
-        <div class="overlay-content">
+        <div class="modal-content">
             <span class="close-button" onclick="closeModal('borrowManualModal')">&times;</span>
-            <iframe src="https://forms.gle/MnnT75DgHWQ4WGQr7" width="100%" height="700" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
+            <h2>Manual Borrow Input</h2>
+            <form id="borrowManualForm">
+                <div class="form-group">
+                    <label>Book Title</label>
+                    <input type="text" id="borrowManualTitle" required>
+                </div>
+                <div class="form-group">
+                    <label>Author</label>
+                    <input type="text" id="borrowManualAuthor" required>
+                </div>
+                <div class="form-group">
+                    <label>Full Name and Room Number</label>
+                    <input type="text" id="borrowManualNameRoom" placeholder="e.g. Billy Bob Joe, room 6" required>
+                </div>
+                <div class="form-group">
+                    <label>Disclaimer Signature</label>
+                    <p style="font-size: 0.85em; color: #666; margin-top:0;">Please recognize that you are fully accountable for the care and return of the book.</p>
+                    <input type="text" id="borrowManualSignature" placeholder="Type full name to sign" required>
+                </div>
+                <button type="submit">Submit Borrow Request</button>
+            </form>
         </div>
     </div>
 
@@ -166,7 +212,21 @@
         <div class="modal-content">
             <span class="close-button" onclick="closeModal('returnManualModal')">&times;</span>
             <h2>Manual Return Input</h2>
-            <p>Form coming soon.</p>
+            <form id="returnManualForm">
+                <div class="form-group">
+                    <label>Book Title</label>
+                    <input type="text" id="returnManualTitle" required>
+                </div>
+                <div class="form-group">
+                    <label>Author</label>
+                    <input type="text" id="returnManualAuthor" required>
+                </div>
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="returnManualName" required>
+                </div>
+                <button type="submit">Submit Return Request</button>
+            </form>
         </div>
     </div>
 
