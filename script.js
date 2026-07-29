@@ -128,7 +128,7 @@ function setupScanner(btnId, readerId, inputId) {
 }
 
 function submitToGoogleSheet(data) {
-    const scriptUrl = 'https://script.google.com/macros/s/AKfycbwtPLjj-FFoVB2faUKShZnPf94PSsL8TZ74-mqOtbNFPfKsSBjFIV326HISEJMFf9jE/exec';
+    const scriptUrl = 'https://script.google.com/macros/s/AKfycbyvHlxSf3NoF8MBZQYiHvJrBmBhYVE6V_GcGhr8iSK6AeKs5SISoUN_Ho4owsjjV0_5Fw/exec';
     
     fetch(scriptUrl, {
         method: 'POST',
