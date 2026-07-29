@@ -5,7 +5,6 @@ body {
     background-color: #f8f8f8;
     color: #333;
 }
-
 header {
     background-color: #333;
     color: white;
@@ -14,7 +13,6 @@ header {
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
 }
-
 .navbar, .navbar2 {
     background-color: #ddd;
     padding: 0.5em 0;
@@ -24,24 +22,20 @@ header {
     width: 90%;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
-
 .navbar2 {
     background-color: #333;
     color: black;
 }
-
 .navbar ul, .navbar2 ul {
     list-style: none;
     padding: 0;
     margin: 0;
     display: inline-block;
 }
-
 .navbar li, .navbar2 li {
     display: inline;
     margin: 0 15px;
 }
-
 .navbar a {
     text-decoration: none;
     color: #FF0000;
@@ -50,7 +44,6 @@ header {
     border-radius: 5px;
     transition: background-color 0.3s ease;
 }
-
 .navbar2 a {
     text-decoration: none;
     color: white;
@@ -59,11 +52,9 @@ header {
     border-radius: 5px;
     transition: background-color 0.3s ease;
 }
-
 .navbar a:hover, .navbar2 a:hover {
     background-color: #bbb;
 }
-
 .container {
     position: relative;
     width: 90%;
@@ -72,12 +63,10 @@ header {
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
-
 .container img {
     width: 100%;
     display: block;
 }
-
 .centered {
     position: absolute;
     top: 50%;
@@ -90,7 +79,6 @@ header {
     font-size: 2em;
     text-align: center;
 }
-
 .body-containers-items {
     display: flex;
     flex-direction: column;
@@ -98,7 +86,6 @@ header {
     width: 90%;
     margin: 20px auto;
 }
-
 .latest-update,
 .book-of-the-month,
 .delivery-chart,
@@ -112,12 +99,10 @@ header {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     text-align: center;
 }
-
 .dashboard-container {
     width: 90%;
     margin: 20px auto;
 }
-
 h2 {
     color: #333;
     margin-top: 0;
@@ -125,11 +110,9 @@ h2 {
     padding-bottom: 10px;
     margin-bottom: 15px;
 }
-
 .book-of-the-month article {
     padding-left: 20px;
 }
-
 footer {
     background-color: #333;
     color: white;
@@ -141,27 +124,22 @@ footer {
     border-top-right-radius: 8px;
     margin-top: 20px;
 }
-
 footer span {
     color: #ff8c00;
 }
-
 table {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 20px;
 }
-
 th, td {
     border: 1px solid #ddd;
     padding: 8px;
     text-align: left;
 }
-
 th {
     background-color: #f2f2f2;
 }
-
 .prominent-actions {
     display: flex;
     justify-content: center;
@@ -170,7 +148,6 @@ th {
     margin: 30px auto;
     width: 90%;
 }
-
 .action-btn {
     font-size: 1.5rem;
     padding: 20px 40px;
@@ -185,23 +162,18 @@ th {
     min-width: 250px;
     max-width: 400px;
 }
-
 .action-btn i {
     margin-right: 10px;
 }
-
 .action-btn:hover {
     transform: translateY(-3px);
     box-shadow: 0 6px 10px rgba(0,0,0,0.3);
 }
-
 .borrow-btn { background-color: #28a745; }
 .return-btn { background-color: #007bff; }
-
 .choice-modal-content {
     text-align: center;
 }
-
 .choice-btn {
     margin: 15px;
     padding: 15px 30px;
@@ -213,11 +185,9 @@ th {
     cursor: pointer;
     transition: background-color 0.3s;
 }
-
 .choice-btn:hover {
     background-color: #0056b3;
 }
-
 .modal {
     display: none; 
     position: fixed; 
@@ -231,7 +201,6 @@ th {
     justify-content: center; 
     align-items: center; 
 }
-
 .modal-content, .overlay-content {
     background-color: #fefefe;
     margin: auto; 
@@ -243,12 +212,10 @@ th {
     position: relative;
     animation: fadeInScale 0.3s ease-out;
 }
-
 @keyframes fadeInScale {
     from { opacity: 0; transform: scale(0.95); }
     to { opacity: 1; transform: scale(1); }
 }
-
 .close-button {
     color: #aaa;
     position: absolute;
@@ -259,25 +226,21 @@ th {
     cursor: pointer;
     transition: color 0.3s ease;
 }
-
 .close-button:hover,
 .close-button:focus {
     color: #333;
     text-decoration: none;
 }
-
 .form-group {
     margin-bottom: 20px;
     text-align: left;
 }
-
 .form-group label {
     display: block;
     margin-bottom: 8px;
     font-weight: bold;
     color: #555;
 }
-
 .form-group input[type="text"],
 .form-group select,
 .form-group textarea {
@@ -289,7 +252,6 @@ th {
     font-size: 1em;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
-
 .form-group input[type="text"]:focus,
 .form-group select:focus,
 .form-group textarea:focus {
@@ -297,7 +259,7 @@ th {
     box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
     outline: none;
 }
-
+button[type="button"],
 button[type="submit"],
 .action-button,
 .done-button,
@@ -315,12 +277,11 @@ button[type="submit"],
     margin-top: 20px;
     transition: background-color 0.3s ease, transform 0.2s ease;
 }
-
+button[type="button"]:hover,
 button[type="submit"]:hover {
     background-color: #218838;
     transform: translateY(-1px);
 }
-
 @media (max-width: 768px) {
     .navbar ul { display: flex; flex-direction: column; align-items: center; }
     .navbar li { margin: 5px 0; }
