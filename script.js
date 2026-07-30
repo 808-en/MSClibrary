@@ -1,4 +1,4 @@
-const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQaTqPVndPccN9h1-RYUulv59x-Ursqed9lsoDnMfejpp8VoI1DjYFh2Cq5Xr-471I8RcKX7vJ2yJgj/pub?output=csv';
+const sheetUrl = 'MSC_Online_Library_Book_Reques.csv';
 const TOKEN_VALUE = "loggedInIdentifierRNBN480H39A=";
 let shouldNavigate = false;
 
@@ -25,6 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }), 'borrowIsbnModal');
 
     setupFormSubmission('returnIsbnForm', 'Return', () => ({
+        requestId: document.getElementById('returnRequestId').value,
         isbn: document.getElementById('returnIsbnInput').value,
         title: document.getElementById('returnAutoTitle').value,
         author: document.getElementById('returnAutoAuthor').value,
@@ -43,6 +44,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }), 'borrowManualModal');
 
     setupFormSubmission('returnManualForm', 'Return', () => ({
+        requestId: document.getElementById('returnManualRequestId').value,
         isbn: 'Manual',
         title: document.getElementById('returnManualTitle').value,
         author: document.getElementById('returnManualAuthor').value,
@@ -75,12 +77,14 @@ function setupFormSubmission(formId, type, dataExtractor, modalId) {
         form.addEventListener('submit', function(e) {
             e.preventDefault();
             const extracted = dataExtractor();
+            const reqId = type === 'Borrow' ? 'REQ-' + Math.random().toString(36).substr(2, 9).toUpperCase() : extracted.requestId;
             const data = {
+                requestID: reqId,
                 type: type,
                 timestamp: new Date().getTime(),
                 ...extracted
             };
-            submitToGoogleSheet(data);
+            submitToGoogleSheet(data, type === 'Borrow' ? reqId : null);
             form.reset();
             closeModal(modalId);
         });
@@ -131,7 +135,7 @@ function setupScanner(btnId, readerId, inputId) {
     }
 }
 
-function submitToGoogleSheet(data) {
+function submitToGoogleSheet(data, generatedId) {
     const scriptUrl = 'https://script.google.com/macros/s/AKfycbyvHlxSf3NoF8MBZQYiHvJrBmBhYVE6V_GcGhr8iSK6AeKs5SISoUN_Ho4owsjjV0_5Fw/exec';
     
     fetch(scriptUrl, {
@@ -140,7 +144,11 @@ function submitToGoogleSheet(data) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     }).then(() => {
-        alert("Request successfully recorded!");
+        if (generatedId) {
+            alert(`Request successfully recorded! Your Return Request ID is: ${generatedId}. Please save this ID to return your book.`);
+        } else {
+            alert("Request successfully recorded!");
+        }
     }).catch(error => {
         console.error('Error!', error.message);
         alert("There was an error saving your request.");
@@ -205,11 +213,13 @@ async function fetchData(container) {
         for (let i = 0; i < maxCols; i++) {
             tableHtml += `<th>${rows[0][i] || `Col ${i+1}`}</th>`;
         }
+        tableHtml += '<th>Pending Return Pickup</th>';
         tableHtml += '</tr></thead><tbody>';
 
         rows.slice(1).forEach(rowData => {
             const statusIndex = 5; 
             const isReturned = rowData[statusIndex] && rowData[statusIndex].trim() === 'RETURNED';
+            const isReturnRequest = rowData.some(cell => cell && cell.trim().toUpperCase() === 'RETURN');
             const rowStyle = isReturned ? 'text-decoration: line-through; color: #666;' : '';
 
             tableHtml += `<tr style="${rowStyle}">`;
@@ -224,6 +234,13 @@ async function fetchData(container) {
                     tableHtml += `<td>${cell}</td>`; 
                 }
             }
+            
+            if (isReturnRequest && !isReturned) {
+                tableHtml += `<td><button class="action-btn return-btn" style="padding: 5px 15px; font-size: 1rem; min-width: auto;">Mark Picked Up</button></td>`;
+            } else {
+                tableHtml += `<td></td>`;
+            }
+            
             tableHtml += '</tr>';
         });
         tableHtml += '</tbody></table>';
