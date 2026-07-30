@@ -19,7 +19,8 @@ document.addEventListener('DOMContentLoaded', function() {
         isbn: document.getElementById('borrowIsbnInput').value,
         title: document.getElementById('borrowAutoTitle').value,
         author: document.getElementById('borrowAutoAuthor').value,
-        nameAndRoom: document.getElementById('borrowNameRoom').value,
+        name: document.getElementById('borrowName').value,
+        roomNumber: document.getElementById('borrowRoom').value,
         signature: document.getElementById('borrowSignature').value
     }), 'borrowIsbnModal');
 
@@ -27,7 +28,8 @@ document.addEventListener('DOMContentLoaded', function() {
         isbn: document.getElementById('returnIsbnInput').value,
         title: document.getElementById('returnAutoTitle').value,
         author: document.getElementById('returnAutoAuthor').value,
-        nameAndRoom: document.getElementById('returnName').value,
+        name: document.getElementById('returnName').value,
+        roomNumber: document.getElementById('returnRoom').value,
         signature: ''
     }), 'returnIsbnModal');
 
@@ -35,7 +37,8 @@ document.addEventListener('DOMContentLoaded', function() {
         isbn: 'Manual',
         title: document.getElementById('borrowManualTitle').value,
         author: document.getElementById('borrowManualAuthor').value,
-        nameAndRoom: document.getElementById('borrowManualNameRoom').value,
+        name: document.getElementById('borrowManualName').value,
+        roomNumber: document.getElementById('borrowManualRoom').value,
         signature: document.getElementById('borrowManualSignature').value
     }), 'borrowManualModal');
 
@@ -43,7 +46,8 @@ document.addEventListener('DOMContentLoaded', function() {
         isbn: 'Manual',
         title: document.getElementById('returnManualTitle').value,
         author: document.getElementById('returnManualAuthor').value,
-        nameAndRoom: document.getElementById('returnManualName').value,
+        name: document.getElementById('returnManualName').value,
+        roomNumber: document.getElementById('returnManualRoom').value,
         signature: ''
     }), 'returnManualModal');
 
