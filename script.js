@@ -24,15 +24,19 @@ document.addEventListener('DOMContentLoaded', function() {
         signature: document.getElementById('borrowSignature').value
     }), 'borrowIsbnModal');
 
-    setupFormSubmission('returnIsbnForm', 'Return', () => ({
-        requestId: document.getElementById('returnRequestId').value,
-        isbn: document.getElementById('returnIsbnInput').value,
-        title: document.getElementById('returnAutoTitle').value,
-        author: document.getElementById('returnAutoAuthor').value,
-        name: document.getElementById('returnName').value,
-        roomNumber: document.getElementById('returnRoom').value,
-        signature: ''
-    }), 'returnIsbnModal');
+    setupFormSubmission('returnIsbnForm', 'Return', () => {
+        const returnMethodElement = document.querySelector('input[name="returnMethodIsbn"]:checked');
+        return {
+            requestId: document.getElementById('returnRequestId').value,
+            isbn: document.getElementById('returnIsbnInput').value,
+            title: document.getElementById('returnAutoTitle').value,
+            author: document.getElementById('returnAutoAuthor').value,
+            name: document.getElementById('returnName').value,
+            roomNumber: document.getElementById('returnRoom').value,
+            signature: '',
+            returnMethod: returnMethodElement ? returnMethodElement.value : ''
+        };
+    }, 'returnIsbnModal');
 
     setupFormSubmission('borrowManualForm', 'Borrow', () => ({
         isbn: 'Manual',
@@ -43,15 +47,19 @@ document.addEventListener('DOMContentLoaded', function() {
         signature: document.getElementById('borrowManualSignature').value
     }), 'borrowManualModal');
 
-    setupFormSubmission('returnManualForm', 'Return', () => ({
-        requestId: document.getElementById('returnManualRequestId').value,
-        isbn: 'Manual',
-        title: document.getElementById('returnManualTitle').value,
-        author: document.getElementById('returnManualAuthor').value,
-        name: document.getElementById('returnManualName').value,
-        roomNumber: document.getElementById('returnManualRoom').value,
-        signature: ''
-    }), 'returnManualModal');
+    setupFormSubmission('returnManualForm', 'Return', () => {
+        const returnMethodElement = document.querySelector('input[name="returnMethodManual"]:checked');
+        return {
+            requestId: document.getElementById('returnManualRequestId').value,
+            isbn: 'Manual',
+            title: document.getElementById('returnManualTitle').value,
+            author: document.getElementById('returnManualAuthor').value,
+            name: document.getElementById('returnManualName').value,
+            roomNumber: document.getElementById('returnManualRoom').value,
+            signature: '',
+            returnMethod: returnMethodElement ? returnMethodElement.value : ''
+        };
+    }, 'returnManualModal');
 
     setupIsbnLookup('borrowLookupBtn', 'borrowIsbnInput', 'borrowAutoTitle', 'borrowAutoAuthor');
     setupIsbnLookup('returnLookupBtn', 'returnIsbnInput', 'returnAutoTitle', 'returnAutoAuthor');
@@ -145,7 +153,7 @@ function submitToGoogleSheet(data, generatedId) {
         body: JSON.stringify(data)
     }).then(() => {
         if (generatedId) {
-            alert(`Request successfully recorded! Your Return Request ID is: ${generatedId}. Please save this ID to return your book.`);
+            alert(`Request successfully recorded! Your Return Request ID is: ${generatedId}. Please store it somewhere safe for when you return the book.`);
         } else {
             alert("Request successfully recorded!");
         }
@@ -213,7 +221,7 @@ async function fetchData(container) {
         for (let i = 0; i < maxCols; i++) {
             tableHtml += `<th>${rows[0][i] || `Col ${i+1}`}</th>`;
         }
-        tableHtml += '<th>Pending Return Pickup</th>';
+        tableHtml += '<th>Actions</th>';
         tableHtml += '</tr></thead><tbody>';
 
         rows.slice(1).forEach(rowData => {
@@ -236,7 +244,7 @@ async function fetchData(container) {
             }
             
             if (isReturnRequest && !isReturned) {
-                tableHtml += `<td><button class="action-btn return-btn" style="padding: 5px 15px; font-size: 1rem; min-width: auto;">Mark Picked Up</button></td>`;
+                tableHtml += `<td><button class="action-btn return-btn" style="padding: 5px 15px; font-size: 1rem; min-width: auto;">Mark as Returned</button></td>`;
             } else {
                 tableHtml += `<td></td>`;
             }
@@ -250,42 +258,4 @@ async function fetchData(container) {
         console.error('Error fetching data:', error);
         container.innerHTML = '<p>Could not load data.</p>';
     }
-}
-
-function alertRec() {
-    document.getElementById('alertTitle').textContent = 'Before You Proceed';
-    document.getElementById('alertMessage').textContent = 'Before you proceed, remember, reading a physical book is more supplemental than online reading. Do not spend too much time on a screen. We are working on a suggestions update, so that you can suggest online books to be purchased and available in the library. Have fun reading! <3';
-
-    const alertBox = document.getElementById('customAlertBox');
-    const overlay = document.getElementById('overlay');
-    const okButton = document.getElementById('okButton');
-    const closeButton = document.getElementById('closeButton');
-    const getBookButton = document.getElementById('getBookButton');
-    const onlineBooksLink = document.querySelector('.online-books-button a');
-
-    shouldNavigate = false;
-
-    if(alertBox && overlay) {
-        alertBox.style.display = 'block';
-        overlay.style.display = 'block';
-    }
-
-    if(okButton) okButton.onclick = function() {
-        shouldNavigate = true;
-        alertBox.style.display = 'none';
-        overlay.style.display = 'none';
-        if(onlineBooksLink) onlineBooksLink.click();
-        window.location.href="onlineBooks.html";
-    };
-
-    if(closeButton) closeButton.onclick = function() {
-        alertBox.style.display = 'none';
-        overlay.style.display = 'none';
-    };
-
-    if(getBookButton) getBookButton.onclick = function() {
-        window.location.href = 'library.html';
-    };
-
-    return false;
 }
