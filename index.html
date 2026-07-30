@@ -89,7 +89,6 @@
                     <h2 data-i18n="credits">Credits</h2>
                     <p>&copy; copyright @ 2024 <span>Coding credit: Atticus Herr</span> [all rights reserved!]</p>
                     <p>5th grade class 2024-2025</p>
-                    <p><button class="online-books-button"><ul><li><a href="humans.html">Additional Credits</a></li></ul></button></p>
                 </div>
             </div>
         </section>
@@ -177,8 +176,8 @@
             <h2>Return by ISBN</h2>
             <form id="returnIsbnForm">
                 <div class="form-group">
-                    <label>Request ID (From your original borrow receipt)</label>
-                    <input type="text" id="returnRequestId" required placeholder="e.g. REQ-ABC123XYZ">
+                    <label>Request ID (Optional if providing Book Details)</label>
+                    <input type="text" id="returnRequestId" placeholder="e.g. REQ-ABC123XYZ">
                 </div>
                 <div class="form-group">
                     <label>ISBN (10, 13, or Barcode)</label>
@@ -222,6 +221,17 @@
                         <option value="Front Office">Front Office</option>
                         <option value="Staff Room">Staff Room</option>
                     </select>
+                </div>
+                <div class="form-group">
+                    <label>Return Method</label>
+                    <div style="margin-bottom: 5px;">
+                        <input type="radio" id="pickupIsbn" name="returnMethodIsbn" value="I need my book picked up" required>
+                        <label for="pickupIsbn" style="display:inline; font-weight:normal;">I need my book picked up</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="selfIsbn" name="returnMethodIsbn" value="I can return my book myself">
+                        <label for="selfIsbn" style="display:inline; font-weight:normal;">I can return my book myself</label>
+                    </div>
                 </div>
                 <button type="submit">Submit Return Request</button>
             </form>
@@ -283,8 +293,8 @@
             <h2>Manual Return Input</h2>
             <form id="returnManualForm">
                 <div class="form-group">
-                    <label>Request ID (From your original borrow receipt)</label>
-                    <input type="text" id="returnManualRequestId" required placeholder="e.g. REQ-ABC123XYZ">
+                    <label>Request ID (Optional if providing Book Details)</label>
+                    <input type="text" id="returnManualRequestId" placeholder="e.g. REQ-ABC123XYZ">
                 </div>
                 <div class="form-group">
                     <label>Book Title</label>
@@ -319,6 +329,17 @@
                         <option value="Front Office">Front Office</option>
                         <option value="Staff Room">Staff Room</option>
                     </select>
+                </div>
+                <div class="form-group">
+                    <label>Return Method</label>
+                    <div style="margin-bottom: 5px;">
+                        <input type="radio" id="pickupManual" name="returnMethodManual" value="I need my book picked up" required>
+                        <label for="pickupManual" style="display:inline; font-weight:normal;">I need my book picked up</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="selfManual" name="returnMethodManual" value="I can return my book myself">
+                        <label for="selfManual" style="display:inline; font-weight:normal;">I can return my book myself</label>
+                    </div>
                 </div>
                 <button type="submit">Submit Return Request</button>
             </form>
