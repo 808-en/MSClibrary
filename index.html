@@ -6,7 +6,6 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <script src="https://kit.fontawesome.com/cd38709ddf.js" crossorigin="anonymous"></script>
-    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <link rel="icon" href="Prepared Cooper.ico" type="image/x-icon">
     <link rel="shortcut icon" href="Prepared Cooper.ico" type="image/x-icon">
     <link rel="apple-touch-icon" href="Prepared Cooper.ico">
@@ -121,10 +120,8 @@
                 <div class="form-group">
                     <label>ISBN (10, 13, or Barcode)</label>
                     <div style="display:flex; gap:10px;">
-                        <input type="text" id="borrowIsbnInput" required style="flex:1;">
-                        <button type="button" id="startBorrowScanner" style="width:auto; margin-top:0; background-color:#6c757d;"><i class="fas fa-camera"></i> Scan</button>
+                        <input type="text" id="borrowIsbnInput" required style="flex:1;" placeholder="Scan barcode here...">
                     </div>
-                    <div id="borrowReader" style="width:100%; display:none; margin-top:10px;"></div>
                     <button type="button" id="borrowLookupBtn" style="margin-top:10px; background-color:#17a2b8;">Lookup Book Info</button>
                 </div>
                 <div class="form-group">
@@ -183,10 +180,8 @@
                 <div class="form-group">
                     <label>ISBN (10, 13, or Barcode)</label>
                     <div style="display:flex; gap:10px;">
-                        <input type="text" id="returnIsbnInput" required style="flex:1;">
-                        <button type="button" id="startReturnScanner" style="width:auto; margin-top:0; background-color:#6c757d;"><i class="fas fa-camera"></i> Scan</button>
+                        <input type="text" id="returnIsbnInput" required style="flex:1;" placeholder="Scan barcode here...">
                     </div>
-                    <div id="returnReader" style="width:100%; display:none; margin-top:10px;"></div>
                     <button type="button" id="returnLookupBtn" style="margin-top:10px; background-color:#17a2b8;">Lookup Book Info</button>
                 </div>
                 <div class="form-group">
