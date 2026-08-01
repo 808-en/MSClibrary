@@ -64,19 +64,20 @@
         <form id="botmForm">
             <div class="form-group">
                 <label>Book Month:</label>
-<select id="cars" name="cars">
-  <option value="january">January</option>
-  <option value="february">February</option>
-  <option value="march">March</option>
-  <option value="april">April</option>
-    <option value="june">June</option>
-    <option value="july">July</option>
-    <option value="august">August</option>
-    <option value="september">September</option>
-    <option value="october">October</option>
-    <option value="november">November</option>
-    <option value="december">December</option>
-</select>
+                <select id="botmMonth" name="botmMonth" required>
+                  <option value="January">January</option>
+                  <option value="February">February</option>
+                  <option value="March">March</option>
+                  <option value="April">April</option>
+                  <option value="May">May</option>
+                  <option value="June">June</option>
+                  <option value="July">July</option>
+                  <option value="August">August</option>
+                  <option value="September">September</option>
+                  <option value="October">October</option>
+                  <option value="November">November</option>
+                  <option value="December">December</option>
+                </select>
             </div>
             <div class="form-group">
                 <label>Book Title</label>
@@ -97,6 +98,10 @@
         <span class="close-button" onclick="closeModal('updateLatestModal')">&times;</span>
         <h2>Update Latest Changelog</h2>
         <form id="changelogForm">
+            <div class="form-group">
+                <label>Site Version</label>
+                <input type="text" id="changelogVersion" placeholder="e.g. 1.2" required>
+            </div>
             <div class="form-group">
                 <label>Latest Update Message</label>
                 <textarea id="changelogMessage" rows="4" required></textarea>
