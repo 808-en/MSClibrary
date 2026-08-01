@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             const data = {
                 sheetTarget: "Book of the Month",
-                timestamp: new Date().toLocaleString(),
+                month: document.getElementById('botmMonth').value,
                 title: document.getElementById('botmTitle').value,
                 author: document.getElementById('botmAuthor').value
             };
