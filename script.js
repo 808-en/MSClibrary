@@ -63,8 +63,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
     setupIsbnLookup('borrowLookupBtn', 'borrowIsbnInput', 'borrowAutoTitle', 'borrowAutoAuthor');
     setupIsbnLookup('returnLookupBtn', 'returnIsbnInput', 'returnAutoTitle', 'returnAutoAuthor');
-    setupScanner('startBorrowScanner', 'borrowReader', 'borrowIsbnInput');
-    setupScanner('startReturnScanner', 'returnReader', 'returnIsbnInput');
+
+    // Physical barcode scanners act as keyboards. Pressing "Enter" triggers the lookup automatically.
+    const borrowIsbnInput = document.getElementById('borrowIsbnInput');
+    if (borrowIsbnInput) {
+        borrowIsbnInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('borrowLookupBtn').click();
+            }
+        });
+    }
+
+    const returnIsbnInput = document.getElementById('returnIsbnInput');
+    if (returnIsbnInput) {
+        returnIsbnInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('returnLookupBtn').click();
+            }
+        });
+    }
 
     window.addEventListener('click', (event) => {
         if (event.target.classList.contains('modal')) {
@@ -98,7 +117,8 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             const data = {
                 sheetTarget: "Changelog",
-                timestamp: new Date().toLocaleString(),
+                timestamp: new Date().toLocaleDateString(), // Updated to only grab the Date
+                version: document.getElementById('changelogVersion').value, // Grabbing site version
                 updateMessage: document.getElementById('changelogMessage').value
             };
             submitAdminData(data, 'updateLatestModal', changelogForm);
@@ -154,22 +174,6 @@ function setupIsbnLookup(btnId, isbnInputId, titleInputId, authorInputId) {
     }
 }
 
-function setupScanner(btnId, readerId, inputId) {
-    const btn = document.getElementById(btnId);
-    if (btn && typeof Html5QrcodeScanner !== 'undefined') {
-        btn.addEventListener('click', () => {
-            const readerDiv = document.getElementById(readerId);
-            readerDiv.style.display = 'block';
-            const scanner = new Html5QrcodeScanner(readerId, { fps: 10, qrbox: 250 });
-            scanner.render((decodedText) => {
-                document.getElementById(inputId).value = decodedText;
-                scanner.clear();
-                readerDiv.style.display = 'none';
-            }, (error) => {});
-        });
-    }
-}
-
 function submitToGoogleSheet(data, generatedId) {
     const scriptUrl = 'https://script.google.com/macros/s/AKfycbyvHlxSf3NoF8MBZQYiHvJrBmBhYVE6V_GcGhr8iSK6AeKs5SISoUN_Ho4owsjjV0_5Fw/exec';
     
@@ -194,6 +198,12 @@ function openModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
         modal.style.display = 'flex';
+        // Auto-focus the input fields so physical scanners are instantly ready to accept inputs.
+        if (modalId === 'borrowIsbnModal') {
+            setTimeout(() => document.getElementById('borrowIsbnInput').focus(), 100);
+        } else if (modalId === 'returnIsbnModal') {
+            setTimeout(() => document.getElementById('returnIsbnInput').focus(), 100);
+        }
     }
 }
 
