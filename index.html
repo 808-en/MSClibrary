@@ -48,6 +48,7 @@
                     <article>
                         <p data-i18n="featuredBook">This month's featured book is:</p>
                         <ul>
+                            <li id="botmMonthDisplay" data-i18n="harryPotterMonth"><strong>Month:</strong> October</li>
                             <li id="botmTitleDisplay" data-i18n="harryPotterTitle"><strong>Title:</strong> Harry Potter and the Deathly Hallows</li>
                             <li id="botmAuthorDisplay" data-i18n="jkRowling"><strong>Author:</strong> JK Rowling</li>
                         </ul>
@@ -359,10 +360,12 @@
             
             if (botmRows.length > 0) {
                 const latestBotm = botmRows[botmRows.length - 1].split(','); 
-                
+
+                const month = latestBotm[1] ? latestBotm[1].trim() : 'Unknown Month';
                 const title = latestBotm[1] ? latestBotm[1].trim() : 'Unknown Title';
                 const author = latestBotm[2] ? latestBotm[2].trim() : 'Unknown Author';
-                
+
+                document.getElementById('botmMonthDisplay').innerHTML = `<strong>Month:</strong> ${title}`;
                 document.getElementById('botmTitleDisplay').innerHTML = `<strong>Title:</strong> ${title}`;
                 document.getElementById('botmAuthorDisplay').innerHTML = `<strong>Author:</strong> ${author}`;
             }
