@@ -38,7 +38,7 @@ header {
 }
 .navbar a {
     text-decoration: none;
-    color: #FF0000;
+    color: black;
     font-weight: bold;
     padding: 8px 12px;
     border-radius: 5px;
