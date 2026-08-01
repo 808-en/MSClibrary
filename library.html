@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MSC Book Collection - Library</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+<script src="https://kit.fontawesome.com/cd38709ddf.js" crossorigin="anonymous"></script>
+<style>
+body { font-family: 'Inter', sans-serif; margin: 0; padding: 0; background-color: #f8f8f8; color: #333; }
+header { background-color: #333; color: white; padding: 1em 0; text-align: center; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; }
+.navbar { background-color: #ddd; padding: 0.5em 0; text-align: center; border-radius: 8px; margin: 10px auto; width: 90%; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); }
+.navbar ul { list-style: none; padding: 0; margin: 0; display: inline-block; }
+.navbar li { display: inline; margin: 0 15px; }
+.navbar a { text-decoration: none; color: #FF0000; font-weight: bold; padding: 8px 12px; border-radius: 5px; transition: background-color 0.3s ease; }
+.navbar a:hover { background-color: #bbb; }
+footer { background-color: #333; color: white; text-align: center; padding: 1em 0; bottom: 0; width: 100%; border-top-left-radius: 8px; border-top-right-radius: 8px; margin-top: 20px; }
+footer span { color: #ff8c00; }
+.controls-container { width: 90%; margin: 20px auto; background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; flex-wrap: wrap; gap: 15px; justify-content: space-between; align-items: center; box-sizing: border-box; }
+.control-group { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 200px; }
+.control-group input, .control-group select { width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 6px; font-size: 1em; box-sizing: border-box; }
+.control-group input:focus, .control-group select:focus { border-color: #007bff; outline: none; }
+.library-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; width: 90%; margin: 20px auto; }
+.book-card { background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); padding: 20px; display: flex; flex-direction: column; align-items: center; text-align: center; box-sizing: border-box; }
+.book-card img { width: 100%; max-width: 200px; height: auto; border-radius: 4px; margin-bottom: 15px; object-fit: cover; }
+.book-card h3 { margin: 0 0 10px 0; font-size: 1.4em; color: #333; }
+.book-card .info { width: 100%; text-align: left; margin-bottom: 10px; font-size: 0.9em; }
+.book-card .info p { margin: 5px 0; }
+.msc-tooltip { position: relative; display: inline-block; cursor: pointer; color: #007bff; margin-left: 5px; }
+.msc-tooltip .tooltiptext { visibility: hidden; width: 200px; background-color: #555; color: #fff; text-align: center; border-radius: 6px; padding: 5px; position: absolute; z-index: 1; bottom: 125%; left: 50%; transform: translateX(-50%); opacity: 0; transition: opacity 0.3s; font-size: 0.8em; font-weight: normal; }
+.msc-tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
+.synopsis-container { width: 100%; text-align: left; font-size: 0.9em; color: #555; margin-bottom: 15px; flex-grow: 1; }
+.synopsis-text { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.synopsis-text.expanded { -webkit-line-clamp: unset; display: block; }
+.more-btn { background: none; border: none; color: #007bff; cursor: pointer; padding: 0; font-size: 1em; font-weight: bold; margin-top: 5px; }
+.borrow-btn { background-color: #28a745; color: white; border: none; border-radius: 6px; padding: 12px 20px; font-size: 1.1em; font-weight: bold; cursor: pointer; width: 100%; transition: background-color 0.3s ease, transform 0.2s ease; margin-top: auto; }
+.borrow-btn:hover { background-color: #218838; transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
+@media (max-width: 1024px) { .library-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 768px) { .library-grid { grid-template-columns: 1fr; } .navbar ul { display: flex; flex-direction: column; align-items: center; } .navbar li { margin: 5px 0; } }
+</style>
+</head>
+<body>
+
+<header>
+    <h1><img src="Prepared Cooper.ico" alt="MSC Book Collection Logo" style="height:30px; vertical-align:middle; margin-right:10px;">MSC Book Collection</h1>
+</header>
+
+<div class="navbar">
+    <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="library.html">Library</a></li>
+        <li><a href="HelpForum.html">Help</a></li>
+        <li><a href="login.html">Login <i class="fa-solid fa-user-lock"></i></a></li>
+    </ul>
+</div>
+
+<div class="controls-container">
+    <div class="control-group">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Search by Book Name or Author...">
+    </div>
+    <div class="control-group">
+        <i class="fas fa-filter"></i>
+        <select id="genreFilter">
+            <option value="">All Genres</option>
+        </select>
+    </div>
+    <div class="control-group">
+        <i class="fas fa-layer-group"></i>
+        <select id="gradeFilter">
+            <option value="">All Grade Levels & MSC+</option>
+        </select>
+    </div>
+</div>
+
+<div class="library-grid" id="libraryGrid">
+</div>
+
+<footer>
+    <p>&copy; copyright @ 2024 <span>Coding credit: Atticus Herr</span> [all rights reserved!]</p>
+    <p>5th grade class 2024-2025</p>
+</footer>
+
+<script>
+const SHEET_ID = 'YOUR_GOOGLE_SHEET_ID_HERE';
+const SHEET_NAME = 'Sheet1';
+const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${SHEET_NAME}`;
+
+let bookData = [];
+
+async function fetchBookData() {
+    try {
+        const response = await fetch(CSV_URL);
+        const csvText = await response.text();
+        parseCSV(csvText);
+    } catch (error) {
+        document.getElementById('libraryGrid').innerHTML = '<p style="text-align:center; width:100%; grid-column: 1 / -1;">Error loading books. Please check the Google Sheet connection.</p>';
+    }
+}
+
+function parseCSV(csvText) {
+    const rows = csvText.split('\n');
+    const headers = rows[0].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g).map(h => h.replace(/(^"|"$)/g, '').trim());
+    
+    for (let i = 1; i < rows.length; i++) {
+        if (!rows[i].trim()) continue;
+        const values = rows[i].match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
+        if(!values) continue;
+        
+        const book = {};
+        headers.forEach((header, index) => {
+            let val = values[index] ? values[index].replace(/(^"|"$)/g, '').trim() : '';
+            book[header] = val;
+        });
+        bookData.push(book);
+    }
+    populateFilters();
+    renderBooks(bookData);
+}
+
+function populateFilters() {
+    const genres = new Set();
+    const grades = new Set();
+
+    bookData.forEach(book => {
+        if(book['Genre']) genres.add(book['Genre']);
+        if(book['Grade Level']) grades.add(book['Grade Level']);
+        if(book['MSC+ Grade Level']) grades.add(book['MSC+ Grade Level']);
+    });
+
+    const genreFilter = document.getElementById('genreFilter');
+    Array.from(genres).sort().forEach(genre => {
+        const option = document.createElement('option');
+        option.value = genre;
+        option.textContent = genre;
+        genreFilter.appendChild(option);
+    });
+
+    const gradeFilter = document.getElementById('gradeFilter');
+    Array.from(grades).sort().forEach(grade => {
+        const option = document.createElement('option');
+        option.value = grade;
+        option.textContent = grade;
+        gradeFilter.appendChild(option);
+    });
+}
+
+function renderBooks(books) {
+    const grid = document.getElementById('libraryGrid');
+    grid.innerHTML = '';
+
+    if(books.length === 0) {
+        grid.innerHTML = '<p style="text-align:center; width:100%; grid-column: 1 / -1;">No books found matching your criteria.</p>';
+        return;
+    }
+
+    books.forEach((book, index) => {
+        const card = document.createElement('div');
+        card.className = 'book-card';
+
+        const imgSrc = book['Cover Image'] || 'ERR_Cover_Image.png';
+        const title = book['Book Name'] || 'Unknown Title';
+        const genre = book['Genre'] || 'N/A';
+        const author = book['Author'] || 'Unknown Author';
+        const grade = book['Grade Level'] || 'N/A';
+        const mscGrade = book['MSC+ Grade Level'] || 'N/A';
+        const synopsis = book['Synopsis'] || 'No synopsis available.';
+
+        card.innerHTML = `
+            <img src="${imgSrc}" alt="${title}" onerror="this.onerror=null; this.src='ERR_Cover_Image.png';">
+            <h3>${title}</h3>
+            <div class="info">
+                <p><strong>Author:</strong> ${author}</p>
+                <p><strong>Genre:</strong> ${genre}</p>
+                <p><strong>Grade Level:</strong> ${grade}</p>
+                <p><strong>MSC+ Grade:</strong> ${mscGrade} 
+                    <span class="msc-tooltip"><i class="fas fa-question-circle"></i>
+                        <span class="tooltiptext">Custom metric for measuring the complexity and developmental level of books.</span>
+                    </span>
+                </p>
+            </div>
+            <div class="synopsis-container">
+                <div class="synopsis-text" id="synopsis-${index}">${synopsis}</div>
+                <button class="more-btn" onclick="toggleSynopsis(${index})">more...</button>
+            </div>
+            <button class="borrow-btn" onclick="window.location.href='index.html#openBorrowForm'"><i class="fa-solid fa-book-open"></i> BORROW THIS BOOK</button>
+        `;
+        grid.appendChild(card);
+    });
+}
+
+function toggleSynopsis(index) {
+    const textElement = document.getElementById(`synopsis-${index}`);
+    const btnElement = textElement.nextElementSibling;
+    
+    textElement.classList.toggle('expanded');
+    if(textElement.classList.contains('expanded')) {
+        btnElement.textContent = 'less';
+    } else {
+        btnElement.textContent = 'more...';
+    }
+}
+
+function filterBooks() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const selectedGenre = document.getElementById('genreFilter').value;
+    const selectedGrade = document.getElementById('gradeFilter').value;
+
+    const filtered = bookData.filter(book => {
+        const matchesSearch = (book['Book Name'] && book['Book Name'].toLowerCase().includes(searchTerm)) || 
+                              (book['Author'] && book['Author'].toLowerCase().includes(searchTerm));
+        const matchesGenre = selectedGenre === '' || book['Genre'] === selectedGenre;
+        const matchesGrade = selectedGrade === '' || book['Grade Level'] === selectedGrade || book['MSC+ Grade Level'] === selectedGrade;
+
+        return matchesSearch && matchesGenre && matchesGrade;
+    });
+
+    renderBooks(filtered);
+}
+
+document.getElementById('searchInput').addEventListener('input', filterBooks);
+document.getElementById('genreFilter').addEventListener('change', filterBooks);
+document.getElementById('gradeFilter').addEventListener('change', filterBooks);
+
+window.onload = fetchBookData;
+</script>
+</body>
+</html>
