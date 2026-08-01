@@ -77,6 +77,33 @@ document.addEventListener('DOMContentLoaded', function() {
         loggedincheck();
         fetchData(dataContainer);
     }
+
+    const botmForm = document.getElementById('botmForm');
+    if (botmForm) {
+        botmForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const data = {
+                sheetTarget: "Book of the Month",
+                timestamp: new Date().toLocaleString(),
+                title: document.getElementById('botmTitle').value,
+                author: document.getElementById('botmAuthor').value
+            };
+            submitAdminData(data, 'updateBotmModal', botmForm);
+        });
+    }
+
+    const changelogForm = document.getElementById('changelogForm');
+    if (changelogForm) {
+        changelogForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const data = {
+                sheetTarget: "Changelog",
+                timestamp: new Date().toLocaleString(),
+                updateMessage: document.getElementById('changelogMessage').value
+            };
+            submitAdminData(data, 'updateLatestModal', changelogForm);
+        });
+    }
 });
 
 function setupFormSubmission(formId, type, dataExtractor, modalId) {
@@ -158,7 +185,7 @@ function submitToGoogleSheet(data, generatedId) {
             alert("Request successfully recorded!");
         }
     }).catch(error => {
-        console.error('Error!', error.message);
+        console.error(error.message);
         alert("There was an error saving your request.");
     });
 }
@@ -181,10 +208,12 @@ function setupModalHandlers() {
     const openAdd = document.getElementById('openAddBookModal');
     const openDel = document.getElementById('openDeleteBookModal');
     const openUpd = document.getElementById('openUpdateBotmModal');
+    const openLatest = document.getElementById('openUpdateLatestModal');
 
     if(openAdd) openAdd.addEventListener('click', () => openModal('addBookModal'));
     if(openDel) openDel.addEventListener('click', () => { openModal('deleteBookModal'); fetchDeleteChartData(); });
     if(openUpd) openUpd.addEventListener('click', () => openModal('updateBotmModal'));
+    if(openLatest) openLatest.addEventListener('click', () => openModal('updateLatestModal'));
 }
 
 function loggedincheck() {
@@ -255,7 +284,25 @@ async function fetchData(container) {
 
         container.innerHTML = tableHtml;
     } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error(error);
         container.innerHTML = '<p>Could not load data.</p>';
     }
+}
+
+function submitAdminData(data, modalId, formElement) {
+    const scriptUrl = 'https://script.google.com/macros/s/AKfycbyvHlxSf3NoF8MBZQYiHvJrBmBhYVE6V_GcGhr8iSK6AeKs5SISoUN_Ho4owsjjV0_5Fw/exec';
+    
+    fetch(scriptUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    }).then(() => {
+        alert("Update successfully recorded!");
+        formElement.reset();
+        closeModal(modalId);
+    }).catch(error => {
+        console.error(error.message);
+        alert("There was an error saving your request.");
+    });
 }
