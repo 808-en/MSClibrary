@@ -63,8 +63,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     setupIsbnLookup('borrowLookupBtn', 'borrowIsbnInput', 'borrowAutoTitle', 'borrowAutoAuthor');
     setupIsbnLookup('returnLookupBtn', 'returnIsbnInput', 'returnAutoTitle', 'returnAutoAuthor');
+    setupIsbnLookup('botmLookupBtn', 'botmIsbnInput', 'botmTitle', 'botmAuthor');
 
-    // Physical barcode scanners act as keyboards. Pressing "Enter" triggers the lookup automatically.
     const borrowIsbnInput = document.getElementById('borrowIsbnInput');
     if (borrowIsbnInput) {
         borrowIsbnInput.addEventListener('keypress', function(e) {
@@ -81,6 +81,16 @@ document.addEventListener('DOMContentLoaded', function() {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 document.getElementById('returnLookupBtn').click();
+            }
+        });
+    }
+
+    const botmIsbnInput = document.getElementById('botmIsbnInput');
+    if (botmIsbnInput) {
+        botmIsbnInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('botmLookupBtn').click();
             }
         });
     }
@@ -117,8 +127,8 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             const data = {
                 sheetTarget: "Changelog",
-                timestamp: new Date().toLocaleDateString(), // Updated to only grab the Date
-                version: document.getElementById('changelogVersion').value, // Grabbing site version
+                timestamp: new Date().toLocaleDateString(),
+                version: document.getElementById('changelogVersion').value,
                 updateMessage: document.getElementById('changelogMessage').value
             };
             submitAdminData(data, 'updateLatestModal', changelogForm);
@@ -198,11 +208,12 @@ function openModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
         modal.style.display = 'flex';
-        // Auto-focus the input fields so physical scanners are instantly ready to accept inputs.
         if (modalId === 'borrowIsbnModal') {
             setTimeout(() => document.getElementById('borrowIsbnInput').focus(), 100);
         } else if (modalId === 'returnIsbnModal') {
             setTimeout(() => document.getElementById('returnIsbnInput').focus(), 100);
+        } else if (modalId === 'updateBotmModal') {
+            setTimeout(() => document.getElementById('botmIsbnInput').focus(), 100);
         }
     }
 }
