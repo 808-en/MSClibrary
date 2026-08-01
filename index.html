@@ -348,23 +348,46 @@
 
     <script src="script.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const botmTitleDisplay = document.getElementById('botmTitleDisplay');
-            const botmAuthorDisplay = document.getElementById('botmAuthorDisplay');
+    document.addEventListener('DOMContentLoaded', async () => {
+        const botmCsvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQaTqPVndPccN9h1-RYUulv59x-Ursqed9lsoDnMfejpp8VoI1DjYFh2Cq5Xr-471I8RcKX7vJ2yJgj/pub?gid=399990247&single=true&output=csv'; 
+        const changelogCsvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQaTqPVndPccN9h1-RYUulv59x-Ursqed9lsoDnMfejpp8VoI1DjYFh2Cq5Xr-471I8RcKX7vJ2yJgj/pub?gid=799275151&single=true&output=csv';
 
-            const storedBookOfTheMonth = localStorage.getItem('bookOfTheMonth');
-            if (storedBookOfTheMonth) {
-                const { title, author } = JSON.parse(storedBookOfTheMonth);
-                botmTitleDisplay.innerHTML = `<strong>Title:</strong> ${title}`;
-                botmAuthorDisplay.innerHTML = `<strong>Author:</strong> ${author}`;
+        try {
+            const botmResponse = await fetch(botmCsvUrl);
+            const botmText = await botmResponse.text();
+            const botmRows = botmText.split('\n').filter(row => row.trim() !== ''); 
+            
+            if (botmRows.length > 0) {
+                const latestBotm = botmRows[botmRows.length - 1].split(','); 
+                
+                const title = latestBotm[1] ? latestBotm[1].trim() : 'Unknown Title';
+                const author = latestBotm[2] ? latestBotm[2].trim() : 'Unknown Author';
+                
+                document.getElementById('botmTitleDisplay').innerHTML = `<strong>Title:</strong> ${title}`;
+                document.getElementById('botmAuthorDisplay').innerHTML = `<strong>Author:</strong> ${author}`;
             }
+        } catch (error) {
+            console.error('Error fetching Book of the Month:', error);
+        }
 
-            const latestUpdateDisplay = document.getElementById('latestUpdateDisplay');
-            const storedLatestUpdate = localStorage.getItem('latestUpdate');
-            if (storedLatestUpdate) {
-                latestUpdateDisplay.textContent = storedLatestUpdate;
+        try {
+            const updateResponse = await fetch(changelogCsvUrl);
+            const updateText = await updateResponse.text();
+            const updateRows = updateText.split('\n').filter(row => row.trim() !== '');
+
+            if (updateRows.length > 0) {
+                const latestUpdateRow = updateRows[updateRows.length - 1].split(',');
+                
+                const updateMessage = latestUpdateRow.slice(1).join(',').trim();
+                
+                if (updateMessage) {
+                    document.getElementById('latestUpdateDisplay').textContent = updateMessage;
+                }
             }
-        });
-    </script>
+        } catch (error) {
+            console.error('Error fetching Changelog:', error);
+        }
+    });
+</script>
 </body>
 </html>
