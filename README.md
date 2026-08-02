@@ -1,6 +1,10 @@
 # MSClibrary
 
-A simple, responsive static website for a small library project — MSClibrary. This repository contains a multi-page front-end built with HTML, CSS and JavaScript: a homepage, library/catalog page, login and admin pages, a help forum page, a 404 page, and supporting assets and scripts.
+A simple, responsive static website for a small library project for the school Merryhill School Calvine (MSC) — MSClibrary. This repository contains a multi-page front-end website built with HTML, CSS and JavaScript: a homepage, library/catalog page, login and admin pages, a help forum page, a 404 page, and supporting assets and scripts. This site has been hosted with 2 different providers -- GitHub Pages, and Cloud Flare Pages.
+
+**Hosted Site Links**
+- https://www.808-en.github.io/MSClibrary
+- https://www.https://msclibrary.atticusherr.workers.dev/
 
 Preview
 -------
@@ -10,7 +14,7 @@ Key features
 ------------
 - Multi-page static site: index, library, login, admin, help forum and 404 pages.
 - Client-side interactivity handled by `script.js`.
-- Styling in `style.css` with responsive layout considerations.
+- Styling in `style.css` with a responsive layout.
 - Assets included (favicon, header image, other images).
 - Sitemap (sitemap.xml) included for static site crawlers.
 
@@ -20,21 +24,6 @@ Tech stack
 - CSS
 - JavaScript
 (No backend required to view the site — it's a static front-end.)
-
-Quick start
------------
-1. Clone the repository:
-   git clone https://github.com/808-en/MSClibrary.git
-2. Open `index.html` in your browser:
-   - Double-click `index.html` or
-   - Serve locally (recommended) to avoid some browser restrictions:
-     - Python 3: `python -m http.server 8000` then open `http://localhost:8000`
-     - Or use any static server you prefer (e.g. `serve`, `http-server`).
-
-Deployment
-----------
-- GitHub Pages: set the repository to publish from the `main` branch (root) to host the static site.
-- Any static-hosting provider (Netlify, Vercel, Surge) will also work — point the provider to the repository root.
 
 Repository layout
 -----------------
@@ -52,11 +41,13 @@ Repository layout
 
 Customization guide
 -------------------
+If you would like to clone, edit, or duplicate this site, please follow these rules:
 - Content: Edit the HTML files (`index.html`, `library.html`, etc.) for text, links and structure.
 - Styling: Modify `style.css` to change fonts, colors, layout and responsive rules.
 - Behavior: Update `script.js` to add/remove client-side logic, form validations, or local UI state.
 - Images: Replace `Header-IMG.jpg` and other images in the repo with your own assets (keep names or update references in HTML).
-- Login/Admin: These pages are front-end only. If you add authentication, connect them to a proper backend and secure storage.
+- Login/Admin: These pages are currently front-end only. If you add authentication, connect them to a proper backend and secure storage. If you keep it front-end, make sure to hash or at least obfuscate javascript to protect passwords.
+- Credits: Proper attribution is required. Preferably in a footer or in a dedicated Credits page.
 
 Accessibility & SEO tips
 ------------------------
@@ -78,13 +69,8 @@ Contributing
 
 License
 -------
-No license file is included in this repository. If you'd like others to reuse this project, consider adding a license (MIT, Apache-2.0, etc.). Let me know which license you prefer and I can add it.
+hmmm
 
 Getting help / Contact
 ----------------------
-If you want me to:
-- Commit this README.md into the repository for you, tell me and I will create the file on the `main` branch.
-- Add a LICENSE file, tell me which license to use and I’ll add it.
-- Improve or expand documentation (API plan, deployment script, example data for the library catalog), mention which area to focus on.
-
-Thank you — nice, clean static site. If you'd like, I can add the README.md directly to the repo now.
+hmmmm
