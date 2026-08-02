@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             const data = {
                 sheetTarget: "Changelog",
-                timestamp: new Date().toLocaleDateString(),
+                timestamp: new Date(),
                 version: document.getElementById('changelogVersion').value,
                 updateMessage: document.getElementById('changelogMessage').value
             };
