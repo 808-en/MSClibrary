@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             const data = {
                 sheetTarget: "Changelog",
-                timestamp: new Date(),
+                timestamp: new Date().getTime(),
                 version: document.getElementById('changelogVersion').value,
                 updateMessage: document.getElementById('changelogMessage').value
             };
