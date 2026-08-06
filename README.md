@@ -3,8 +3,8 @@
 A simple, responsive static website for a small library project for the school Merryhill School Calvine (MSC) — MSClibrary. This repository contains a multi-page front-end website built with HTML, CSS and JavaScript: a homepage, library/catalog page, login and admin pages, a help forum page, a 404 page, and supporting assets and scripts. This site has been hosted with 2 different providers -- GitHub Pages, and Cloud Flare Pages.
 
 **Hosted Site Links**
-- https://www.808-en.github.io/MSClibrary
-- https://www.https://msclibrary.atticusherr.workers.dev/
+- https://808-en.github.io/MSClibrary
+- https://msclibrary.atticusherr.workers.dev/
 
 Preview
 -------
