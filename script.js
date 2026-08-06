@@ -291,14 +291,14 @@ async function fetchData(container) {
             const returnedVal = rowData[returnedIndex] ? rowData[returnedIndex].trim().toUpperCase() : '';
             const isReturned = returnedVal === 'Y' || returnedVal === 'YES' || returnedVal === 'RETURNED';
             const reqId = rowData[reqIdIndex] || '';
-            const rowStyle = isReturned ? 'text-decoration: line-through; color: green;' : '';
+            const rowStyle = isReturned ? 'text-decoration: line-through; color: green; font-weight: bold;' : '';
 
             tableHtml += `<tr style="${rowStyle}">`;
             
             for (let i = 0; i < maxCols; i++) {
                 let cell = rowData[i] || '';
-                if (i === returnedIndex && isReturned) {
-                    cell = 'Y';
+                if (i === returnedIndex) {
+                    cell = isReturned ? 'Y' : cell;
                 }
                 tableHtml += `<td>${cell}</td>`; 
             }
@@ -349,8 +349,11 @@ function markAsReturned(row, reqId, returnedIndex) {
         console.error(error.message);
     });
 
+
     row.style.textDecoration = 'line-through';
     row.style.color = 'green';
+    row.style.fontWeight = 'bold';
+
 
     const cells = row.querySelectorAll('td');
     if (cells[returnedIndex]) {
