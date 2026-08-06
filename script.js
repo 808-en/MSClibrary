@@ -262,39 +262,49 @@ async function fetchData(container) {
         if (!response.ok) throw new Error('Network response was not ok');
 
         const textData = await response.text();
-        const rows = textData.split('\n').map(row => row.split(','));
+        const lines = textData.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+        const rows = lines.map(row => row.split(',').map(cell => cell.trim().replace(/^"|"$/g, '')));
 
-        let maxCols = 0;
-        rows.forEach(row => { if(row.length > maxCols) maxCols = row.length; });
+        if (rows.length === 0) {
+            container.innerHTML = '<p>No data available.</p>';
+            return;
+        }
+
+        const headers = rows[0];
+        let maxCols = headers.length;
+        rows.forEach(row => { if (row.length > maxCols) maxCols = row.length; });
+
+        let returnedIndex = headers.findIndex(h => h.toLowerCase().includes('returned'));
+        if (returnedIndex === -1) returnedIndex = 9;
+
+        let reqIdIndex = headers.findIndex(h => h.toLowerCase().includes('request id') || h.toLowerCase().includes('requestid'));
+        if (reqIdIndex === -1) reqIdIndex = 1;
 
         let tableHtml = '<table><thead><tr>';
         for (let i = 0; i < maxCols; i++) {
-            tableHtml += `<th>${rows[0][i] || `Col ${i+1}`}</th>`;
+            tableHtml += `<th>${headers[i] || `Col ${i+1}`}</th>`;
         }
         tableHtml += '<th>Actions</th>';
         tableHtml += '</tr></thead><tbody>';
 
         rows.slice(1).forEach(rowData => {
-            const statusIndex = 5; 
-            const isReturned = rowData[statusIndex] && rowData[statusIndex].trim() === 'RETURNED';
-            const isReturnRequest = rowData.some(cell => cell && cell.trim().toUpperCase() === 'RETURN');
-            const rowStyle = isReturned ? 'text-decoration: line-through; color: #666;' : '';
+            const returnedVal = rowData[returnedIndex] ? rowData[returnedIndex].trim().toUpperCase() : '';
+            const isReturned = returnedVal === 'Y' || returnedVal === 'YES' || returnedVal === 'RETURNED';
+            const reqId = rowData[reqIdIndex] || '';
+            const rowStyle = isReturned ? 'text-decoration: line-through; color: green;' : '';
 
             tableHtml += `<tr style="${rowStyle}">`;
             
             for (let i = 0; i < maxCols; i++) {
-                const cell = rowData[i] || '';
-                if (i === statusIndex && isReturned) {
-                    tableHtml += `<td style="color: blue; font-weight: bold; font-size: 1.2em; text-decoration: none;">${cell}</td>`;
-                } else if (i === statusIndex && cell.trim() === 'BORROWED') {
-                    tableHtml += `<td style="color: green; font-weight: bold;">${cell}</td>`;
-                } else {
-                    tableHtml += `<td>${cell}</td>`; 
+                let cell = rowData[i] || '';
+                if (i === returnedIndex && isReturned) {
+                    cell = 'Y';
                 }
+                tableHtml += `<td>${cell}</td>`; 
             }
             
-            if (isReturnRequest && !isReturned) {
-                tableHtml += `<td><button class="action-btn return-btn" style="padding: 5px 15px; font-size: 1rem; min-width: auto;">Mark as Returned</button></td>`;
+            if (!isReturned) {
+                tableHtml += `<td><button class="action-btn return-btn" style="padding: 5px 15px; font-size: 1rem; min-width: auto;" data-reqid="${reqId}">Mark as Returned</button></td>`;
             } else {
                 tableHtml += `<td></td>`;
             }
@@ -304,9 +314,52 @@ async function fetchData(container) {
         tableHtml += '</tbody></table>';
 
         container.innerHTML = tableHtml;
+
+        const returnBtns = container.querySelectorAll('.return-btn');
+        returnBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const reqId = this.getAttribute('data-reqid');
+                const row = this.closest('tr');
+                markAsReturned(row, reqId, returnedIndex);
+            });
+        });
     } catch (error) {
         console.error(error);
         container.innerHTML = '<p>Could not load data.</p>';
+    }
+}
+
+function markAsReturned(row, reqId, returnedIndex) {
+    const scriptUrl = 'https://script.google.com/macros/s/AKfycbyvHlxSf3NoF8MBZQYiHvJrBmBhYVE6V_GcGhr8iSK6AeKs5SISoUN_Ho4owsjjV0_5Fw/exec';
+    const data = {
+        sheetTarget: "MarkReturned",
+        type: "Return",
+        requestID: reqId,
+        returned: "Y"
+    };
+
+    fetch(scriptUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    }).then(() => {
+        alert("Marked as returned successfully!");
+    }).catch(error => {
+        console.error(error.message);
+    });
+
+    row.style.textDecoration = 'line-through';
+    row.style.color = 'green';
+
+    const cells = row.querySelectorAll('td');
+    if (cells[returnedIndex]) {
+        cells[returnedIndex].textContent = 'Y';
+    }
+
+    const actionCell = cells[cells.length - 1];
+    if (actionCell) {
+        actionCell.innerHTML = '';
     }
 }
 
