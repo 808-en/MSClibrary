@@ -18,8 +18,15 @@
         <h1>401</h1>
         <p class="lead">Forbidden — your session has expired or you do not have permission to access this page.</p>
         <p>If you believe this is an error, try logging in again or contact the site administrator.</p>
-        <a class="button" href="login.html">Log in</a>
+        <a class="button" href="login.html">Log in</a><a class="button" href="index.html">Home Page</a><a class="button" onclick="reloadPage()">Refresh</a>
         <small>MSC Book Collection</small>
     </div>
-</body>
+</body>\
+    <script>
+
+        function reloadPage() {
+            window.location.reload();
+        }
+        
+    </script>
 </html>
