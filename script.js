@@ -1,6 +1,7 @@
 const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQaTqPVndPccN9h1-RYUulv59x-Ursqed9lsoDnMfejpp8VoI1DjYFh2Cq5Xr-471I8RcKX7vJ2yJgj/pub?output=csv';
 const TOKEN_VALUE = "loggedInIdentifierRNBN480H39A=";
 let shouldNavigate = false;
+let _sessionInterval = null;
 
 document.addEventListener('DOMContentLoaded', function() {
     setupModalHandlers();
@@ -134,6 +135,12 @@ document.addEventListener('DOMContentLoaded', function() {
             submitAdminData(data, 'updateLatestModal', changelogForm);
         });
     }
+
+    // start session countdown if the element exists
+    const countdownEl = document.getElementById('sessionCountdown');
+    if (countdownEl) {
+        startSessionCountdown('sessionCountdown');
+    }
 });
 
 function setupFormSubmission(formId, type, dataExtractor, modalId) {
@@ -245,7 +252,8 @@ function loggedincheck() {
     if (!isValid) {
         localStorage.removeItem("loggedInState");
         localStorage.removeItem("loggedInExpiry");
-        window.location.href = "login.html";
+        // redirect to 401 - forbidden page when the session expires or token is invalid
+        window.location.href = "401.html";
         return;
     }
 }
@@ -253,7 +261,36 @@ function loggedincheck() {
 function logout() {
     localStorage.removeItem("loggedInState");
     localStorage.removeItem("loggedInExpiry");
-    window.location.href = "index.html";
+    // send users to 401 forbidden page on logout as requested
+    window.location.href = "401.html";
+}
+
+// Session countdown helper: shows mm:ss and redirects to 401 when expired
+function startSessionCountdown(elementId) {
+    clearInterval(_sessionInterval);
+    const el = document.getElementById(elementId);
+    if (!el) return;
+
+    function update() {
+        const expiry = Number(localStorage.getItem('loggedInExpiry')) || 0;
+        const remaining = expiry - Date.now();
+        if (remaining <= 0) {
+            el.textContent = 'Session: 00:00';
+            localStorage.removeItem('loggedInState');
+            localStorage.removeItem('loggedInExpiry');
+            clearInterval(_sessionInterval);
+            // small delay so the user sees 00:00 for a moment
+            setTimeout(() => { window.location.href = '401.html'; }, 250);
+            return;
+        }
+        const totalSeconds = Math.floor(remaining / 1000);
+        const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+        const seconds = (totalSeconds % 60).toString().padStart(2, '0');
+        el.textContent = `Session: ${minutes}:${seconds}`;
+    }
+
+    update();
+    _sessionInterval = setInterval(update, 1000);
 }
 
 async function fetchData(container) {
