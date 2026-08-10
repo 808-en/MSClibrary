@@ -261,8 +261,8 @@ function loggedincheck() {
 function logout() {
     localStorage.removeItem("loggedInState");
     localStorage.removeItem("loggedInExpiry");
-    // send users to 401 forbidden page on logout as requested
-    window.location.href = "401.html";
+    
+    window.location.href = "index.html";
 }
 
 // Session countdown helper: shows mm:ss and redirects to 401 when expired
@@ -280,7 +280,7 @@ function startSessionCountdown(elementId) {
             localStorage.removeItem('loggedInExpiry');
             clearInterval(_sessionInterval);
             // small delay so the user sees 00:00 for a moment
-            setTimeout(() => { window.location.href = '401.html'; }, 250);
+            setTimeout(() => { window.location.href = '401.html'; }, 3000);
             return;
         }
         const totalSeconds = Math.floor(remaining / 1000);
