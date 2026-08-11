@@ -2,11 +2,25 @@ const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQaTqPVndPccN9
 const TOKEN_VALUE = "loggedInIdentifierRNBN480H39A=";
 const ADMIN_DB_URL = "https://script.google.com/macros/s/AKfycbwbPCbZbcoQ6GvIUCjYrY_jU6kM9hXk9LB5Z8vmcgBfbo9kbbzkInrp6n7URJlXuI1Wzw/exec";
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyvHlxSf3NoF8MBZQYiHvJrBmBhYVE6V_GcGhr8iSK6AeKs5SISoUN_Ho4owsjjV0_5Fw/exec';
+const PERMISSIONS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSoAFx19CsTSNpMOzTY5hKdRb8zK4xhyaf62-dtZoKuZVNpba7pm8Q7S61PnrhwcldrbXc-vmFJopnr/pub?gid=1165712763&single=true&output=csv';
+
+const specialUids = [
+    "VhgEt0B5ngSPNUYoVd1pRJnPrHv2",
+    "1VbKdeueO7YnEvAAT3OAVrqmquy2",
+    "qe6G5PXPoqTQZVnQmcsJ6ovkq9y2",
+    "rdAV8IhU11beQN7hVPhm2IUddFq1",
+    "7eJpgkWS6KPXh1vCLI5gJkW698e2",
+    "ozb34ly0fiWDRbc6SGHy85GVO4s1",
+    "f6ODKfpvzxXzYn6DSE8PfuAmz5q1",
+    "Uuy1MIQovXMJVQp3KqOuIpgvKCn1E"
+];
+
 let shouldNavigate = false;
 let _sessionInterval = null;
 
 document.addEventListener('DOMContentLoaded', function() {
     setupModalHandlers();
+    updateAccountPermissions(null);
     
     const btnProminentBorrow = document.getElementById('btnProminentBorrow');
     const btnProminentReturn = document.getElementById('btnProminentReturn');
@@ -344,6 +358,94 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+function isActivePeriodValid(activePeriodStr) {
+    if (!activePeriodStr) return false;
+    const currentYear = new Date().getFullYear();
+    if (activePeriodStr.includes(String(currentYear))) return true;
+    const years = activePeriodStr.match(/\b20\d\d\b/g);
+    if (years && years.length >= 2) {
+        const startYear = parseInt(years[0], 10);
+        const endYear = parseInt(years[years.length - 1], 10);
+        if (currentYear >= startYear && currentYear <= endYear) return true;
+    }
+    return false;
+}
+
+async function updateAccountPermissions(user) {
+    const addDelEl = document.getElementById('addDeleteBooksPermission');
+    const exportEl = document.getElementById('exportRequestsPermission');
+    const botmEl = document.getElementById('updateChangesBotmPermission');
+    const teacherEl = document.getElementById('teacherToolsPermission');
+
+    if (!addDelEl && !exportEl && !botmEl && !teacherEl) return;
+
+    const greenY = '<span style="color: green; font-weight: bold;">Y</span>';
+    const redN = '<span style="color: red; font-weight: bold;">N</span>';
+
+    let role = 'guest';
+
+    if (user && user.uid) {
+        if (specialUids.includes(user.uid)) {
+            role = 'teacher';
+        } else {
+            try {
+                const response = await fetch(PERMISSIONS_CSV_URL);
+                if (response.ok) {
+                    const csvText = await response.text();
+                    const lines = csvText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+                    if (lines.length > 1) {
+                        const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, '').toLowerCase());
+                        let uidIdx = headers.indexOf('uid');
+                        if (uidIdx === -1) uidIdx = 3;
+                        let roleIdx = headers.indexOf('role');
+                        if (roleIdx === -1) roleIdx = 2;
+                        let activeIdx = headers.findIndex(h => h.includes('active'));
+                        if (activeIdx === -1) activeIdx = 4;
+
+                        for (let i = 1; i < lines.length; i++) {
+                            const cells = lines[i].split(',').map(c => c.trim().replace(/^"|"$/g, ''));
+                            const rowUid = cells[uidIdx] !== undefined ? cells[uidIdx] : (cells[3] || '');
+                            const rowRole = cells[roleIdx] !== undefined ? cells[roleIdx] : (cells[2] || '');
+                            const rowActive = cells[activeIdx] !== undefined ? cells[activeIdx] : (cells[4] || cells[cells.length - 1] || '');
+
+                            if (rowUid === user.uid && isActivePeriodValid(rowActive)) {
+                                const lowerRole = rowRole.toLowerCase();
+                                if (lowerRole.includes('teacher')) {
+                                    role = 'teacher';
+                                } else if (lowerRole.includes('book manager') || lowerRole.includes('librarian') || lowerRole.includes('manager')) {
+                                    role = 'librarian';
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+    }
+
+    if (role === 'teacher') {
+        if (addDelEl) addDelEl.innerHTML = greenY;
+        if (exportEl) exportEl.innerHTML = greenY;
+        if (botmEl) botmEl.innerHTML = greenY;
+        if (teacherEl) teacherEl.innerHTML = greenY;
+    } else if (role === 'librarian') {
+        if (addDelEl) addDelEl.innerHTML = greenY;
+        if (exportEl) exportEl.innerHTML = greenY;
+        if (botmEl) botmEl.innerHTML = greenY;
+        if (teacherEl) teacherEl.innerHTML = redN;
+    } else {
+        if (addDelEl) addDelEl.innerHTML = redN;
+        if (exportEl) exportEl.innerHTML = redN;
+        if (botmEl) botmEl.innerHTML = redN;
+        if (teacherEl) teacherEl.innerHTML = redN;
+    }
+}
+
+window.updateAccountPermissions = updateAccountPermissions;
+
 function setupFormSubmission(formId, type, dataExtractor, modalId) {
     const form = document.getElementById(formId);
     if (form) {
@@ -481,11 +583,13 @@ function setupModalHandlers() {
     const openDel = document.getElementById('openDeleteBookModal');
     const openUpd = document.getElementById('openUpdateBotmModal');
     const openLatest = document.getElementById('openUpdateLatestModal');
+    const openPerms = document.getElementById('openPermissions');
 
     if(openAdd) openAdd.addEventListener('click', () => openModal('addBookModal'));
     if(openDel) openDel.addEventListener('click', () => { openModal('deleteBookModal'); fetchDeleteChartData(); });
     if(openUpd) openUpd.addEventListener('click', () => openModal('updateBotmModal'));
     if(openLatest) openLatest.addEventListener('click', () => openModal('updateLatestModal'));
+    if(openPerms) openPerms.addEventListener('click', () => openModal('permissionsModal'));
 }
 
 function loggedincheck() {}
