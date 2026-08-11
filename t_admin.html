@@ -6,6 +6,19 @@
     <title>Admin Dashboard - MSC Book Collection</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        #sessionCountdown {
+            color: #ff0000;
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-left: 10px;
+        }
+        .countdown-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -32,11 +45,17 @@
     <div class="dashboard-container admin-book-actions">
         <h2>Management Options</h2>
         <div class="prominent-actions">
-            <button onclick="window.location.href='https://docs.google.com/spreadsheets/d/e/2PACX-1vQaTqPVndPccN9h1-RYUulv59x-Ursqed9lsoDnMfejpp8VoI1DjYFh2Cq5Xr-471I8RcKX7vJ2yJgj/pub?output=csv'" class="action-btn return-btn" style="font-size: 1.1rem; padding: 15px; background-color: #28a745;">Export CSV</button>
             <button id="openAddBookModal" class="action-btn return-btn" style="font-size: 1.1rem; padding: 15px; background-color: #28a745;">Add New Book</button>
             <button id="openDeleteBookModal" class="action-btn return-btn" style="font-size: 1.1rem; padding: 15px; background-color: #dc3545;">Delete Books</button>
             <button id="openUpdateBotmModal" class="action-btn return-btn" style="font-size: 1.1rem; padding: 15px; background-color: #007bff;">Update Book of the Month</button>
             <button id="openUpdateLatestModal" class="action-btn return-btn" style="font-size: 1.1rem; padding: 15px; background-color: #6c757d;">Update Latest Changelog</button>
+        </div>
+    </div>
+    <div class="dashboard-container">
+        <h2>Download Data</h2>
+        <div class="prominent-actions">
+        <button onclick="window.location.href='https://docs.google.com/spreadsheets/d/e/2PACX-1vQaTqPVndPccN9h1-RYUulv59x-Ursqed9lsoDnMfejpp8VoI1DjYFh2Cq5Xr-471I8RcKX7vJ2yJgj/pub?gid=0&single=true&output=csv'" class="action-btn return-btn" style="font-size: 1.1rem; padding: 15px; background-color: #28a745;">Export Borrow CSV</button>
+        <button onclick="window.location.href='https://docs.google.com/spreadsheets/d/e/2PACX-1vQaTqPVndPccN9h1-RYUulv59x-Ursqed9lsoDnMfejpp8VoI1DjYFh2Cq5Xr-471I8RcKX7vJ2yJgj/pub?gid=2128186552&single=true&output=csv'" class="action-btn return-btn" style="font-size: 1.1rem; padding: 15px; background-color: #a7288a;">Export Return Requests CSV</button>
         </div>
     </div>
 
@@ -46,18 +65,85 @@
 
     <div id="addBookModal" class="modal">
         <div class="modal-content">
-            <span class="close-button" onclick="closeModal('addBookModal')">&times;</span>
+            <span class="close-button" onclick="closeModal('addBookModal'); document.getElementById('addBookChoiceSection').style.display='block'; document.getElementById('normalTypeChoiceSection').style.display='none'; document.getElementById('normalInputSection').style.display='none'; document.getElementById('massInputSection').style.display='none';">&times;</span>
             <h2>Add New Book</h2>
-            <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdpxvArZsHA7UMjbv88oMnif2SPeAAdGlVrvWaEMJL8CDh0-w/viewform?embedded=true" width="100%" height="600" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
+            
+            <div id="addBookChoiceSection" class="choice-modal-content">
+                <h3>How would you like to add?</h3>
+                <button type="button" class="choice-btn" onclick="document.getElementById('addBookChoiceSection').style.display='none'; document.getElementById('normalTypeChoiceSection').style.display='block';">Normal Input</button>
+                <button type="button" class="choice-btn" onclick="document.getElementById('addBookChoiceSection').style.display='none'; document.getElementById('massInputSection').style.display='block'; setTimeout(() => { const first = document.querySelector('.mass-isbn-input'); if(first) first.focus(); }, 100);">Mass Input</button>
+            </div>
+
+            <div id="normalTypeChoiceSection" class="choice-modal-content" style="display:none;">
+                <h3>Select Input Type</h3>
+                
+               ISBN/Barcode coming soon.
+                
+                <button type="button" class="choice-btn" onclick="document.getElementById('normalTypeChoiceSection').style.display='none'; document.getElementById('normalInputSection').style.display='block'; document.getElementById('normalIsbnGroup').style.display='none'; setTimeout(() => document.getElementById('addNormalTitle').focus(), 100);">Manual</button>
+                <br>
+                <button type="button" class="choice-btn" style="background-color: #6c757d; margin-top: 20px;" onclick="document.getElementById('normalTypeChoiceSection').style.display='none'; document.getElementById('addBookChoiceSection').style.display='block';">Back</button>
+            </div>
+            
+            <div id="normalInputSection" style="display:none;">
+                <button type="button" class="choice-btn" style="background-color: #6c757d; padding: 10px 20px; font-size: 1rem; margin-bottom: 20px; margin-left: 0;" onclick="document.getElementById('normalInputSection').style.display='none'; document.getElementById('normalTypeChoiceSection').style.display='block';">Back</button>
+                <form id="addBookNormalForm">
+                    <div id="normalIsbnGroup" class="form-group">
+                        <label>ISBN/Barcode</label>
+                        <div style="display:flex; gap:10px;">
+                            <input type="text" id="addNormalIsbn" required style="flex:1;" placeholder="Scan barcode here...">
+                            <button type="button" id="addNormalLookupBtn" style="background-color:#17a2b8; padding: 12px 20px; border: none; color: white; border-radius: 6px; cursor: pointer;">Lookup</button>
+                        </div>
+                    </div>
+                    <div class="form-group"><label>Book Title</label><input type="text" id="addNormalTitle" required></div>
+                    <div class="form-group"><label>Author</label><input type="text" id="addNormalAuthor" required></div>
+                    <div class="form-group"><label>Genre</label><input type="text" id="addNormalGenre"></div>
+                    <div class="form-group"><label>Grade Level</label><input type="text" id="addNormalGrade"></div>
+                    <div class="form-group"><label>MSC+ Grade Level</label><input type="text" id="addNormalMsc"></div>
+                    <div class="form-group"><label>Synopsis</label><textarea id="addNormalSynopsis"></textarea></div>
+                    <div class="form-group"><label>Cover Image Link</label><input type="text" id="addNormalCover"></div>
+                    <div class="form-group"><label>Quantity</label><input type="number" id="addNormalQuantity" value="1" min="1" required style="width: 100%; padding: 12px; border: 1px solid #ced4da; border-radius: 6px; box-sizing: border-box;"></div>
+                    <button type="submit">Submit</button>
+                </form>
+            </div>
+
+            <div id="massInputSection" style="display:none;">
+                <button type="button" class="choice-btn" style="background-color: #6c757d; padding: 10px 20px; font-size: 1rem; margin-bottom: 20px; margin-left: 0;" onclick="document.getElementById('massInputSection').style.display='none'; document.getElementById('addBookChoiceSection').style.display='block';">Back</button>
+                <form id="addBookMassForm">
+                    <p style="text-align: center; font-weight: bold; margin-bottom: 15px;">Scan up to 15 ISBNs/Barcodes.</p>
+                    <div id="massIsbnContainer" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+                    </div>
+                    <button type="submit">Submit Mass Input</button>
+                </form>
+            </div>
         </div>
     </div>
 
     <div id="deleteBookModal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content" style="max-width: 800px;">
             <span class="close-button" onclick="closeModal('deleteBookModal')">&times;</span>
-            <h2>Delete Books - Instructions</h2>
-            <div id="deleteChartContainer" style="overflow-x: auto;">
-                <p>Loading collection data...</p>
+            <h2>Delete Books</h2>
+            <div class="form-group">
+                <input type="text" id="deleteSearchInput" placeholder="Search by Book Name or Author..." style="width:100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #ced4da;">
+            </div>
+            <div id="deleteChartContainer" style="overflow-x: auto; max-height: 400px; overflow-y: auto;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px; text-align: center;"><input type="checkbox" id="selectAllDelete"></th>
+                            <th>Book Name</th>
+                            <th>Author</th>
+                            <th>Quantity</th>
+                        </tr>
+                    </thead>
+                    <tbody id="deleteBooksBody">
+                    </tbody>
+                </table>
+            </div>
+            <div style="display:flex; flex-wrap: wrap; gap:10px; margin-top:20px; justify-content: center;">
+                <button type="button" id="btnDeleteSelected" style="background-color:#dc3545; flex: 1; min-width: 150px; padding: 12px 20px; border: none; color: white; border-radius: 6px; cursor: pointer;">Delete Selected</button>
+                <button type="button" id="btnDeleteAll" style="background-color:#8b0000; flex: 1; min-width: 150px; padding: 12px 20px; border: none; color: white; border-radius: 6px; cursor: pointer;">Delete All</button>
+                <button type="button" id="btnRefreshDelete" style="background-color:#17a2b8; flex: 1; min-width: 150px; padding: 12px 20px; border: none; color: white; border-radius: 6px; cursor: pointer;">Refresh</button>
+                <button type="button" onclick="closeModal('deleteBookModal')" style="background-color:#6c757d; flex: 1; min-width: 150px; padding: 12px 20px; border: none; color: white; border-radius: 6px; cursor: pointer;">Cancel</button>
             </div>
         </div>
     </div>
@@ -71,25 +157,12 @@
                     <label>ISBN (10, 13, or Barcode)</label>
                     <div style="display:flex; gap:10px;">
                         <input type="text" id="botmIsbnInput" required style="flex:1;" placeholder="Scan barcode here...">
+                        <button type="button" id="botmLookupBtn" style="background-color:#17a2b8; padding: 12px 20px; border: none; color: white; border-radius: 6px; cursor: pointer;">Lookup</button>
                     </div>
-                    <button type="button" id="botmLookupBtn" style="margin-top:10px; background-color:#17a2b8;">Lookup Book Info</button>
                 </div>
                 <div class="form-group">
-                    <label>Book Month:</label>
-                    <select id="botmMonth" name="botmMonth" required>
-                        <option value="January">January</option>
-                        <option value="February">February</option>
-                        <option value="March">March</option>
-                        <option value="April">April</option>
-                        <option value="May">May</option>
-                        <option value="June">June</option>
-                        <option value="July">July</option>
-                        <option value="August">August</option>
-                        <option value="September">September</option>
-                        <option value="October">October</option>
-                        <option value="November">November</option>
-                        <option value="December">December</option>
-                    </select>
+                    <label>Month</label>
+                    <input type="text" id="botmMonth" required>
                 </div>
                 <div class="form-group">
                     <label>Book Title</label>
@@ -99,7 +172,7 @@
                     <label>Author</label>
                     <input type="text" id="botmAuthor" required>
                 </div>
-                <button type="submit">Submit Book of the Month</button>
+                <button type="submit">Update</button>
             </form>
         </div>
     </div>
@@ -110,18 +183,40 @@
             <h2>Update Latest Changelog</h2>
             <form id="changelogForm">
                 <div class="form-group">
-                    <label>Site Version</label>
-                    <input type="text" id="changelogVersion" placeholder="e.g. 1.2" required>
+                    <label>Version Number</label>
+                    <input type="text" id="changelogVersion" required>
                 </div>
                 <div class="form-group">
-                    <label>Latest Update Message</label>
-                    <textarea id="changelogMessage" rows="4" required></textarea>
+                    <label>Update Message</label>
+                    <textarea id="changelogMessage" required></textarea>
                 </div>
-                <button type="submit">Submit Update</button>
+                <button type="submit">Update Changelog</button>
             </form>
         </div>
     </div>
-
+    
     <script src="script.js"></script>
+    <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBOEU6zCbp66le6Dr06GpmGx1yeT5WHNk0",
+        authDomain: "msc-library-808-en.firebaseapp.com",
+        projectId: "msc-library-808-en",
+        storageBucket: "msc-library-808-en.firebasestorage.app",
+        messagingSenderId: "62522328857",
+        appId: "1:62522328857:web:b56829c3d41238f0866788"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    onAuthStateChanged(auth, (user) => {
+        if (!user) {
+            document.body.innerHTML = '<h1 style="text-align:center; margin-top: 50px; color: red;">THIS ACCOUNT IS NOT AUTHORIZED TO VISIT THIS PAGE.</h1>';
+        }
+    });
+</script>
 </body>
 </html>
