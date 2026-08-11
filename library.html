@@ -4,22 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MSC Book Collection - Library</title>
+<link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 <script src="https://kit.fontawesome.com/cd38709ddf.js" crossorigin="anonymous"></script>
 <style>
-body { font-family: 'Inter', sans-serif; margin: 0; padding: 0; background-color: #f8f8f8; color: #333; }
-header { background-color: #333; color: white; padding: 1em 0; text-align: center; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; }
-.navbar { background-color: #ddd; padding: 0.5em 0; text-align: center; border-radius: 8px; margin: 10px auto; width: 90%; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); }
-.navbar ul { list-style: none; padding: 0; margin: 0; display: inline-block; }
-.navbar li { display: inline; margin: 0 15px; }
-.navbar a { text-decoration: none; color: #FF0000; font-weight: bold; padding: 8px 12px; border-radius: 5px; transition: background-color 0.3s ease; }
-.navbar a:hover { background-color: #bbb; }
-footer { background-color: #333; color: white; text-align: center; padding: 1em 0; bottom: 0; width: 100%; border-top-left-radius: 8px; border-top-right-radius: 8px; margin-top: 20px; }
-footer span { color: #ff8c00; }
-.controls-container { width: 90%; margin: 20px auto; background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; flex-wrap: wrap; gap: 15px; justify-content: space-between; align-items: center; box-sizing: border-box; }
-.control-group { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 200px; }
-.control-group input, .control-group select { width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 6px; font-size: 1em; box-sizing: border-box; }
-.control-group input:focus, .control-group select:focus { border-color: #007bff; outline: none; }
 .library-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; width: 90%; margin: 20px auto; }
 .book-card { background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); padding: 20px; display: flex; flex-direction: column; align-items: center; text-align: center; box-sizing: border-box; }
 .book-card img { width: 100%; max-width: 200px; height: auto; border-radius: 4px; margin-bottom: 15px; object-fit: cover; }
@@ -33,13 +21,24 @@ footer span { color: #ff8c00; }
 .synopsis-text { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .synopsis-text.expanded { -webkit-line-clamp: unset; display: block; }
 .more-btn { background: none; border: none; color: #007bff; cursor: pointer; padding: 0; font-size: 1em; font-weight: bold; margin-top: 5px; }
-.borrow-btn { background-color: #28a745; color: white; border: none; border-radius: 6px; padding: 12px 20px; font-size: 1.1em; font-weight: bold; cursor: pointer; width: 100%; transition: background-color 0.3s ease, transform 0.2s ease; margin-top: auto; }
-.borrow-btn:hover { background-color: #218838; transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
+.controls-container { width: 90%; margin: 20px auto; background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; flex-wrap: wrap; gap: 15px; justify-content: space-between; align-items: center; box-sizing: border-box; }
+.control-group { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 200px; }
+.control-group input, .control-group select { width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 6px; font-size: 1em; box-sizing: border-box; }
+.control-group input:focus, .control-group select:focus { border-color: #007bff; outline: none; }
 @media (max-width: 1024px) { .library-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 768px) { .library-grid { grid-template-columns: 1fr; } .navbar ul { display: flex; flex-direction: column; align-items: center; } .navbar li { margin: 5px 0; } }
+@media (max-width: 768px) { .library-grid { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
+
+<div class="account-widget" id="accountWidget" onclick="this.classList.toggle('active')">
+    <img id="userPfp" src="guestpfp.png" alt="Profile Picture">
+    <span class="name" id="userName">Guest</span>
+    <div class="account-dropdown">
+        <button id="logoutBtn" style="display:none;" onclick="window.logoutFirebase()">Logout</button>
+        <button id="loginDropdownBtn" onclick="window.location.href='login.html'">Log In</button>
+    </div>
+</div>
 
 <header>
     <h1><img src="Prepared Cooper.ico" alt="MSC Book Collection Logo" style="height:30px; vertical-align:middle; margin-right:10px;">MSC Book Collection</h1>
@@ -50,7 +49,7 @@ footer span { color: #ff8c00; }
         <li><a href="index.html">Home</a></li>
         <li><a href="library.html">Library</a></li>
         <li><a href="HelpForum.html">Help</a></li>
-        <li><a href="login.html">Login <i class="fa-solid fa-user-lock"></i></a></li>
+        <li><a href="login.html" id="AdminLogin">Log In <i class="fa-solid fa-user-lock"></i></a></li>
     </ul>
 </div>
 
@@ -80,6 +79,57 @@ footer span { color: #ff8c00; }
     <p>&copy; copyright @ 2024 <span>Coding credit: Atticus Herr</span> [all rights reserved!]</p>
     <p>5th grade class 2024-2025</p>
 </footer>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBOEU6zCbp66le6Dr06GpmGx1yeT5WHNk0",
+        authDomain: "msc-library-808-en.firebaseapp.com",
+        projectId: "msc-library-808-en",
+        storageBucket: "msc-library-808-en.firebasestorage.app",
+        messagingSenderId: "62522328857",
+        appId: "1:62522328857:web:b56829c3d41238f0866788"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    window.logoutFirebase = () => {
+        signOut(auth).then(() => {
+            window.location.reload();
+        });
+    };
+
+    onAuthStateChanged(auth, (user) => {
+        const pfp = document.getElementById('userPfp');
+        const nameEl = document.getElementById('userName');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const loginDropdownBtn = document.getElementById('loginDropdownBtn');
+        const navLoginBtn = document.getElementById('AdminLogin');
+
+        if (user) {
+            if(pfp) pfp.src = 'loggedinpfp.png';
+            if(nameEl) nameEl.textContent = user.displayName || user.email.split('@')[0];
+            if(logoutBtn) logoutBtn.style.display = 'block';
+            if(loginDropdownBtn) loginDropdownBtn.style.display = 'none';
+            if(navLoginBtn) {
+                navLoginBtn.innerHTML = 'Admin Panel <i class="fa-solid fa-lock"></i>';
+                navLoginBtn.href = 'admin.html';
+            }
+        } else {
+            if(pfp) pfp.src = 'guestpfp.png';
+            if(nameEl) nameEl.textContent = 'Guest';
+            if(logoutBtn) logoutBtn.style.display = 'none';
+            if(loginDropdownBtn) loginDropdownBtn.style.display = 'block';
+            if(navLoginBtn) {
+                navLoginBtn.innerHTML = 'Log In <i class="fa-solid fa-user-lock"></i>';
+                navLoginBtn.href = 'login.html';
+            }
+        }
+    });
+</script>
 
 <script>
 const SHEET_ID = '1ZfFEooX7fWIMA9tMZlxcUndPfw2ebSHGJMLRIoyzyO0';
