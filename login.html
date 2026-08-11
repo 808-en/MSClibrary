@@ -3,175 +3,63 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>MSC Book Collection Admin Login</title>
-  <!-- Tailwind CDN for convenience -->
+  <title>MSC Book Collection Log In</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="min-h-screen bg-gray-100 flex items-center justify-center p-6">
-  <div class="w-full max-w-4xl flex flex-col md:flex-row items-stretch gap-6">
-    <!-- Admin Login -->
-    <div class="flex-1 bg-white p-8 rounded-lg shadow-md">
-      <h2 class="text-2xl font-semibold text-gray-800 mb-6">Admin Login</h2>
-      <form id="adminLoginForm" class="space-y-4">
-        <div>
-          <label for="adminUsername" class="block text-sm font-medium text-gray-700 mb-1">Username:</label>
-          <input type="text" id="adminUsername" name="username" class="block w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-300" />
-        </div>
+  <div class="w-full max-w-md bg-white p-8 rounded-lg shadow-md">
+    <h2 class="text-2xl font-semibold text-gray-800 mb-6">Log In</h2>
+    <form id="firebaseLoginForm" class="space-y-4">
+      <div>
+        <label for="firebaseEmail" class="block text-sm font-medium text-gray-700 mb-1">Email:</label>
+        <input type="email" id="firebaseEmail" required class="block w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-300" />
+      </div>
 
-        <div>
-          <label for="adminPassword" class="block text-sm font-medium text-gray-700 mb-1">Password:</label>
-          <input type="password" id="adminPassword" name="password" class="block w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-300" />
-        </div>
+      <div>
+        <label for="firebasePassword" class="block text-sm font-medium text-gray-700 mb-1">Password:</label>
+        <input type="password" id="firebasePassword" required class="block w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-300" />
+      </div>
 
-        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded">Log In</button>
+      <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded">Log In</button>
 
-        <div id="adminErrorMessage" class="hidden text-red-600 text-sm mt-2">Invalid username or password.</div>
-      </form>
-    </div>
-
-    <!-- Divider: vertical on md+, horizontal on small -->
-    <div class="self-center md:self-auto md:w-px md:h-96 bg-gray-300 w-full h-px"></div>
-
-    <!-- Teacher Login (emerald theme) -->
-    <div class="flex-1 bg-emerald-400 p-8 rounded-lg shadow-md text-white">
-      <h2 class="text-2xl font-semibold mb-6">Teacher Login</h2>
-      <form id="teacherLoginForm" class="space-y-4">
-        <div>
-          <label for="teacherUsername" class="block text-sm font-medium mb-1">Username:</label>
-          <!-- On emerald background we use white inputs for contrast -->
-          <input type="text" id="teacherUsername" name="username" class="block w-full px-4 py-2 rounded focus:outline-none" style="background-color: white; color: #0f172a;" />
-        </div>
-
-        <div>
-          <label for="teacherPassword" class="block text-sm font-medium mb-1">Password:</label>
-          <input type="password" id="teacherPassword" name="password" class="block w-full px-4 py-2 rounded focus:outline-none" style="background-color: white; color: #0f172a;" />
-        </div>
-
-        <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white py-2 rounded">Log In</button>
-
-        <div id="teacherErrorMessage" class="hidden text-emerald-100 text-sm mt-2">Invalid username or password.</div>
-      </form>
-    </div>
+      <div id="firebaseError" class="hidden text-red-600 text-sm mt-2"></div>
+    </form>
   </div>
 
-  <script>
-    // Admin Login Handler
-    document.getElementById('adminLoginForm').addEventListener('submit', function(event) {
-      event.preventDefault();
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
 
-      const usernameInput = document.getElementById('adminUsername');
-      const passwordInput = document.getElementById('adminPassword');
-      const errorMessageDiv = document.getElementById('adminErrorMessage');
+    const firebaseConfig = {
+      apiKey: "AIzaSyBOEU6zCbp66le6Dr06GpmGx1yeT5WHNk0",
+      authDomain: "msc-library-808-en.firebaseapp.com",
+      projectId: "msc-library-808-en",
+      storageBucket: "msc-library-808-en.firebasestorage.app",
+      messagingSenderId: "62522328857",
+      appId: "1:62522328857:web:b56829c3d41238f0866788"
+    };
 
-      errorMessageDiv.classList.add('hidden');
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
 
-      const enteredUsername = usernameInput.value;
-      const enteredPassword = passwordInput.value;
-
-      const baseDate = new Date("2026-07-27T00:00:00").getTime();
-      const twoWeeksMs = 14 * 24 * 60 * 60 * 1000;
-      const currentPeriod = Math.floor((Date.now() - baseDate) / twoWeeksMs);
-
-      const alwaysActive = {
-        '5thGrade': 'Mrs.Beck',
-        'ByPass': '@&45'
-      };
-
-      if (alwaysActive[enteredUsername] && alwaysActive[enteredUsername] === enteredPassword) {
-        const TOKEN_VALUE = "loggedInIdentifierRNBN480H39A=";
-        const TOKEN_TTL_MS = 20 * 60 * 1000;
-
-        localStorage.setItem("loggedInState", TOKEN_VALUE);
-        localStorage.setItem("loggedInExpiry", String(Date.now() + TOKEN_TTL_MS));
-        window.location.href = "admin.html";
-        return;
-      }
-
-      const rotatingCredentials = [
-        { month: "August (Weeks 1-2)", users: {'UserAlp1': 'CodeBet2', 'UserGam3': 'CodeDel4', 'UserEpsl5': 'CodeZeta6'} },
-        { month: "August (Weeks 3-4)", users: {'UserEta7': 'CodeThet8', 'UserIota9': 'CodeKapp10', 'UserLamd11': 'CodeMu12'} },
-        { month: "September (Weeks 1-2)", users: {'UserNu13': 'CodeXi14', 'UserOmic15': 'CodePi16', 'UserRho17': 'CodeSigm18'} },
-        { month: "September (Weeks 3-4)", users: {'UserTau19': 'CodeUpsi20', 'UserPhi21': 'CodeChi22', 'UserPsi23': 'CodeOmeg24'} },
-        { month: "October (Weeks 1-2)", users: {'UserYen25': 'CodeYen26', 'UserPound27': 'CodePound28', 'UserEuro29': 'CodeEuro30'} },
-        { month: "October (Weeks 3-4)", users: {'UserRupee31': 'CodeRup32', 'UserWon33': 'CodeWon34', 'UserFranc35': 'CodeFran36'} },
-        { month: "November (Weeks 1-2)", users: {'UserDinar37': 'CodeDina38', 'UserLira39': 'CodeLira40', 'UserPeso41': 'CodePeso42'} },
-        { month: "November (Weeks 3-4)", users: {'UserRuble43': 'CodeRubl44', 'UserKrone45': 'CodeKron46', 'UserZloty47': 'CodeZlot48'} },
-        { month: "December (Weeks 1-2)", users: {'UserBaht49': 'CodeBaht50', 'UserRingg51': 'CodeRing52', 'UserDirh53': 'CodeDirh54'} },
-        { month: "December (Weeks 3-4)", users: {'UserRand55': 'CodeRand56', 'UserForint57': 'CodeFori58', 'UserKrona59': 'CodeKrona60'} },
-        { month: "January (Weeks 1-2)", users: {'UserLeu61': 'CodeLeu62', 'UserDram63': 'CodeDram64', 'UserCedi65': 'CodeCedi66'} },
-        { month: "January (Weeks 3-4)", users: {'UserNaira67': 'CodeNair68', 'UserShill69': 'CodeShil70', 'UserQuetz71': 'CodeQuet72'} },
-        { month: "February (Weeks 1-2)", users: {'UserColon73': 'CodeColo74', 'UserBoliv75': 'CodeBoli76', 'UserGuara77': 'CodeGuar78'} }
-      ];
-
-      let isRotatingUser = false;
-      let isCorrectPeriod = false;
-      let isCorrectPassword = false;
-
-      for (let i = 0; i < rotatingCredentials.length; i++) {
-        if (rotatingCredentials[i].users.hasOwnProperty(enteredUsername)) {
-          isRotatingUser = true;
-          if (rotatingCredentials[i].users[enteredUsername] === enteredPassword) {
-            isCorrectPassword = true;
-            if (i === currentPeriod) {
-              isCorrectPeriod = true;
-            }
-          }
-          break;
-        }
-      }
-
-      if (isRotatingUser && isCorrectPassword) {
-        if (isCorrectPeriod) {
-          const TOKEN_VALUE = "loggedInIdentifierRNBN480H39A=";
-          const TOKEN_TTL_MS = 20 * 60 * 1000;
-          localStorage.setItem("loggedInState", TOKEN_VALUE);
-          localStorage.setItem("loggedInExpiry", String(Date.now() + TOKEN_TTL_MS));
-          window.location.href = "admin.html";
-        } else {
-          errorMessageDiv.innerText = "This Password Is Not Active For This 2 Week Increment. Try Again Later, Or Contact Help.";
-          errorMessageDiv.classList.remove('hidden');
-        }
-      } else {
-        errorMessageDiv.innerText = "Invalid username or password.";
-        errorMessageDiv.classList.remove('hidden');
-        usernameInput.value = '';
-        passwordInput.value = '';
-      }
-    });
-
-    // Teacher Login Handler
-    document.getElementById('teacherLoginForm').addEventListener('submit', function(event) {
-      event.preventDefault();
-
-      const usernameInput = document.getElementById('teacherUsername');
-      const passwordInput = document.getElementById('teacherPassword');
-      const errorMessageDiv = document.getElementById('teacherErrorMessage');
-
-      errorMessageDiv.classList.add('hidden');
-
-      const enteredUsername = usernameInput.value;
-      const enteredPassword = passwordInput.value;
-
-      const validCredentials = {
-        '5thGrade': 'Mrs.Beck',
-        'SchoolAdmin': '@&45'
-      };
-
-      if (validCredentials[enteredUsername] && validCredentials[enteredUsername] === enteredPassword) {
-        const TOKEN_VALUE = "loggedInIdentifierRNBN480H39A=";
-        const TOKEN_TTL_MS = 20 * 60 * 1000;
-
-        localStorage.setItem("loggedInState", TOKEN_VALUE);
-        localStorage.setItem("loggedInExpiry", String(Date.now() + TOKEN_TTL_MS));
-        window.location.href = "t_admin.html";
-        return;
-      } else {
-        errorMessageDiv.innerText = "Invalid username or password.";
-        errorMessageDiv.classList.remove('hidden');
-        usernameInput.value = '';
-        passwordInput.value = '';
-      }
-    });
+    const loginForm = document.getElementById('firebaseLoginForm');
+    if (loginForm) {
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('firebaseEmail').value;
+            const password = document.getElementById('firebasePassword').value;
+            const errorMsg = document.getElementById('firebaseError');
+            
+            signInWithEmailAndPassword(auth, email, password)
+                .then(() => {
+                    window.location.href = 'index.html';
+                })
+                .catch((error) => {
+                    errorMsg.classList.remove('hidden');
+                    errorMsg.innerText = error.message;
+                });
+        });
+    }
   </script>
 </body>
 </html>
