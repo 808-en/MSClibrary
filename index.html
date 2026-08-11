@@ -427,7 +427,7 @@
             const navLoginBtn = document.getElementById('AdminLogin');
 
             if (user) {
-                if(pfp) pfp.src = 'loggedinpfp.png';
+                if(pfp) pfp.src = 'face-smile-solid-full.svg';
                 if(nameEl) nameEl.textContent = user.displayName || user.email.split('@')[0];
                 if(logoutBtn) logoutBtn.style.display = 'block';
                 if(loginDropdownBtn) loginDropdownBtn.style.display = 'none';
@@ -446,7 +446,7 @@
                 if (returnManualName) returnManualName.value = user.displayName || user.email.split('@')[0];
 
             } else {
-                if(pfp) pfp.src = 'guestpfp.png';
+                if(pfp) pfp.src = 'user-solid-full.svg';
                 if(nameEl) nameEl.textContent = 'Guest';
                 if(logoutBtn) logoutBtn.style.display = 'none';
                 if(loginDropdownBtn) loginDropdownBtn.style.display = 'block';
