@@ -144,6 +144,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const massContainer = document.getElementById('massIsbnContainer');
     if (massContainer) {
+        const massInputs = [];
         for (let i = 1; i <= 15; i++) {
             const input = document.createElement('input');
             input.type = 'text';
@@ -155,7 +156,18 @@ document.addEventListener('DOMContentLoaded', function() {
             input.style.border = '1px solid #ced4da';
             input.style.borderRadius = '6px';
             massContainer.appendChild(input);
+            massInputs.push(input);
         }
+        massInputs.forEach((input, index) => {
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (index + 1 < massInputs.length) {
+                        massInputs[index + 1].focus();
+                    }
+                }
+            });
+        });
     }
 
     const addNormalLookupBtn = document.getElementById('addNormalLookupBtn');
@@ -199,6 +211,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert("Book added successfully.");
                 normalForm.reset();
                 closeModal('addBookModal');
+                const choiceSec = document.getElementById('addBookChoiceSection');
+                if(choiceSec) {
+                    choiceSec.style.display = 'block';
+                    document.getElementById('normalTypeChoiceSection').style.display = 'none';
+                    document.getElementById('normalInputSection').style.display = 'none';
+                    document.getElementById('massInputSection').style.display = 'none';
+                }
             });
         });
     }
@@ -231,6 +250,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert(books.length + " books added successfully.");
                 massForm.reset();
                 closeModal('addBookModal');
+                const choiceSec = document.getElementById('addBookChoiceSection');
+                if(choiceSec) {
+                    choiceSec.style.display = 'block';
+                    document.getElementById('normalTypeChoiceSection').style.display = 'none';
+                    document.getElementById('normalInputSection').style.display = 'none';
+                    document.getElementById('massInputSection').style.display = 'none';
+                }
             });
         });
     }
