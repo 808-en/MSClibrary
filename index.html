@@ -17,7 +17,7 @@
         <span class="name" id="userName">Guest</span>
         <div class="account-dropdown">
             <button id="logoutBtn" style="display:none;" onclick="window.logoutFirebase()">Logout</button>
-            <button id="openPermissions" style="display:none;">Account Permissions</button>
+            <button id="openPermissions" style="display:block;">Account Permissions</button>
             <button id="loginDropdownBtn" onclick="window.location.href='login.html'">Log In</button>
         </div>
     </div>
@@ -380,11 +380,11 @@
   </tr>
   <tr>
     <td>Borrow/Return Books</td>
-    <td style="color: green;">Y</td>
+    <td style="color: green; font-weight: bold;">Y</td>
   </tr>
   <tr>
     <td>Download Online Resources</td>
-    <td style="color: green;">Y</td>
+    <td style="color: green; font-weight: bold;">Y</td>
   </tr>
 </table>
         </div>
@@ -461,8 +461,11 @@
             const pfp = document.getElementById('userPfp');
             const nameEl = document.getElementById('userName');
             const logoutBtn = document.getElementById('logoutBtn');
+            const openPermsBtn = document.getElementById('openPermissions');
             const loginDropdownBtn = document.getElementById('loginDropdownBtn');
             const navLoginBtn = document.getElementById('AdminLogin');
+
+            if (openPermsBtn) openPermsBtn.style.display = 'block';
 
             if (user) {
                 if(pfp) pfp.src = 'face-smile-solid-full.svg';
@@ -483,6 +486,9 @@
                 const returnManualName = document.getElementById('returnManualName');
                 if (returnManualName) returnManualName.value = user.displayName || user.email.split('@')[0];
 
+                if (window.updateAccountPermissions) {
+                    window.updateAccountPermissions(user);
+                }
             } else {
                 if(pfp) pfp.src = 'user-solid-full.svg';
                 if(nameEl) nameEl.textContent = 'Guest';
@@ -492,9 +498,13 @@
                     navLoginBtn.innerHTML = 'Log In <i class="fa-solid fa-user-lock"></i>';
                     navLoginBtn.href = 'login.html';
                 }
+
+                if (window.updateAccountPermissions) {
+                    window.updateAccountPermissions(null);
+                }
             }
         });
     </script>
-    <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "082695a43f814cc7871a76922df6162e"}'></script><!-- End Cloudflare Web Analytics -->
+    <script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "082695a43f814cc7871a76922df6162e"}'></script>
 </body>
 </html>
