@@ -27,39 +27,59 @@
   </div>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyBOEU6zCbp66le6Dr06GpmGx1yeT5WHNk0",
-      authDomain: "msc-library-808-en.firebaseapp.com",
-      projectId: "msc-library-808-en",
-      storageBucket: "msc-library-808-en.firebasestorage.app",
-      messagingSenderId: "62522328857",
-      appId: "1:62522328857:web:b56829c3d41238f0866788"
-    };
+  const firebaseConfig = {
+    apiKey: "AIzaSyBOEU6zCbp66le6Dr06GpmGx1yeT5WHNk0",
+    authDomain: "msc-library-808-en.firebaseapp.com",
+    projectId: "msc-library-808-en",
+    storageBucket: "msc-library-808-en.firebasestorage.app",
+    messagingSenderId: "62522328857",
+    appId: "1:62522328857:web:b56829c3d41238f0866788"
+  };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
 
-    const loginForm = document.getElementById('firebaseLoginForm');
-    if (loginForm) {
-        loginForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const email = document.getElementById('firebaseEmail').value;
-            const password = document.getElementById('firebasePassword').value;
-            const errorMsg = document.getElementById('firebaseError');
-            
-            signInWithEmailAndPassword(auth, email, password)
-                .then(() => {
-                    window.location.href = 'index.html';
-                })
-                .catch((error) => {
-                    errorMsg.classList.remove('hidden');
-                    errorMsg.innerText = error.message;
-                });
-        });
-    }
-  </script>
+  const loginForm = document.getElementById('firebaseLoginForm');
+  if (loginForm) {
+      loginForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const email = document.getElementById('firebaseEmail').value.trim();
+          const password = document.getElementById('firebasePassword').value;
+          const errorMsg = document.getElementById('firebaseError');
+          
+          signInWithEmailAndPassword(auth, email, password)
+              .then((userCredential) => {
+                
+                  const signedInUid = userCredential.user.uid;
+
+                  const specialUids = [
+                      "VhgEt0B5ngSPNUYoVd1pRJnPrHv2",
+                      "1VbKdeueO7YnEvAAT3OAVrqmquy2",
+                    "qe6G5PXPoqTQZVnQmcsJ6ovkq9y2",
+                    "rdAV8IhU11beQN7hVPhm2IUddFq1",
+                    "7eJpgkWS6KPXh1vCLI5gJkW698e2",
+                    "ozb34ly0fiWDRbc6SGHy85GVO4s1",
+                    "f6ODKfpvzxXzYn6DSE8PfuAmz5q1",
+                      "Uuy1MIQovXMJVQp3KqOuIpgvKCn1E"
+                  ];
+
+                  if (specialUids.includes(signedInUid)) {
+                      window.location.href = 't_admin.html';
+                  } else {
+                      window.location.href = 'admin.html';
+                  }
+              })
+              .catch((error) => {
+                  errorMsg.classList.remove('hidden');
+                  errorMsg.innerText = error.message;
+              });
+      });
+  }
+</script>
+
+
 </body>
 </html>
