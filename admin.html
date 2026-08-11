@@ -60,22 +60,25 @@
 
     <div id="addBookModal" class="modal">
         <div class="modal-content">
-            <span class="close-button" onclick="closeModal('addBookModal')">&times;</span>
+            <span class="close-button" onclick="closeModal('addBookModal'); document.getElementById('addBookChoiceSection').style.display='block'; document.getElementById('normalTypeChoiceSection').style.display='none'; document.getElementById('normalInputSection').style.display='none'; document.getElementById('massInputSection').style.display='none';">&times;</span>
             <h2>Add New Book</h2>
-            <div style="margin-bottom: 20px; text-align: center;">
-                <input type="radio" id="modeNormal" name="addMode" value="normal" checked onclick="document.getElementById('normalInputSection').style.display='block'; document.getElementById('massInputSection').style.display='none';">
-                <label for="modeNormal" style="margin-right: 20px; font-weight: bold;">Normal Input</label>
-                <input type="radio" id="modeMass" name="addMode" value="mass" onclick="document.getElementById('normalInputSection').style.display='none'; document.getElementById('massInputSection').style.display='block';">
-                <label for="modeMass" style="font-weight: bold;">Mass Input</label>
+            
+            <div id="addBookChoiceSection" class="choice-modal-content">
+                <h3>How would you like to add?</h3>
+                <button type="button" class="choice-btn" onclick="document.getElementById('addBookChoiceSection').style.display='none'; document.getElementById('normalTypeChoiceSection').style.display='block';">Normal Input</button>
+                <button type="button" class="choice-btn" onclick="document.getElementById('addBookChoiceSection').style.display='none'; document.getElementById('massInputSection').style.display='block'; setTimeout(() => { const first = document.querySelector('.mass-isbn-input'); if(first) first.focus(); }, 100);">Mass Input</button>
+            </div>
+
+            <div id="normalTypeChoiceSection" class="choice-modal-content" style="display:none;">
+                <h3>Select Input Type</h3>
+                <button type="button" class="choice-btn" onclick="document.getElementById('normalTypeChoiceSection').style.display='none'; document.getElementById('normalInputSection').style.display='block'; document.getElementById('normalIsbnGroup').style.display='block'; setTimeout(() => document.getElementById('addNormalIsbn').focus(), 100);">ISBN/Barcode</button>
+                <button type="button" class="choice-btn" onclick="document.getElementById('normalTypeChoiceSection').style.display='none'; document.getElementById('normalInputSection').style.display='block'; document.getElementById('normalIsbnGroup').style.display='none'; setTimeout(() => document.getElementById('addNormalTitle').focus(), 100);">Manual</button>
+                <br>
+                <button type="button" class="choice-btn" style="background-color: #6c757d; margin-top: 20px;" onclick="document.getElementById('normalTypeChoiceSection').style.display='none'; document.getElementById('addBookChoiceSection').style.display='block';">Back</button>
             </div>
             
-            <div id="normalInputSection">
-                <div class="form-group" style="text-align: center;">
-                    <input type="radio" id="inputTypeIsbn" name="normalInputType" value="isbn" checked onclick="document.getElementById('normalIsbnGroup').style.display='block';">
-                    <label for="inputTypeIsbn" style="margin-right: 20px;">ISBN/Barcode</label>
-                    <input type="radio" id="inputTypeManual" name="normalInputType" value="manual" onclick="document.getElementById('normalIsbnGroup').style.display='none';">
-                    <label for="inputTypeManual">Manual</label>
-                </div>
+            <div id="normalInputSection" style="display:none;">
+                <button type="button" class="choice-btn" style="background-color: #6c757d; padding: 10px 20px; font-size: 1rem; margin-bottom: 20px; margin-left: 0;" onclick="document.getElementById('normalInputSection').style.display='none'; document.getElementById('normalTypeChoiceSection').style.display='block';">Back</button>
                 <form id="addBookNormalForm">
                     <div id="normalIsbnGroup" class="form-group">
                         <label>ISBN/Barcode</label>
@@ -97,6 +100,7 @@
             </div>
 
             <div id="massInputSection" style="display:none;">
+                <button type="button" class="choice-btn" style="background-color: #6c757d; padding: 10px 20px; font-size: 1rem; margin-bottom: 20px; margin-left: 0;" onclick="document.getElementById('massInputSection').style.display='none'; document.getElementById('addBookChoiceSection').style.display='block';">Back</button>
                 <form id="addBookMassForm">
                     <p style="text-align: center; font-weight: bold; margin-bottom: 15px;">Scan up to 15 ISBNs/Barcodes.</p>
                     <div id="massIsbnContainer" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
