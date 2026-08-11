@@ -11,6 +11,16 @@
     <link rel="apple-touch-icon" href="Prepared Cooper.ico">
 </head>
 <body>
+    
+    <div class="account-widget" id="accountWidget" onclick="this.classList.toggle('active')">
+        <img id="userPfp" src="guestpfp.png" alt="Profile Picture">
+        <span class="name" id="userName">Guest</span>
+        <div class="account-dropdown">
+            <button id="logoutBtn" style="display:none;" onclick="window.logoutFirebase()">Logout</button>
+            <button id="loginDropdownBtn" onclick="window.location.href='login.html'">Log In</button>
+        </div>
+    </div>
+
     <header>
         <h1 data-i18n="headerTitle"><img src="Prepared Cooper.ico" alt="MSC Book Collection Logo">MSC Book Collection</h1>
     </header>
@@ -21,7 +31,7 @@
             <li><a href="#" id="openReturnForm" data-i18n="bookReturn">Book Return</a></li>
             <li><a href="HelpForum.html" data-i18n="help">Help</a></li>
             <li><a href="#" id="openBorrowForm" data-i18n="borrowBook">Borrow Book</a></li>
-            <li><a href="login.html" id="AdminLogin" data-i18n="login">Login<i class="fa-solid fa-user-lock"></i></a></li>
+            <li><a href="login.html" id="AdminLogin" data-i18n="login">Log In<i class="fa-solid fa-user-lock"></i></a></li>
         </ul>
     </div>
 
@@ -360,9 +370,9 @@
                 const title = latestBotm[1] ? latestBotm[1].trim() : 'Unknown Title';
                 const author = latestBotm[2] ? latestBotm[2].trim() : 'Unknown Author';
 
-                document.getElementById('botmMonthDisplay').innerHTML = `<strong>Month:</strong> ${title}`;
-                document.getElementById('botmTitleDisplay').innerHTML = `<strong>Title:</strong> ${title}`;
-                document.getElementById('botmAuthorDisplay').innerHTML = `<strong>Author:</strong> ${author}`;
+                if (document.getElementById('botmMonthDisplay')) document.getElementById('botmMonthDisplay').innerHTML = `<strong>Month:</strong> ${title}`;
+                if (document.getElementById('botmTitleDisplay')) document.getElementById('botmTitleDisplay').innerHTML = `<strong>Title:</strong> ${title}`;
+                if (document.getElementById('botmAuthorDisplay')) document.getElementById('botmAuthorDisplay').innerHTML = `<strong>Author:</strong> ${author}`;
             }
         } catch (error) {
             console.error('Error fetching Book of the Month:', error);
@@ -378,7 +388,7 @@
                 
                 const updateMessage = latestUpdateRow.slice(1).join(',').trim();
                 
-                if (updateMessage) {
+                if (updateMessage && document.getElementById('latestUpdateDisplay')) {
                     document.getElementById('latestUpdateDisplay').textContent = updateMessage;
                 }
             }
@@ -386,25 +396,67 @@
             console.error('Error fetching Changelog:', error);
         }
     });
-</script>
+    </script>
     <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
 
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
+        const firebaseConfig = {
+            apiKey: "AIzaSyBOEU6zCbp66le6Dr06GpmGx1yeT5WHNk0",
+            authDomain: "msc-library-808-en.firebaseapp.com",
+            projectId: "msc-library-808-en",
+            storageBucket: "msc-library-808-en.firebasestorage.app",
+            messagingSenderId: "62522328857",
+            appId: "1:62522328857:web:b56829c3d41238f0866788"
+        };
 
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
 
+        window.logoutFirebase = () => {
+            signOut(auth).then(() => {
+                window.location.reload();
+            });
+        };
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyBOEU6zCbp66le6Dr06GpmGx1yeT5WHNk0",
-    authDomain: "msc-library-808-en.firebaseapp.com",
-    projectId: "msc-library-808-en",
-    storageBucket: "msc-library-808-en.firebasestorage.app",
-    messagingSenderId: "62522328857",
-    appId: "1:62522328857:web:b56829c3d41238f0866788"
-  };
+        onAuthStateChanged(auth, (user) => {
+            const pfp = document.getElementById('userPfp');
+            const nameEl = document.getElementById('userName');
+            const logoutBtn = document.getElementById('logoutBtn');
+            const loginDropdownBtn = document.getElementById('loginDropdownBtn');
+            const navLoginBtn = document.getElementById('AdminLogin');
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-</script>
+            if (user) {
+                if(pfp) pfp.src = 'loggedinpfp.png';
+                if(nameEl) nameEl.textContent = user.displayName || user.email.split('@')[0];
+                if(logoutBtn) logoutBtn.style.display = 'block';
+                if(loginDropdownBtn) loginDropdownBtn.style.display = 'none';
+                if(navLoginBtn) {
+                    navLoginBtn.innerHTML = 'Admin Panel <i class="fa-solid fa-lock"></i>';
+                    navLoginBtn.href = 'admin.html';
+                }
+
+                const borrowName = document.getElementById('borrowName');
+                if (borrowName) borrowName.value = user.displayName || user.email.split('@')[0];
+                const returnName = document.getElementById('returnName');
+                if (returnName) returnName.value = user.displayName || user.email.split('@')[0];
+                const borrowManualName = document.getElementById('borrowManualName');
+                if (borrowManualName) borrowManualName.value = user.displayName || user.email.split('@')[0];
+                const returnManualName = document.getElementById('returnManualName');
+                if (returnManualName) returnManualName.value = user.displayName || user.email.split('@')[0];
+
+            } else {
+                if(pfp) pfp.src = 'guestpfp.png';
+                if(nameEl) nameEl.textContent = 'Guest';
+                if(logoutBtn) logoutBtn.style.display = 'none';
+                if(loginDropdownBtn) loginDropdownBtn.style.display = 'block';
+                if(navLoginBtn) {
+                    navLoginBtn.innerHTML = 'Log In <i class="fa-solid fa-user-lock"></i>';
+                    navLoginBtn.href = 'login.html';
+                }
+            }
+        });
+    </script>
     <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "082695a43f814cc7871a76922df6162e"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
 </html>
