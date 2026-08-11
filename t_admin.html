@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - MSC Book Collection</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header>
+        <h1>Admin Dashboard - MSC Book Collection</h1>
+    </header>
+
+    <div class="navbar">
+        <ul>
+            <li>
+                <div class="countdown-container">
+                    <button onclick="logout()" style="background: none; border: none; font-size: 1rem; color: #FF0000; font-weight: bold; cursor: pointer; padding: 10px;">Logout</button>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <div class="dashboard-container">
+        <h2>Current Borrow & Return Requests</h2>
+        <div id="data-container" style="overflow-x: auto; width: 100%;">
+            <p>Loading collection data...</p>
+        </div>
+    </div>
+
+    <div class="dashboard-container admin-book-actions">
+        <h2>Management Options</h2>
+        <div class="prominent-actions">
+            <button onclick="window.location.href='https://docs.google.com/spreadsheets/d/e/2PACX-1vQaTqPVndPccN9h1-RYUulv59x-Ursqed9lsoDnMfejpp8VoI1DjYFh2Cq5Xr-471I8RcKX7vJ2yJgj/pub?output=csv'" class="action-btn return-btn" style="font-size: 1.1rem; padding: 15px; background-color: #28a745;">Export CSV</button>
+            <button id="openAddBookModal" class="action-btn return-btn" style="font-size: 1.1rem; padding: 15px; background-color: #28a745;">Add New Book</button>
+            <button id="openDeleteBookModal" class="action-btn return-btn" style="font-size: 1.1rem; padding: 15px; background-color: #dc3545;">Delete Books</button>
+            <button id="openUpdateBotmModal" class="action-btn return-btn" style="font-size: 1.1rem; padding: 15px; background-color: #007bff;">Update Book of the Month</button>
+            <button id="openUpdateLatestModal" class="action-btn return-btn" style="font-size: 1.1rem; padding: 15px; background-color: #6c757d;">Update Latest Changelog</button>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 MSC Book Collection - Admin Area</p>
+    </footer>
+
+    <div id="addBookModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal('addBookModal')">&times;</span>
+            <h2>Add New Book</h2>
+            <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdpxvArZsHA7UMjbv88oMnif2SPeAAdGlVrvWaEMJL8CDh0-w/viewform?embedded=true" width="100%" height="600" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
+        </div>
+    </div>
+
+    <div id="deleteBookModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal('deleteBookModal')">&times;</span>
+            <h2>Delete Books - Instructions</h2>
+            <div id="deleteChartContainer" style="overflow-x: auto;">
+                <p>Loading collection data...</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="updateBotmModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal('updateBotmModal')">&times;</span>
+            <h2>Update Book of the Month</h2>
+            <form id="botmForm">
+                <div class="form-group">
+                    <label>ISBN (10, 13, or Barcode)</label>
+                    <div style="display:flex; gap:10px;">
+                        <input type="text" id="botmIsbnInput" required style="flex:1;" placeholder="Scan barcode here...">
+                    </div>
+                    <button type="button" id="botmLookupBtn" style="margin-top:10px; background-color:#17a2b8;">Lookup Book Info</button>
+                </div>
+                <div class="form-group">
+                    <label>Book Month:</label>
+                    <select id="botmMonth" name="botmMonth" required>
+                        <option value="January">January</option>
+                        <option value="February">February</option>
+                        <option value="March">March</option>
+                        <option value="April">April</option>
+                        <option value="May">May</option>
+                        <option value="June">June</option>
+                        <option value="July">July</option>
+                        <option value="August">August</option>
+                        <option value="September">September</option>
+                        <option value="October">October</option>
+                        <option value="November">November</option>
+                        <option value="December">December</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Book Title</label>
+                    <input type="text" id="botmTitle" required>
+                </div>
+                <div class="form-group">
+                    <label>Author</label>
+                    <input type="text" id="botmAuthor" required>
+                </div>
+                <button type="submit">Submit Book of the Month</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="updateLatestModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal('updateLatestModal')">&times;</span>
+            <h2>Update Latest Changelog</h2>
+            <form id="changelogForm">
+                <div class="form-group">
+                    <label>Site Version</label>
+                    <input type="text" id="changelogVersion" placeholder="e.g. 1.2" required>
+                </div>
+                <div class="form-group">
+                    <label>Latest Update Message</label>
+                    <textarea id="changelogMessage" rows="4" required></textarea>
+                </div>
+                <button type="submit">Submit Update</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
