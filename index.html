@@ -489,6 +489,9 @@
                 if (window.updateAccountPermissions) {
                     window.updateAccountPermissions(user);
                 }
+                if (window.checkForSpecialLogin) {
+                    window.checkForSpecialLogin(user);
+                }
             } else {
                 if(pfp) pfp.src = 'user-solid-full.svg';
                 if(nameEl) nameEl.textContent = 'Guest';
