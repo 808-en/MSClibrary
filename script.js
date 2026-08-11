@@ -1,5 +1,6 @@
 const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQaTqPVndPccN9h1-RYUulv59x-Ursqed9lsoDnMfejpp8VoI1DjYFh2Cq5Xr-471I8RcKX7vJ2yJgj/pub?output=csv';
 const TOKEN_VALUE = "loggedInIdentifierRNBN480H39A=";
+const ADMIN_DB_URL = "YOUR_APPS_SCRIPT_WEB_APP_URL_HERE";
 let shouldNavigate = false;
 let _sessionInterval = null;
 
@@ -136,10 +137,174 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // start session countdown if the element exists
     const countdownEl = document.getElementById('sessionCountdown');
     if (countdownEl) {
         startSessionCountdown('sessionCountdown');
+    }
+
+    const massContainer = document.getElementById('massIsbnContainer');
+    if (massContainer) {
+        for (let i = 1; i <= 15; i++) {
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'mass-isbn-input';
+            input.placeholder = `ISBN ${i}`;
+            input.style.width = '100%';
+            input.style.padding = '12px';
+            input.style.boxSizing = 'border-box';
+            input.style.border = '1px solid #ced4da';
+            input.style.borderRadius = '6px';
+            massContainer.appendChild(input);
+        }
+    }
+
+    const addNormalLookupBtn = document.getElementById('addNormalLookupBtn');
+    if (addNormalLookupBtn) {
+        addNormalLookupBtn.addEventListener('click', async () => {
+            const isbn = document.getElementById('addNormalIsbn').value.trim();
+            const details = await fetchBookDetailsFromAPI(isbn);
+            if (details) {
+                document.getElementById('addNormalTitle').value = details.title;
+                document.getElementById('addNormalAuthor').value = details.author;
+                document.getElementById('addNormalGenre').value = details.genre;
+                document.getElementById('addNormalSynopsis').value = details.synopsis;
+                document.getElementById('addNormalCover').value = details.cover;
+            } else {
+                alert("Book details not found automatically.");
+            }
+        });
+    }
+
+    const normalForm = document.getElementById('addBookNormalForm');
+    if (normalForm) {
+        normalForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const data = {
+                action: "addBook",
+                title: document.getElementById('addNormalTitle').value,
+                author: document.getElementById('addNormalAuthor').value,
+                genre: document.getElementById('addNormalGenre').value,
+                grade: document.getElementById('addNormalGrade').value,
+                msc: document.getElementById('addNormalMsc').value,
+                synopsis: document.getElementById('addNormalSynopsis').value,
+                cover: document.getElementById('addNormalCover').value,
+                quantity: document.getElementById('addNormalQuantity').value
+            };
+            fetch(ADMIN_DB_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            }).then(() => {
+                alert("Book added successfully.");
+                normalForm.reset();
+                closeModal('addBookModal');
+            });
+        });
+    }
+
+    const massForm = document.getElementById('addBookMassForm');
+    if (massForm) {
+        massForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const inputs = document.querySelectorAll('.mass-isbn-input');
+            const books = [];
+            for (let input of inputs) {
+                const isbn = input.value.trim();
+                if (isbn) {
+                    const details = await fetchBookDetailsFromAPI(isbn);
+                    if (details) {
+                        books.push(details);
+                    }
+                }
+            }
+            if (books.length === 0) {
+                alert("No valid books found to add.");
+                return;
+            }
+            fetch(ADMIN_DB_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: "addMass", books: books })
+            }).then(() => {
+                alert(books.length + " books added successfully.");
+                massForm.reset();
+                closeModal('addBookModal');
+            });
+        });
+    }
+
+    const searchDel = document.getElementById('deleteSearchInput');
+    if (searchDel) {
+        searchDel.addEventListener('input', function() {
+            const term = this.value.toLowerCase();
+            const rows = document.getElementById('deleteBooksBody').querySelectorAll('tr');
+            rows.forEach(row => {
+                const title = row.cells[1] ? row.cells[1].textContent.toLowerCase() : '';
+                const author = row.cells[2] ? row.cells[2].textContent.toLowerCase() : '';
+                if (title.includes(term) || author.includes(term)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    }
+
+    const selectAllDel = document.getElementById('selectAllDelete');
+    if (selectAllDel) {
+        selectAllDel.addEventListener('change', function() {
+            const checkboxes = document.querySelectorAll('.delete-checkbox');
+            checkboxes.forEach(cb => {
+                if(cb.closest('tr').style.display !== 'none') {
+                    cb.checked = this.checked;
+                }
+            });
+        });
+    }
+
+    const btnDelSelected = document.getElementById('btnDeleteSelected');
+    if (btnDelSelected) {
+        btnDelSelected.addEventListener('click', () => {
+            const checked = document.querySelectorAll('.delete-checkbox:checked');
+            if (checked.length === 0) {
+                alert('No books selected.');
+                return;
+            }
+            const rows = Array.from(checked).map(cb => parseInt(cb.value));
+            fetch(ADMIN_DB_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: "deleteSelected", rows: rows })
+            }).then(() => {
+                setTimeout(fetchDeleteChartData, 2000);
+            });
+        });
+    }
+
+    const btnDelAll = document.getElementById('btnDeleteAll');
+    if (btnDelAll) {
+        btnDelAll.addEventListener('click', () => {
+            if (confirm("Are you sure you want to delete ALL books? This requires extra confirmation and cannot be undone.")) {
+                if (confirm("FINAL WARNING: Click OK to delete the entire library database.")) {
+                    fetch(ADMIN_DB_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: "deleteAll" })
+                    }).then(() => {
+                        setTimeout(fetchDeleteChartData, 2000);
+                    });
+                }
+            }
+        });
+    }
+
+    const btnRefresh = document.getElementById('btnRefreshDelete');
+    if (btnRefresh) {
+        btnRefresh.addEventListener('click', fetchDeleteChartData);
     }
 });
 
@@ -179,6 +344,28 @@ async function lookupIsbn(isbn, titleInputId, authorInputId) {
         console.error(error);
         alert("Error retrieving book information.");
     }
+}
+
+async function fetchBookDetailsFromAPI(isbn) {
+    if (!isbn) return null;
+    try {
+        const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`);
+        const data = await response.json();
+        if (data.items && data.items.length > 0) {
+            const vol = data.items[0].volumeInfo;
+            return {
+                title: vol.title || '',
+                author: vol.authors ? vol.authors.join(', ') : '',
+                genre: vol.categories ? vol.categories.join(', ') : '',
+                synopsis: vol.description || '',
+                cover: vol.imageLinks ? (vol.imageLinks.thumbnail || vol.imageLinks.smallThumbnail) : '',
+                grade: '',
+                msc: '',
+                quantity: 1
+            };
+        }
+    } catch(e) {}
+    return null;
 }
 
 function setupIsbnLookup(btnId, isbnInputId, titleInputId, authorInputId) {
@@ -252,7 +439,6 @@ function loggedincheck() {
     if (!isValid) {
         localStorage.removeItem("loggedInState");
         localStorage.removeItem("loggedInExpiry");
-        // redirect to 401 - forbidden page when the session expires or token is invalid
         window.location.href = "401.html";
         return;
     }
@@ -261,11 +447,9 @@ function loggedincheck() {
 function logout() {
     localStorage.removeItem("loggedInState");
     localStorage.removeItem("loggedInExpiry");
-    
     window.location.href = "index.html";
 }
 
-// Session countdown helper: shows mm:ss and redirects to 401 when expired
 function startSessionCountdown(elementId) {
     clearInterval(_sessionInterval);
     const el = document.getElementById(elementId);
@@ -279,7 +463,6 @@ function startSessionCountdown(elementId) {
             localStorage.removeItem('loggedInState');
             localStorage.removeItem('loggedInExpiry');
             clearInterval(_sessionInterval);
-            // small delay so the user sees 00:00 for a moment
             setTimeout(() => { window.location.href = '401.html'; }, 3000);
             return;
         }
@@ -386,11 +569,9 @@ function markAsReturned(row, reqId, returnedIndex) {
         console.error(error.message);
     });
 
-
     row.style.textDecoration = 'line-through';
     row.style.color = 'green';
     row.style.fontWeight = 'bold';
-
 
     const cells = row.querySelectorAll('td');
     if (cells[returnedIndex]) {
@@ -419,4 +600,27 @@ function submitAdminData(data, modalId, formElement) {
         console.error(error.message);
         alert("There was an error saving your request.");
     });
+}
+
+async function fetchDeleteChartData() {
+    const bodyEl = document.getElementById('deleteBooksBody');
+    if (!bodyEl) return;
+    bodyEl.innerHTML = '<tr><td colspan="4" style="text-align:center;">Loading...</td></tr>';
+    try {
+        const response = await fetch(ADMIN_DB_URL);
+        const books = await response.json();
+        bodyEl.innerHTML = '';
+        books.forEach(book => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="text-align: center;"><input type="checkbox" class="delete-checkbox" value="${book.row}"></td>
+                <td>${book.title}</td>
+                <td>${book.author}</td>
+                <td>${book.quantity}</td>
+            `;
+            bodyEl.appendChild(tr);
+        });
+    } catch (error) {
+        bodyEl.innerHTML = '<tr><td colspan="4" style="text-align:center;">Error loading books.</td></tr>';
+    }
 }
