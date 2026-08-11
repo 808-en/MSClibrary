@@ -17,6 +17,7 @@
         <span class="name" id="userName">Guest</span>
         <div class="account-dropdown">
             <button id="logoutBtn" style="display:none;" onclick="window.logoutFirebase()">Logout</button>
+            <button id="openPermissions" style="display:none;">Account Permissions</button>
             <button id="loginDropdownBtn" onclick="window.location.href='login.html'">Log In</button>
         </div>
     </div>
@@ -349,6 +350,43 @@
                 </div>
                 <button type="submit">Submit Return Request</button>
             </form>
+        </div>
+    </div>
+
+    <div id="permissionsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal('permissionsModal')">&times;</span>
+            <h2>Account Permissions</h2>
+            <table>
+  <tr>
+    <th>Permission</th>
+    <th>Y/N</th>
+  </tr>
+  <tr>
+    <td>Add/Delete Books</td>
+    <td><div id="addDeleteBooksPermission"></div></td>
+  </tr>
+  <tr>
+    <td>Download Book Borrow/Return Requests</td>
+    <td><div id="exportRequestsPermission"></div></td>
+  </tr>
+  <tr>
+    <td>Update Changelog / Book of the Month</td>
+    <td><div id="updateChangesBotmPermission"></div></td>
+  </tr>
+  <tr>
+    <td>Use Teacher Tools</td>
+    <td><div id="teacherToolsPermission"></div></td>
+  </tr>
+  <tr>
+    <td>Borrow/Return Books</td>
+    <td style="color: green;">Y</td>
+  </tr>
+  <tr>
+    <td>Download Online Resources</td>
+    <td style="color: green;">Y</td>
+  </tr>
+</table>
         </div>
     </div>
 
