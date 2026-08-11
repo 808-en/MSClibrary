@@ -1,6 +1,6 @@
 const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQaTqPVndPccN9h1-RYUulv59x-Ursqed9lsoDnMfejpp8VoI1DjYFh2Cq5Xr-471I8RcKX7vJ2yJgj/pub?output=csv';
 const TOKEN_VALUE = "loggedInIdentifierRNBN480H39A=";
-const ADMIN_DB_URL = "YOUR_APPS_SCRIPT_WEB_APP_URL_HERE";
+const ADMIN_DB_URL = "https://script.google.com/macros/s/AKfycbwbPCbZbcoQ6GvIUCjYrY_jU6kM9hXk9LB5Z8vmcgBfbo9kbbzkInrp6n7URJlXuI1Wzw/exec";
 let shouldNavigate = false;
 let _sessionInterval = null;
 
