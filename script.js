@@ -1,6 +1,7 @@
 const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQaTqPVndPccN9h1-RYUulv59x-Ursqed9lsoDnMfejpp8VoI1DjYFh2Cq5Xr-471I8RcKX7vJ2yJgj/pub?output=csv';
 const TOKEN_VALUE = "loggedInIdentifierRNBN480H39A=";
 const ADMIN_DB_URL = "https://script.google.com/macros/s/AKfycbwbPCbZbcoQ6GvIUCjYrY_jU6kM9hXk9LB5Z8vmcgBfbo9kbbzkInrp6n7URJlXuI1Wzw/exec";
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyvHlxSf3NoF8MBZQYiHvJrBmBhYVE6V_GcGhr8iSK6AeKs5SISoUN_Ho4owsjjV0_5Fw/exec';
 let shouldNavigate = false;
 let _sessionInterval = null;
 
@@ -144,17 +145,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const massContainer = document.getElementById('massIsbnContainer');
     if (massContainer) {
+        massContainer.innerHTML = '';
         const massInputs = [];
         for (let i = 1; i <= 15; i++) {
             const input = document.createElement('input');
             input.type = 'text';
             input.className = 'mass-isbn-input';
             input.placeholder = `ISBN ${i}`;
-            input.style.width = '100%';
-            input.style.padding = '12px';
-            input.style.boxSizing = 'border-box';
-            input.style.border = '1px solid #ced4da';
-            input.style.borderRadius = '6px';
+            input.style.marginBottom = '10px';
             massContainer.appendChild(input);
             massInputs.push(input);
         }
@@ -176,13 +174,13 @@ document.addEventListener('DOMContentLoaded', function() {
             const isbn = document.getElementById('addNormalIsbn').value.trim();
             const details = await fetchBookDetailsFromAPI(isbn);
             if (details) {
-                document.getElementById('addNormalTitle').value = details.title;
-                document.getElementById('addNormalAuthor').value = details.author;
-                document.getElementById('addNormalGenre').value = details.genre;
-                document.getElementById('addNormalSynopsis').value = details.synopsis;
-                document.getElementById('addNormalCover').value = details.cover;
+                if (document.getElementById('addNormalTitle')) document.getElementById('addNormalTitle').value = details.title;
+                if (document.getElementById('addNormalAuthor')) document.getElementById('addNormalAuthor').value = details.author;
+                if (document.getElementById('addNormalGenre')) document.getElementById('addNormalGenre').value = details.genre;
+                if (document.getElementById('addNormalSynopsis')) document.getElementById('addNormalSynopsis').value = details.synopsis;
+                if (document.getElementById('addNormalCover')) document.getElementById('addNormalCover').value = details.cover;
             } else {
-                alert("Book details not found automatically.");
+                alert("Book details not found automatically. You may enter them manually.");
             }
         });
     }
@@ -193,6 +191,8 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             const data = {
                 action: "addBook",
+                sheetTarget: "Library Catalog",
+                isbn: document.getElementById('addNormalIsbn') ? document.getElementById('addNormalIsbn').value : '',
                 title: document.getElementById('addNormalTitle').value,
                 author: document.getElementById('addNormalAuthor').value,
                 genre: document.getElementById('addNormalGenre').value,
@@ -202,22 +202,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 cover: document.getElementById('addNormalCover').value,
                 quantity: document.getElementById('addNormalQuantity').value
             };
-            fetch(ADMIN_DB_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            }).then(() => {
+            const payload = JSON.stringify(data);
+            Promise.all([
+                fetch(ADMIN_DB_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload }),
+                fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload })
+            ]).then(() => {
                 alert("Book added successfully.");
                 normalForm.reset();
                 closeModal('addBookModal');
                 const choiceSec = document.getElementById('addBookChoiceSection');
-                if(choiceSec) {
+                if (choiceSec) {
                     choiceSec.style.display = 'block';
                     document.getElementById('normalTypeChoiceSection').style.display = 'none';
                     document.getElementById('normalInputSection').style.display = 'none';
                     document.getElementById('massInputSection').style.display = 'none';
                 }
+            }).catch(() => {
+                alert("Book submission attempted. Please check Google Sheet.");
             });
         });
     }
@@ -233,7 +234,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (isbn) {
                     const details = await fetchBookDetailsFromAPI(isbn);
                     if (details) {
+                        details.isbn = isbn;
                         books.push(details);
+                    } else {
+                        books.push({
+                            isbn: isbn,
+                            title: 'Unknown Title (' + isbn + ')',
+                            author: 'Unknown Author',
+                            genre: '',
+                            grade: '',
+                            msc: '',
+                            synopsis: '',
+                            cover: '',
+                            quantity: 1
+                        });
                     }
                 }
             }
@@ -241,22 +255,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert("No valid books found to add.");
                 return;
             }
-            fetch(ADMIN_DB_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: "addMass", books: books })
-            }).then(() => {
+            const data = { action: "addMass", sheetTarget: "Library Catalog", books: books };
+            const payload = JSON.stringify(data);
+            Promise.all([
+                fetch(ADMIN_DB_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload }),
+                fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload })
+            ]).then(() => {
                 alert(books.length + " books added successfully.");
                 massForm.reset();
                 closeModal('addBookModal');
                 const choiceSec = document.getElementById('addBookChoiceSection');
-                if(choiceSec) {
+                if (choiceSec) {
                     choiceSec.style.display = 'block';
                     document.getElementById('normalTypeChoiceSection').style.display = 'none';
                     document.getElementById('normalInputSection').style.display = 'none';
                     document.getElementById('massInputSection').style.display = 'none';
                 }
+            }).catch(() => {
+                alert("Books submission attempted. Please check Google Sheet.");
             });
         });
     }
@@ -283,7 +299,7 @@ document.addEventListener('DOMContentLoaded', function() {
         selectAllDel.addEventListener('change', function() {
             const checkboxes = document.querySelectorAll('.delete-checkbox');
             checkboxes.forEach(cb => {
-                if(cb.closest('tr').style.display !== 'none') {
+                if (cb.closest('tr').style.display !== 'none') {
                     cb.checked = this.checked;
                 }
             });
@@ -299,13 +315,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             const rows = Array.from(checked).map(cb => parseInt(cb.value));
-            fetch(ADMIN_DB_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: "deleteSelected", rows: rows })
-            }).then(() => {
-                setTimeout(fetchDeleteChartData, 2000);
+            const payload = JSON.stringify({ action: "deleteSelected", sheetTarget: "Library Catalog", rows: rows });
+            Promise.all([
+                fetch(ADMIN_DB_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload }),
+                fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload })
+            ]).then(() => {
+                alert('Deletion requested successfully.');
+                setTimeout(fetchDeleteChartData, 1500);
             });
         });
     }
@@ -315,13 +331,13 @@ document.addEventListener('DOMContentLoaded', function() {
         btnDelAll.addEventListener('click', () => {
             if (confirm("Are you sure you want to delete ALL books? This requires extra confirmation and cannot be undone.")) {
                 if (confirm("FINAL WARNING: Click OK to delete the entire library database.")) {
-                    fetch(ADMIN_DB_URL, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ action: "deleteAll" })
-                    }).then(() => {
-                        setTimeout(fetchDeleteChartData, 2000);
+                    const payload = JSON.stringify({ action: "deleteAll", sheetTarget: "Library Catalog" });
+                    Promise.all([
+                        fetch(ADMIN_DB_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload }),
+                        fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload })
+                    ]).then(() => {
+                        alert('All books deleted.');
+                        setTimeout(fetchDeleteChartData, 1500);
                     });
                 }
             }
@@ -343,6 +359,7 @@ function setupFormSubmission(formId, type, dataExtractor, modalId) {
             const reqId = type === 'Borrow' ? 'REQ-' + Math.random().toString(36).substr(2, 9).toUpperCase() : extracted.requestId;
             const data = {
                 requestID: reqId,
+                requestId: reqId,
                 type: type,
                 timestamp: new Date().getTime(),
                 ...extracted
@@ -354,44 +371,67 @@ function setupFormSubmission(formId, type, dataExtractor, modalId) {
     }
 }
 
-async function lookupIsbn(isbn, titleInputId, authorInputId) {
-    if (!isbn) return;
-    try {
-        const response = await fetch(`https://openlibrary.org/api/books?bibkeys=ISBN:${isbn}&format=json&jscmd=data`);
-        const data = await response.json();
-        const book = data[`ISBN:${isbn}`];
-        if (book) {
-            document.getElementById(titleInputId).value = book.title || '';
-            document.getElementById(authorInputId).value = book.authors ? book.authors.map(a => a.name).join(', ') : '';
-        } else {
-            alert("Book details not found automatically. You can proceed with just the ISBN or use Manual Input.");
-        }
-    } catch (error) {
-        console.error(error);
-        alert("Error retrieving book information.");
-    }
-}
-
 async function fetchBookDetailsFromAPI(isbn) {
     if (!isbn) return null;
+    const cleanIsbn = isbn.replace(/[^0-9X]/gi, '');
+    if (!cleanIsbn) return null;
+
     try {
-        const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`);
-        const data = await response.json();
-        if (data.items && data.items.length > 0) {
-            const vol = data.items[0].volumeInfo;
-            return {
-                title: vol.title || '',
-                author: vol.authors ? vol.authors.join(', ') : '',
-                genre: vol.categories ? vol.categories.join(', ') : '',
-                synopsis: vol.description || '',
-                cover: vol.imageLinks ? (vol.imageLinks.thumbnail || vol.imageLinks.smallThumbnail) : '',
-                grade: '',
-                msc: '',
-                quantity: 1
-            };
+        const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${cleanIsbn}`);
+        if (response.ok) {
+            const data = await response.json();
+            if (data.items && data.items.length > 0) {
+                const vol = data.items[0].volumeInfo;
+                return {
+                    title: vol.title || '',
+                    author: vol.authors ? vol.authors.join(', ') : '',
+                    genre: vol.categories ? vol.categories.join(', ') : '',
+                    synopsis: vol.description || '',
+                    cover: vol.imageLinks ? (vol.imageLinks.thumbnail || vol.imageLinks.smallThumbnail || '').replace('http:', 'https:') : '',
+                    grade: '',
+                    msc: '',
+                    quantity: 1
+                };
+            }
         }
     } catch(e) {}
+
+    try {
+        const response = await fetch(`https://openlibrary.org/api/books?bibkeys=ISBN:${cleanIsbn}&format=json&jscmd=data`);
+        if (response.ok) {
+            const data = await response.json();
+            const book = data[`ISBN:${cleanIsbn}`];
+            if (book) {
+                return {
+                    title: book.title || '',
+                    author: book.authors ? book.authors.map(a => a.name).join(', ') : '',
+                    genre: book.subjects ? book.subjects.map(s => s.name).join(', ') : '',
+                    synopsis: typeof book.notes === 'string' ? book.notes : '',
+                    cover: book.cover ? (book.cover.large || book.cover.medium || book.cover.small || '') : '',
+                    grade: '',
+                    msc: '',
+                    quantity: 1
+                };
+            }
+        }
+    } catch(e) {}
+
     return null;
+}
+
+async function lookupIsbn(isbn, titleInputId, authorInputId) {
+    if (!isbn) return;
+    const details = await fetchBookDetailsFromAPI(isbn);
+    if (details) {
+        if (titleInputId && document.getElementById(titleInputId)) {
+            document.getElementById(titleInputId).value = details.title;
+        }
+        if (authorInputId && document.getElementById(authorInputId)) {
+            document.getElementById(authorInputId).value = details.author;
+        }
+    } else {
+        alert("Book details not found automatically. You can proceed with standard text entry.");
+    }
 }
 
 function setupIsbnLookup(btnId, isbnInputId, titleInputId, authorInputId) {
@@ -405,14 +445,11 @@ function setupIsbnLookup(btnId, isbnInputId, titleInputId, authorInputId) {
 }
 
 function submitToGoogleSheet(data, generatedId) {
-    const scriptUrl = 'https://script.google.com/macros/s/AKfycbyvHlxSf3NoF8MBZQYiHvJrBmBhYVE6V_GcGhr8iSK6AeKs5SISoUN_Ho4owsjjV0_5Fw/exec';
-    
-    fetch(scriptUrl, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-    }).then(() => {
+    const payload = JSON.stringify(data);
+    Promise.all([
+        fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload }),
+        fetch(ADMIN_DB_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload })
+    ]).then(() => {
         if (generatedId) {
             alert(`Request successfully recorded! Your Return Request ID is: ${generatedId}. Please store it somewhere safe for when you return the book.`);
         } else {
@@ -576,20 +613,22 @@ async function fetchData(container) {
 }
 
 function markAsReturned(row, reqId, returnedIndex) {
-    const scriptUrl = 'https://script.google.com/macros/s/AKfycbyvHlxSf3NoF8MBZQYiHvJrBmBhYVE6V_GcGhr8iSK6AeKs5SISoUN_Ho4owsjjV0_5Fw/exec';
     const data = {
         sheetTarget: "MarkReturned",
+        action: "markReturned",
         type: "Return",
         requestID: reqId,
-        returned: "Y"
+        requestId: reqId,
+        returned: "Y",
+        "Returned?": "Y"
     };
 
-    fetch(scriptUrl, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-    }).then(() => {
+    const payload = JSON.stringify(data);
+
+    Promise.all([
+        fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload }),
+        fetch(ADMIN_DB_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload })
+    ]).then(() => {
         alert("Marked as returned successfully!");
     }).catch(error => {
         console.error(error.message);
@@ -611,16 +650,13 @@ function markAsReturned(row, reqId, returnedIndex) {
 }
 
 function submitAdminData(data, modalId, formElement) {
-    const scriptUrl = 'https://script.google.com/macros/s/AKfycbyvHlxSf3NoF8MBZQYiHvJrBmBhYVE6V_GcGhr8iSK6AeKs5SISoUN_Ho4owsjjV0_5Fw/exec';
-    
-    fetch(scriptUrl, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-    }).then(() => {
+    const payload = JSON.stringify(data);
+    Promise.all([
+        fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload }),
+        fetch(ADMIN_DB_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload })
+    ]).then(() => {
         alert("Update successfully recorded!");
-        formElement.reset();
+        if (formElement) formElement.reset();
         closeModal(modalId);
     }).catch(error => {
         console.error(error.message);
@@ -636,16 +672,20 @@ async function fetchDeleteChartData() {
         const response = await fetch(ADMIN_DB_URL);
         const books = await response.json();
         bodyEl.innerHTML = '';
-        books.forEach(book => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td style="text-align: center;"><input type="checkbox" class="delete-checkbox" value="${book.row}"></td>
-                <td>${book.title}</td>
-                <td>${book.author}</td>
-                <td>${book.quantity}</td>
-            `;
-            bodyEl.appendChild(tr);
-        });
+        if (Array.isArray(books) && books.length > 0) {
+            books.forEach(book => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="text-align: center;"><input type="checkbox" class="delete-checkbox" value="${book.row}"></td>
+                    <td>${book.title || book['Book Name'] || ''}</td>
+                    <td>${book.author || book['Author'] || ''}</td>
+                    <td>${book.quantity || book['Quantity'] || 1}</td>
+                `;
+                bodyEl.appendChild(tr);
+            });
+        } else {
+            bodyEl.innerHTML = '<tr><td colspan="4" style="text-align:center;">No books found.</td></tr>';
+        }
     } catch (error) {
         bodyEl.innerHTML = '<tr><td colspan="4" style="text-align:center;">Error loading books.</td></tr>';
     }
