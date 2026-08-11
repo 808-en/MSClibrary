@@ -494,6 +494,7 @@ function logout() {
     if (window.logoutFirebase) {
         window.logoutFirebase();
     }
+    window.location.href = "index.html";
 }
 
 async function fetchData(container) {
