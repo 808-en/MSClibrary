@@ -451,19 +451,31 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
+        let currentUser = null;
+
         window.logoutFirebase = () => {
             signOut(auth).then(() => {
                 window.location.reload();
             });
         };
 
+        const navLoginBtn = document.getElementById('AdminLogin');
+        if (navLoginBtn) {
+            navLoginBtn.addEventListener('click', (e) => {
+                if (currentUser && window.checkForSpecialLogin) {
+                    window.checkForSpecialLogin(currentUser);
+                }
+            });
+        }
+
         onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+
             const pfp = document.getElementById('userPfp');
             const nameEl = document.getElementById('userName');
             const logoutBtn = document.getElementById('logoutBtn');
             const openPermsBtn = document.getElementById('openPermissions');
             const loginDropdownBtn = document.getElementById('loginDropdownBtn');
-            const navLoginBtn = document.getElementById('AdminLogin');
 
             if (openPermsBtn) openPermsBtn.style.display = 'block';
 
@@ -488,9 +500,6 @@
 
                 if (window.updateAccountPermissions) {
                     window.updateAccountPermissions(user);
-                }
-                if (window.checkForSpecialLogin) {
-                    window.checkForSpecialLogin(user);
                 }
             } else {
                 if(pfp) pfp.src = 'user-solid-full.svg';
