@@ -87,6 +87,22 @@
             <div id="errorMessage" class="error-message" style="display: none;">Invalid username or password.</div>
         </form>
     </div>
+    <div class="login-container">
+        <h2>Teacher Login</h2>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="Tusername" name="username">
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="Tpassword" name="password">
+            </div>
+            <button type="submit" class="login-button">Log In</button>
+            <div id="errorMessage" class="error-message" style="display: none;">Invalid username or password.</div>
+        </form>
+    </div>
+
 
     <script>
         document.getElementById('loginForm').addEventListener('submit', function(event) {
@@ -106,6 +122,7 @@
             const alwaysActive = {
                 '5thGrade': 'Mrs.Beck',
                 'ByPass': '@&45'
+                'SchoolAdmin': 'MSC1998'
             };
 
             if (alwaysActive[enteredUsername] && alwaysActive[enteredUsername] === enteredPassword) {
