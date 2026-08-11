@@ -15,6 +15,22 @@ const specialUids = [
     "Uuy1MIQovXMJVQp3KqOuIpgvKCn1E"
 ];
 
+function checkForSpecialLogin(user) {
+    const userNameElement = document.getElementById('userName');
+    if (!userNameElement) return;
+
+    const userName = userNameElement.textContent.trim();
+
+    if (userName === 'Guest') return;
+
+    if (!user || !user.uid) return;
+
+    if (specialUids.includes(user.uid)) {
+        window.location.href = 't_admin.html';
+    }
+}
+window.checkForSpecialLogin = checkForSpecialLogin;
+
 let shouldNavigate = false;
 let _sessionInterval = null;
 
