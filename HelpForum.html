@@ -1,11 +1,17 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>Customer Service</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
         body {
-            font-family: sans-serif;
+            font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
             margin: 0;
             padding: 0;
             background-color: #f8f8f8;
@@ -13,125 +19,55 @@
         }
 
         header {
-            background-color: #333;
+            background-color: #111827;
             color: white;
-            padding: 1em 0;
+            padding: 1rem 0;
             text-align: center;
-        }
-
-        .navbar {
-            background-color: #ddd;
-            padding: 0.5em 0;
-            text-align: center;
-        }
-
-        .navbar ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: inline-block;
-        }
-
-        .navbar li {
-            display: inline;
-            margin: 0 15px;
         }
 
         .navbar a {
             text-decoration: none;
-            color: #333;
-            font-weight: bold;
-            padding: 8px 12px;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
+            color: #111827;
+            font-weight: 600;
         }
 
-        .navbar a:hover {
-            background-color: #bbb;
+        .email{
+            color:#ef4444;
+            font-weight: 600;
+            display: inline-block;
+            margin-left: .25rem;
         }
 
-        .dashboard-container {
-            width: 90%;
-            margin: 20px auto;
+        .fade-enter { opacity: 0; transform: translateY(6px); }
+        .fade-enter-active { transition: opacity .28s ease, transform .28s ease; opacity: 1; transform: translateY(0); }
+        .fade-exit { opacity: 1; }
+        .fade-exit-active { transition: opacity .18s ease; opacity: 0; }
+
+        main { padding-bottom: 5.5rem; }
+
+        .Forum {
             background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        h2 {
-            color: #333;
-            margin-top: 0;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-        }
-
-        #borrowRequests {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-
-        #borrowRequests th, #borrowRequests td {
-            border: 1px solid #ddd;
-            padding: 8px;
+            padding: 1.25rem;
+            margin: 1.25rem auto;
+            width: 90%;
+            max-width: 900px;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
             text-align: left;
         }
-
-        #borrowRequests th {
-            background-color: #f2f2f2;
-        }
-
-        .no-requests {
-            font-style: italic;
-            color: #777;
-        }
-
-        footer {
-            background-color: #333;
-            color: white;
-            text-align: center;
-            padding: 1em 0;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-        }
-
-.Forum {
-    background-color: white;
-    padding: 20px;
-    margin: 20px auto;
-    width: 80%;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    text-align: center; /* Center the button */
-}
-
-.Forum Long {
-    background-color:#000000;
-    margin: 20px auto;
-    width: 100%;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    text-align: center; /* Center the button */
-transform: translate(-50%)
-}
-
-.email{
-    color:#FF0000;
-}
     </style>
 </head>
-<body>
+<body class="antialiased">
+
     <header>
-        <h1>Help</h1>
+        <h1 class="text-2xl md:text-3xl font-extrabold">Help</h1>
     </header>
-    <div class="navbar">
-        <ul>
-            <li><a href="index.html">Home</a></li>
+
+    <div class="navbar bg-gray-200 py-3">
+        <ul class="flex items-center justify-center gap-6">
+            <li><a href="index.html" class="px-3 py-1 rounded hover:bg-gray-300"><i class="fa-solid fa-house mr-1"></i>Home</a></li>
             <li>
-                <select class="genre-choice">
+                <select class="genre-choice rounded px-3 py-1 border border-gray-300">
                     <option selected>Genres</option>
                     <option>Action-Adventure</option>
                     <option>Science Fiction</option>
@@ -140,28 +76,250 @@ transform: translate(-50%)
                     <option>Historical Fiction</option>
                     <option>Informational Text</option>
                     <option>Biography</option>
-                    </select>
+                </select>
             </li>
-            <li><a href="BookReturn.html">Book Return</a></li>
-            <li><a href="HelpForum.html">Help</a></li>
-            <li><a href="LoginFork.html" id="ForkedLogin">Login</a></li>
+            <li><a href="BookReturn.html" class="px-3 py-1 rounded hover:bg-gray-300"><i class="fa-solid fa-rotate-left mr-1"></i>Book Return</a></li>
+            <li><a href="HelpForum.html" class="px-3 py-1 rounded bg-white shadow-sm"><i class="fa-solid fa-circle-question mr-1"></i>Help</a></li>
+            <li><a href="LoginFork.html" id="ForkedLogin" class="px-3 py-1 rounded hover:bg-gray-300"><i class="fa-solid fa-right-to-bracket mr-1"></i>Login</a></li>
         </ul>
     </div>
 
-            <div class="Forum">
-                <h2>How To Request Help</h2>
-                <p>Encountered a bug? Can't find your book? We can help! If you need help, you can either contact <div class="email">atticusherr@gmail.com</div>
-            </div>
-<div class="Forum">
-    <h2>Submit a Bug, Issue, or Feedback</h2>
-    
-   
-    <p>Answer the quick survey <a href="https://forms.gle/MnnT2SVvKQpviKNq8" target="_blank" class="email">here</a>.</p>
-</div>
+    <main class="max-w-6xl mx-auto">
 
-    <footer>
+        <div class="Forum">
+            <h2 class="text-xl font-bold mb-2"><i class="fa-solid fa-hands-helping text-yellow-500 mr-2"></i>How To Request Help</h2>
+            <p class="text-gray-700 mb-4">Encountered a bug? Can't find your book? We can help! If you need help, you can either contact
+                <span class="email">atticusherr@gmail.com</span>
+            </p>
+        </div>
+
+        <section class="Forum" aria-labelledby="forum-title">
+            <div class="flex items-start justify-between gap-4">
+                <div>
+                    <h2 id="forum-title" class="text-2xl font-bold flex items-center gap-3">
+                        <i id="page-icon" class="fa-solid fa-book-open text-indigo-600"></i>
+                        <span id="page-title">What is MSC Library</span>
+                        <span id="page-index" class="text-sm text-gray-500 ml-2">— Page <span class="font-semibold" id="page-num">1</span> / 7</span>
+                    </h2>
+                    <p id="page-sub" class="text-sm text-gray-500 mt-1"><i class="fa-solid fa-info-circle mr-1"></i>A quick guide for each topic — use the buttons below to navigate.</p>
+                </div>
+
+                <div class="hidden sm:flex items-center space-x-2 text-sm text-gray-600">
+                    <span class="flex items-center gap-2 px-3 py-1 rounded bg-gray-100">
+                        <i class="fa-solid fa-circle-nodes text-indigo-500"></i> Forum Documents
+                    </span>
+                    <span class="flex items-center gap-2 px-3 py-1 rounded bg-gray-100">
+                        <i class="fa-solid fa-clock-rotate-left text-gray-500"></i> Updated 2024
+                    </span>
+                </div>
+            </div>
+
+            <article id="page-content" class="mt-6 text-gray-800 leading-relaxed">
+            </article>
+
+            <nav aria-label="Forum pagination" class="mt-6 flex items-center justify-between gap-4">
+                <button id="prev-btn" class="flex-1 sm:flex-none inline-flex items-center gap-3 px-3 py-2 rounded-lg text-left bg-gray-100 hover:bg-gray-200 disabled:opacity-40"
+                        aria-label="Previous document">
+                    <i class="fa-solid fa-chevron-left text-lg"></i>
+                    <div class="text-sm">
+                        <div class="text-xs text-gray-500">Previous</div>
+                        <div id="prev-label" class="font-medium text-gray-800">—</div>
+                    </div>
+                </button>
+
+                <div class="flex-1 text-center">
+                    <div class="inline-flex items-center gap-3 bg-white px-4 py-2 rounded-lg shadow-sm">
+                        <button id="first-btn" class="px-2 py-1 text-sm text-indigo-600 hover:underline" title="Go to first"><i class="fa-solid fa-backward-step mr-2"></i>First</button>
+                        <button id="jump-prev" class="px-2 py-1 text-sm text-gray-600 hidden" title="Jump back"><i class="fa-solid fa-ellipsis"></i></button>
+
+                        <div id="page-dots" class="flex items-center gap-2"></div>
+
+                        <button id="jump-next" class="px-2 py-1 text-sm text-gray-600 hidden" title="Jump forward"><i class="fa-solid fa-ellipsis"></i></button>
+                        <button id="last-btn" class="px-2 py-1 text-sm text-indigo-600 hover:underline" title="Go to last">Last <i class="fa-solid fa-forward-step ml-2"></i></button>
+                    </div>
+                </div>
+
+                <button id="next-btn" class="flex-1 sm:flex-none inline-flex items-center gap-3 px-3 py-2 rounded-lg justify-end bg-gray-100 hover:bg-gray-200 disabled:opacity-40"
+                        aria-label="Next document">
+                    <div class="text-sm text-right">
+                        <div class="text-xs text-gray-500">Next</div>
+                        <div id="next-label" class="font-medium text-gray-800">—</div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-lg"></i>
+                </button>
+            </nav>
+        </section>
+
+        <div class="Forum text-center">
+            <h3 class="font-semibold text-lg"><i class="fa-solid fa-poll text-green-600 mr-2"></i>Submit a Bug, Issue, or Feedback</h3>
+            <p class="mt-3">Answer the quick survey <a href="https://forms.gle/MnnT2SVvKQpviKNq8" target="_blank" class="email"><i class="fa-solid fa-arrow-up-right-from-square ml-1"></i> here</a>.</p>
+        </div>
+
+    </main>
+
+    <footer class="bg-gray-900 text-white text-center py-3 fixed bottom-0 left-0 right-0">
         <p>&copy; 2024 <span>coding credit: Atticus Herr</span></p>
     </footer>
 
+    <script>
+        const pages = [
+            {
+                title: "What is MSC Library",
+                icon: "fa-solid fa-building-columns",
+                subtitle: "An overview of the MSC Library mission and services.",
+                content: `
+                    <h4 class="text-lg font-semibold mb-2"><i class="fa-solid fa-book-open mr-2 text-indigo-500"></i>About MSC Library</h4>
+                    <p>The MSC Library is a community resource for students, staff, and visitors. We provide borrowing, scanning,
+                    research help, and access to technology.</p>
+                    <ul class="list-disc pl-5 mt-3 text-gray-700">
+                        <li>Open to the community</li>
+                        <li>Books, magazines, and digital resources</li>
+                        <li>On-site help &amp; technology</li>
+                    </ul>
+                `
+            },
+            {
+                title: "How to Borrow a Book",
+                icon: "fa-solid fa-arrow-right-to-bracket",
+                subtitle: "Steps to borrow an item from the collection.",
+                content: `
+                    <h4 class="text-lg font-semibold mb-2"><i class="fa-solid fa-book mr-2 text-green-500"></i>Borrowing Steps</h4>
+                    <ol class="list-decimal pl-5 mt-2 text-gray-700">
+                        <li>Locate the book in the catalog.</li>
+                        <li>Bring it to the circulation desk or scan your ID at the kiosk.</li>
+                        <li>Check due dates and renew online if eligible.</li>
+                    </ol>
+                    <p class="mt-3 text-sm text-gray-500"><i class="fa-solid fa-calendar-check mr-1"></i>Standard loan: 3 weeks. Renewals allowed if no hold.</p>
+                `
+            },
+            {
+                title: "How to Return a Book",
+                icon: "fa-solid fa-box-archive",
+                subtitle: "Return options and late fees.",
+                content: `
+                    <h4 class="text-lg font-semibold mb-2"><i class="fa-solid fa-rotate-left mr-2 text-yellow-600"></i>Returning Items</h4>
+                    <p>You can return materials at the front desk during service hours or use the 24/7 returns drop-box near the main entrance.</p>
+                    <p class="mt-3 text-sm text-gray-500"><i class="fa-solid fa-exclamation-circle mr-1"></i>Late fees may apply for certain items; contact staff for details.</p>
+                `
+            },
+            {
+                title: "How to Use the Laser Scanner",
+                icon: "fa-solid fa-scan",
+                subtitle: "Guide to scanning documents with the laser scanner.",
+                content: `
+                    <h4 class="text-lg font-semibold mb-2"><i class="fa-solid fa-magnifying-glass-chart mr-2 text-pink-500"></i>Laser Scanner Basics</h4>
+                    <p>Place your document face-down on the scanner bed, select the scan resolution, and press the scan button. Save to USB or email the scan to yourself.</p>
+                    <p class="mt-2 text-sm text-gray-500">Ask staff for assistance or training for special materials.</p>
+                `
+            },
+            {
+                title: "Technology used",
+                icon: "fa-solid fa-microchip",
+                subtitle: "List of technologies powering MSC Library systems.",
+                content: `
+                    <h4 class="text-lg font-semibold mb-2"><i class="fa-solid fa-laptop-code mr-2 text-indigo-600"></i>Technology Stack</h4>
+                    <ul class="list-disc pl-5 mt-2 text-gray-700">
+                        <li>Catalog &amp; circulation system</li>
+                        <li>Public workstations and printers</li>
+                        <li>Laser scanner and mobile scanning solutions</li>
+                        <li>Online forms and helpdesk</li>
+                    </ul>
+                `
+            },
+            {
+                title: "",
+                icon: "fa-regular fa-square",
+                subtitle: "",
+                content: `
+                    <h4 class="text-lg font-semibold mb-2">Placeholder</h4>
+                    <p class="text-gray-700">This page is intentionally left blank for future content.</p>
+                `
+            },
+            {
+                title: "",
+                icon: "fa-regular fa-square",
+                subtitle: "",
+                content: `
+                    <h4 class="text-lg font-semibold mb-2">Placeholder</h4>
+                    <p class="text-gray-700">This is another blank page. Add content here later.</p>
+                `
+            }
+        ];
+
+        let idx = 0;
+
+        const pageTitle = document.getElementById('page-title');
+        const pageIcon = document.getElementById('page-icon');
+        const pageContent = document.getElementById('page-content');
+        const pageSub = document.getElementById('page-sub');
+        const pageNum = document.getElementById('page-num');
+
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const prevLabel = document.getElementById('prev-label');
+        const nextLabel = document.getElementById('next-label');
+
+        const pageDots = document.getElementById('page-dots');
+        const firstBtn = document.getElementById('first-btn');
+        const lastBtn = document.getElementById('last-btn');
+
+        function renderPage(i) {
+            const p = pages[i];
+            pageContent.classList.add('fade-exit-active');
+            setTimeout(() => {
+                pageTitle.textContent = p.title || 'Untitled';
+                pageIcon.className = p.icon || 'fa-solid fa-file';
+                pageSub.innerHTML = `<i class="fa-solid fa-info-circle mr-1"></i>${p.subtitle || ''}`;
+                pageContent.innerHTML = p.content;
+                pageNum.textContent = i + 1;
+
+                const prevIndex = i - 1;
+                const nextIndex = i + 1;
+                prevLabel.textContent = (prevIndex >= 0 && pages[prevIndex].title) ? pages[prevIndex].title : (prevIndex >= 0 ? 'Untitled' : '—');
+                nextLabel.textContent = (nextIndex < pages.length && pages[nextIndex].title) ? pages[nextIndex].title : (nextIndex < pages.length ? 'Untitled' : '—');
+
+                prevBtn.disabled = prevIndex < 0;
+                nextBtn.disabled = nextIndex >= pages.length;
+
+                renderDots(i);
+
+                pageContent.classList.remove('fade-exit-active');
+
+            }, 140);
+        }
+
+        function renderDots(activeIndex) {
+            pageDots.innerHTML = '';
+            pages.forEach((p, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'w-8 h-8 rounded-full text-sm flex items-center justify-center ' + (i === activeIndex ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200');
+                btn.innerHTML = `<span class="sr-only">Page ${i+1}</span>${i+1}`;
+                btn.onclick = () => { idx = i; renderPage(idx); };
+                pageDots.appendChild(btn);
+            });
+        }
+
+        prevBtn.addEventListener('click', () => {
+            if (idx > 0) { idx--; renderPage(idx); }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (idx < pages.length - 1) { idx++; renderPage(idx); }
+        });
+
+        firstBtn.addEventListener('click', () => { idx = 0; renderPage(idx); });
+        lastBtn.addEventListener('click', () => { idx = pages.length - 1; renderPage(idx); });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') {
+                if (idx > 0) { idx--; renderPage(idx); }
+            } else if (e.key === 'ArrowRight') {
+                if (idx < pages.length - 1) { idx++; renderPage(idx); }
+            }
+        });
+
+        renderPage(idx);
+    </script>
 </body>
 </html>
+```
