@@ -241,19 +241,34 @@ th {
     color: #555;
 }
 .form-group input[type="text"],
+.form-group input[type="number"],
+.form-group input[type="password"],
+.form-group input[type="url"],
 .form-group select,
-.form-group textarea {
+.form-group textarea,
+.mass-isbn-input,
+#deleteSearchInput {
     width: 100%; 
     padding: 12px;
     border: 1px solid #ced4da;
     border-radius: 6px;
     box-sizing: border-box;
     font-size: 1em;
+    font-family: inherit;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
+.form-group textarea {
+    min-height: 100px;
+    resize: vertical;
+}
 .form-group input[type="text"]:focus,
+.form-group input[type="number"]:focus,
+.form-group input[type="password"]:focus,
+.form-group input[type="url"]:focus,
 .form-group select:focus,
-.form-group textarea:focus {
+.form-group textarea:focus,
+.mass-isbn-input:focus,
+#deleteSearchInput:focus {
     border-color: #007bff;
     box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
     outline: none;
