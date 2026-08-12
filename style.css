@@ -170,6 +170,24 @@ th {
 }
 .borrow-btn { background-color: #28a745; }
 .return-btn { background-color: #007bff; }
+.teacher-btn {
+    background-color: #ff8c00;
+    color: white;
+    border: none;
+    padding: 15px 25px;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    flex: 1;
+    min-width: 220px;
+}
+.teacher-btn:hover {
+    background-color: #e07b00;
+    transform: translateY(-2px);
+}
 .choice-modal-content {
     text-align: center;
 }
