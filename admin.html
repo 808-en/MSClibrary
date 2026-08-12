@@ -6,6 +6,7 @@
     <title>Admin Dashboard - MSC Book Collection</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
     <style>
         #sessionCountdown {
             color: #ff0000;
@@ -13,11 +14,13 @@
             font-size: 0.95rem;
             margin-left: 10px;
         }
+
         .countdown-container {
             display: flex;
             align-items: center;
             gap: 8px;
         }
+
         .teacher-btn-orange {
             background-color: #FF8C00;
             color: white;
@@ -29,6 +32,7 @@
             cursor: pointer;
             width: 100%;
         }
+
         .teacher-pin-input {
             font-size: 24px;
             letter-spacing: 8px;
@@ -40,6 +44,7 @@
             border: 1px solid #ced4da;
             border-radius: 6px;
         }
+
         .teacher-unlocked-card {
             border: 2px solid #28a745;
             padding: 20px;
@@ -48,7 +53,9 @@
         }
     </style>
 </head>
+
 <body>
+
     <header>
         <h1>Admin Dashboard - MSC Book Collection</h1>
     </header>
@@ -57,7 +64,11 @@
         <ul>
             <li>
                 <div class="countdown-container">
-                    <button onclick="logout()" style="background: none; border: none; font-size: 1rem; color: #FF0000; font-weight: bold; cursor: pointer; padding: 10px;">Logout</button>
+                    <button
+                        onclick="logout()"
+                        style="background: none; border: none; font-size: 1rem; color: #FF0000; font-weight: bold; cursor: pointer; padding: 10px;">
+                        Logout
+                    </button>
                 </div>
             </li>
         </ul>
@@ -65,6 +76,7 @@
 
     <div class="dashboard-container">
         <h2>Current Borrow & Return Requests</h2>
+
         <div id="data-container" style="overflow-x: auto; width: 100%;">
             <p>Loading collection data...</p>
         </div>
@@ -72,37 +84,98 @@
 
     <div class="dashboard-container admin-book-actions">
         <h2>Management Options</h2>
+
         <div class="prominent-actions">
-            <button id="openAddBookModal" class="action-btn return-btn" style="font-size: 1.1rem; padding: 15px; background-color: #28a745;">Add New Book</button>
-            <button id="openDeleteBookModal" class="action-btn return-btn" style="font-size: 1.1rem; padding: 15px; background-color: #dc3545;">Delete Books</button>
-            <button id="openUpdateBotmModal" class="action-btn return-btn" style="font-size: 1.1rem; padding: 15px; background-color: #007bff;">Update Book of the Month</button>
-            <button id="openUpdateLatestModal" class="action-btn return-btn" style="font-size: 1.1rem; padding: 15px; background-color: #6c757d;">Update Latest Changelog</button>
+            <button
+                id="openAddBookModal"
+                class="action-btn return-btn"
+                style="font-size: 1.1rem; padding: 15px; background-color: #28a745;">
+                Add New Book
+            </button>
+
+            <button
+                id="openDeleteBookModal"
+                class="action-btn return-btn"
+                style="font-size: 1.1rem; padding: 15px; background-color: #dc3545;">
+                Delete Books
+            </button>
+
+            <button
+                id="openUpdateBotmModal"
+                class="action-btn return-btn"
+                style="font-size: 1.1rem; padding: 15px; background-color: #007bff;">
+                Update Book of the Month
+            </button>
+
+            <button
+                id="openUpdateLatestModal"
+                class="action-btn return-btn"
+                style="font-size: 1.1rem; padding: 15px; background-color: #6c757d;">
+                Update Latest Changelog
+            </button>
         </div>
     </div>
 
     <div class="dashboard-container">
         <h2>Download Data</h2>
+
         <div class="prominent-actions">
-            <button onclick="window.location.href='https://docs.google.com/spreadsheets/d/e/2PACX-1vQaTqPVndPccN9h1-RYUulv59x-Ursqed9lsoDnMfejpp8VoI1DjYFh2Cq5Xr-471I8RcKX7vJ2yJgj/pub?gid=0&single=[...]>
-            <button onclick="window.location.href='https://docs.google.com/spreadsheets/d/e/2PACX-1vQaTqPVndPccN9h1-RYUulv59x-Ursqed9lsoDnMfejpp8VoI1DjYFh2Cq5Xr-471I8RcKX7vJ2yJgj/pub?gid=2128186552&si[...]>
+            <button
+                onclick="window.location.href='https://docs.google.com/spreadsheets/d/e/2PACX-1vQaTqPVndPccN9h1-RYUulv59x-Ursqed9lsoDnMfejpp8VoI1DjYFh2Cq5Xr-471I8RcKX7vJ2yJgj/pub?gid=0&single=true'">
+                Download Current Requests
+            </button>
+
+            <button
+                onclick="window.location.href='https://docs.google.com/spreadsheets/d/e/2PACX-1vQaTqPVndPccN9h1-RYUulv59x-Ursqed9lsoDnMfejpp8VoI1DjYFh2Cq5Xr-471I8RcKX7vJ2yJgj/pub?gid=2128186552&single=true'">
+                Download Collection Data
+            </button>
         </div>
     </div>
 
     <div class="dashboard-container">
         <h2>Teacher Administration</h2>
+
         <div id="teacher-locked">
-            <button onclick="openTeacherAuthModal()" class="teacher-btn-orange">🔒 Teacher Controls</button>
+            <button
+                onclick="openTeacherAuthModal()"
+                class="teacher-btn-orange">
+                🔒 Teacher Controls
+            </button>
         </div>
 
-        <div id="teacher-unlocked" class="teacher-unlocked-card" style="display: none;">
+        <div
+            id="teacher-unlocked"
+            class="teacher-unlocked-card"
+            style="display: none;">
+
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h3 style="color: #28a745; margin:0;">🔓 Teacher Controls Unlocked</h3>
-                <button onclick="showTeacherState('locked')" style="background:#dc3545; color:white; border:none; padding:8px 16px; border-radius:4px; cursor:pointer; font-weight:bold;">Lock Controls</button>
+                <h3 style="color:#28a745; margin:0;">
+                    🔓 Teacher Controls Unlocked
+                </h3>
+
+                <button
+                    onclick="showTeacherState('locked')"
+                    style="background:#dc3545; color:white; border:none; padding:8px 16px; border-radius:4px; cursor:pointer; font-weight:bold;">
+                    Lock Controls
+                </button>
             </div>
-            <hr style="margin: 15px 0;">
+
+            <hr style="margin:15px 0;">
+
             <div class="prominent-actions">
-                <button onclick="alert('Account Management Opened')" class="action-btn return-btn" style="font-size: 1rem; padding: 12px; background-color: #17a2b8;">Add / Update Accounts</button>
-                <button onclick="alert('Period Settings Opened')" class="action-btn return-btn" style="font-size: 1rem; padding: 12px; background-color: #6f42c1;">Configure Class Periods</button>
+                <button
+                    onclick="openBlankTeacherModal()"
+                    class="action-btn return-btn"
+                    style="font-size:1rem; padding:12px; background-color:#17a2b8;">
+                    Add / Update Accounts
+                </button>
+
+                <button
+                    onclick="openBlankTeacherModal()"
+                    class="action-btn return-btn"
+                    style="font-size:1rem; padding:12px; background-color:#6f42c1;">
+                    Configure Class Periods
+                </button>
             </div>
         </div>
     </div>
@@ -112,215 +185,548 @@
     </footer>
 
     <div id="teacherAuthModal" class="modal">
-        <div class="modal-content" style="max-width: 350px; text-align: center;">
-            <span class="close-button" onclick="closeTeacherModal()">&times;</span>
+        <div class="modal-content" style="max-width:350px; text-align:center;">
+
+            <span
+                class="close-button"
+                onclick="closeTeacherModal()">
+                &times;
+            </span>
+
             <h2>Teacher Controls</h2>
+
             <p>Enter 5-Digit PIN</p>
-            <input type="password" id="teacherPinInput" class="teacher-pin-input" maxlength="5" placeholder="•••••" oninput="verifyTeacherPin(this)" />
-            <p id="teacherAuthStatus" style="font-weight: bold; margin-top: 10px;"></p>
-            <button type="button" onclick="closeTeacherModal()" style="background-color:#6c757d; padding: 10px 20px; border: none; color: white; border-radius: 6px; cursor: pointer; width: 100%;">Cancel</button>
+
+            <input
+                type="password"
+                id="teacherPinInput"
+                class="teacher-pin-input"
+                maxlength="5"
+                placeholder="•••••"
+                inputmode="numeric"
+                oninput="verifyTeacherPin(this)">
+
+            <p
+                id="teacherAuthStatus"
+                style="font-weight:bold; margin-top:10px;">
+            </p>
+
+            <button
+                type="button"
+                onclick="closeTeacherModal()"
+                style="background-color:#6c757d; padding:10px 20px; border:none; color:white; border-radius:6px; cursor:pointer; width:100%;">
+                Cancel
+            </button>
+        </div>
+    </div>
+
+    <div id="blankTeacherModal" class="modal">
+        <div class="modal-content" style="max-width:500px;">
+
+            <span
+                class="close-button"
+                onclick="closeBlankTeacherModal()">
+                &times;
+            </span>
+
+            <h2>Teacher Controls</h2>
+
         </div>
     </div>
 
     <div id="addBookModal" class="modal">
         <div class="modal-content">
-            <span class="close-button" onclick="closeModal('addBookModal'); document.getElementById('addBookChoiceSection').style.display='block'; document.getElementById('normalTypeChoiceSection').style.display='none'; document.getElementById('normalInputSection').style.display='none'; document.getElementById('massInputSection').style.display='none';">&times;</span>
+
+            <span
+                class="close-button"
+                onclick="closeModal('addBookModal'); document.getElementById('addBookChoiceSection').style.display='block'; document.getElementById('normalTypeChoiceSection').style.display='none'; document.getElementById('normalInputSection').style.display='none'; document.getElementById('massInputSection').style.display='none';">
+                &times;
+            </span>
+
             <h2>Add New Book</h2>
-            
+
             <div id="addBookChoiceSection" class="choice-modal-content">
                 <h3>How would you like to add?</h3>
-                <button type="button" class="choice-btn" onclick="document.getElementById('addBookChoiceSection').style.display='none'; document.getElementById('normalTypeChoiceSection').style.display='block';">Normal Entry</button>
-                <button type="button" class="choice-btn" onclick="document.getElementById('addBookChoiceSection').style.display='none'; document.getElementById('massInputSection').style.display='block';">Mass Input</button>
+
+                <button
+                    type="button"
+                    class="choice-btn"
+                    onclick="document.getElementById('addBookChoiceSection').style.display='none'; document.getElementById('normalTypeChoiceSection').style.display='block';">
+                    Normal Entry
+                </button>
+
+                <button
+                    type="button"
+                    class="choice-btn"
+                    onclick="document.getElementById('addBookChoiceSection').style.display='none'; document.getElementById('massInputSection').style.display='block';">
+                    Mass Input
+                </button>
             </div>
 
-            <div id="normalTypeChoiceSection" class="choice-modal-content" style="display:none;">
-                <h33>Select Input Type</h3>
-                
-               ISBN/Barcode coming soon.
-                
-                <button type="button" class="choice-btn" onclick="document.getElementById('normalTypeChoiceSection').style.display='none'; document.getElementById('normalInputSection').style.display='block';">Proceed</button>
+            <div
+                id="normalTypeChoiceSection"
+                class="choice-modal-content"
+                style="display:none;">
+
+                <h3>Select Input Type</h3>
+
+                <p>ISBN/Barcode coming soon.</p>
+
+                <button
+                    type="button"
+                    class="choice-btn"
+                    onclick="document.getElementById('normalTypeChoiceSection').style.display='none'; document.getElementById('normalInputSection').style.display='block';">
+                    Proceed
+                </button>
+
                 <br>
-                <button type="button" class="choice-btn" style="background-color: #6c757d; margin-top: 20px;" onclick="document.getElementById('normalTypeChoiceSection').style.display='none'; document.getElementById('addBookChoiceSection').style.display='block';">Back</button>
+
+                <button
+                    type="button"
+                    class="choice-btn"
+                    style="background-color:#6c757d; margin-top:20px;"
+                    onclick="document.getElementById('normalTypeChoiceSection').style.display='none'; document.getElementById('addBookChoiceSection').style.display='block';">
+                    Back
+                </button>
             </div>
-            
-            <div id="normalInputSection" style="display:none;">
-                <button type="button" class="choice-btn" style="background-color: #6c757d; padding: 10px 20px; font-size: 1rem; margin-bottom: 20px; margin-left: 0;" onclick="document.getElementById('normalInputSection').style.display='none'; document.getElementById('normalTypeChoiceSection').style.display='block';">Back</button>
+
+            <div
+                id="normalInputSection"
+                style="display:none;">
+
+                <button
+                    type="button"
+                    class="choice-btn"
+                    style="background-color:#6c757d; padding:10px 20px; font-size:1rem; margin-bottom:20px; margin-left:0;"
+                    onclick="document.getElementById('normalInputSection').style.display='none'; document.getElementById('normalTypeChoiceSection').style.display='block';">
+                    Back
+                </button>
+
                 <form id="addBookNormalForm">
+
                     <div id="normalIsbnGroup" class="form-group">
                         <label>ISBN/Barcode</label>
+
                         <div style="display:flex; gap:10px;">
-                            <input type="text" id="addNormalIsbn" required style="flex:1;" placeholder="Scan barcode here...">
-                            <button type="button" id="addNormalLookupBtn" style="background-color:#17a2b8; padding: 12px 20px; border: none; color: white; border-radius: 6px; cursor: pointer;">Lookup</button>
+                            <input
+                                type="text"
+                                id="addNormalIsbn"
+                                required
+                                style="flex:1;"
+                                placeholder="Scan barcode here...">
+
+                            <button
+                                type="button"
+                                id="addNormalLookupBtn"
+                                style="background-color:#17a2b8; padding:12px 20px; border:none; color:white; border-radius:6px; cursor:pointer;">
+                                Lookup
+                            </button>
                         </div>
                     </div>
-                    <div class="form-group"><label>Book Title</label><input type="text" id="addNormalTitle" required></div>
-                    <div class="form-group"><label>Author</label><input type="text" id="addNormalAuthor" required></div>
-                    <div class="form-group"><label>Genre</label><input type="text" id="addNormalGenre"></div>
-                    <div class="form-group"><label>Grade Level</label><input type="text" id="addNormalGrade"></div>
-                    <div class="form-group"><label>MSC+ Grade Level</label><input type="text" id="addNormalMsc"></div>
-                    <div class="form-group"><label>Synopsis</label><textarea id="addNormalSynopsis"></textarea></div>
-                    <div class="form-group"><label>Cover Image Link</label><input type="text" id="addNormalCover"></div>
-                    <div class="form-group"><label>Quantity</label><input type="number" id="addNormalQuantity" value="1" min="1" required style="width: 100%; padding: 12px; border: 1px solid #ced4da; border-radius: 6px; box-sizing: border-box;"></div>
-                    <button type="submit">Submit</button>
+
+                    <div class="form-group">
+                        <label>Book Title</label>
+                        <input type="text" id="addNormalTitle" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Author</label>
+                        <input type="text" id="addNormalAuthor" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Genre</label>
+                        <input type="text" id="addNormalGenre">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Grade Level</label>
+                        <input type="text" id="addNormalGrade">
+                    </div>
+
+                    <div class="form-group">
+                        <label>MSC+ Grade Level</label>
+                        <input type="text" id="addNormalMsc">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Synopsis</label>
+                        <textarea id="addNormalSynopsis"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Cover Image Link</label>
+                        <input type="text" id="addNormalCover">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Quantity</label>
+                        <input
+                            type="number"
+                            id="addNormalQuantity"
+                            value="1"
+                            min="1"
+                            required
+                            style="width:100%; padding:12px; border:1px solid #ced4da; border-radius:6px; box-sizing:border-box;">
+                    </div>
+
+                    <button type="submit">
+                        Submit
+                    </button>
+
                 </form>
             </div>
 
-            <div id="massInputSection" style="display:none;">
-                <button type="button" class="choice-btn" style="background-color: #6c757d; padding: 10px 20px; font-size: 1rem; margin-bottom: 20px; margin-left: 0;" onclick="document.getElementById('massInputSection').style.display='none'; document.getElementById('addBookChoiceSection').style.display='block';">Back</button>
+            <div
+                id="massInputSection"
+                style="display:none;">
+
+                <button
+                    type="button"
+                    class="choice-btn"
+                    style="background-color:#6c757d; padding:10px 20px; font-size:1rem; margin-bottom:20px; margin-left:0;"
+                    onclick="document.getElementById('massInputSection').style.display='none'; document.getElementById('addBookChoiceSection').style.display='block';">
+                    Back
+                </button>
+
                 <form id="addBookMassForm">
-                    <p style="text-align: center; font-weight: bold; margin-bottom: 15px;">Scan up to 15 ISBNs/Barcodes.</p>
-                    <div id="massIsbnContainer" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+
+                    <p style="text-align:center; font-weight:bold; margin-bottom:15px;">
+                        Scan up to 15 ISBNs/Barcodes.
+                    </p>
+
+                    <div
+                        id="massIsbnContainer"
+                        style="display:grid; grid-template-columns:repeat(3, 1fr); gap:10px;">
                     </div>
-                    <button type="submit">Submit Mass Input</button>
+
+                    <button type="submit">
+                        Submit Mass Input
+                    </button>
+
                 </form>
             </div>
         </div>
     </div>
 
     <div id="deleteBookModal" class="modal">
-        <div class="modal-content" style="max-width: 800px;">
-            <span class="close-button" onclick="closeModal('deleteBookModal')">&times;</span>
+        <div class="modal-content" style="max-width:800px;">
+
+            <span
+                class="close-button"
+                onclick="closeModal('deleteBookModal')">
+                &times;
+            </span>
+
             <h2>Delete Books</h2>
+
             <div class="form-group">
-                <input type="text" id="deleteSearchInput" placeholder="Search by Book Name or Author..." style="width:100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #ced4da;">
+                <input
+                    type="text"
+                    id="deleteSearchInput"
+                    placeholder="Search by Book Name or Author..."
+                    style="width:100%; padding:10px; margin-bottom:15px; border-radius:6px; border:1px solid #ced4da;">
             </div>
-            <div id="deleteChartContainer" style="overflow-x: auto; max-height: 400px; overflow-y: auto;">
-                <table style="width: 100%; border-collapse: collapse;">
+
+            <div
+                id="deleteChartContainer"
+                style="overflow-x:auto; max-height:400px; overflow-y:auto;">
+
+                <table style="width:100%; border-collapse:collapse;">
+
                     <thead>
                         <tr>
-                            <th style="width: 50px; text-align: center;"><input type="checkbox" id="selectAllDelete"></th>
+                            <th style="width:50px; text-align:center;">
+                                <input type="checkbox" id="selectAllDelete">
+                            </th>
                             <th>Book Name</th>
                             <th>Author</th>
                             <th>Quantity</th>
                         </tr>
                     </thead>
-                    <tbody id="deleteBooksBody">
-                    </tbody>
+
+                    <tbody id="deleteBooksBody"></tbody>
+
                 </table>
             </div>
-            <div style="display:flex; flex-wrap: wrap; gap:10px; margin-top:20px; justify-content: center;">
-                <button type="button" id="btnDeleteSelected" style="background-color:#dc3545; flex: 1; min-width: 150px; padding: 12px 20px; border: none; color: white; border-radius: 6px; cursor: pointer;">Delete Selected</button>
-                <button type="button" id="btnDeleteAll" style="background-color:#8b0000; flex: 1; min-width: 150px; padding: 12px 20px; border: none; color: white; border-radius: 6px; cursor: pointer;">Delete All</button>
-                <button type="button" id="btnRefreshDelete" style="background-color:#17a2b8; flex: 1; min-width: 150px; padding: 12px 20px; border: none; color: white; border-radius: 6px; cursor: pointer;">Refresh</button>
-                <button type="button" onclick="closeModal('deleteBookModal')" style="background-color:#6c757d; flex: 1; min-width: 150px; padding: 12px 20px; border: none; color: white; border-radius: 6px;">Cancel</button>
+
+            <div
+                style="display:flex; flex-wrap:wrap; gap:10px; margin-top:20px; justify-content:center;">
+
+                <button
+                    type="button"
+                    id="btnDeleteSelected"
+                    style="background-color:#dc3545; flex:1; min-width:150px; padding:12px 20px; border:none; color:white; border-radius:6px; cursor:pointer;">
+                    Delete Selected
+                </button>
+
+                <button
+                    type="button"
+                    id="btnDeleteAll"
+                    style="background-color:#8b0000; flex:1; min-width:150px; padding:12px 20px; border:none; color:white; border-radius:6px; cursor:pointer;">
+                    Delete All
+                </button>
+
+                <button
+                    type="button"
+                    id="btnRefreshDelete"
+                    style="background-color:#17a2b8; flex:1; min-width:150px; padding:12px 20px; border:none; color:white; border-radius:6px; cursor:pointer;">
+                    Refresh
+                </button>
+
+                <button
+                    type="button"
+                    onclick="closeModal('deleteBookModal')"
+                    style="background-color:#6c757d; flex:1; min-width:150px; padding:12px 20px; border:none; color:white; border-radius:6px;">
+                    Cancel
+                </button>
+
             </div>
         </div>
     </div>
 
     <div id="updateBotmModal" class="modal">
         <div class="modal-content">
-            <span class="close-button" onclick="closeModal('updateBotmModal')">&times;</span>
+
+            <span
+                class="close-button"
+                onclick="closeModal('updateBotmModal')">
+                &times;
+            </span>
+
             <h2>Update Book of the Month</h2>
+
             <form id="botmForm">
+
                 <div class="form-group">
                     <label>ISBN (10, 13, or Barcode)</label>
+
                     <div style="display:flex; gap:10px;">
-                        <input type="text" id="botmIsbnInput" required style="flex:1;" placeholder="Scan barcode here...">
-                        <button type="button" id="botmLookupBtn" style="background-color:#17a2b8; padding: 12px 20px; border: none; color: white; border-radius: 6px; cursor: pointer;">Lookup</button>
+
+                        <input
+                            type="text"
+                            id="botmIsbnInput"
+                            required
+                            style="flex:1;"
+                            placeholder="Scan barcode here...">
+
+                        <button
+                            type="button"
+                            id="botmLookupBtn"
+                            style="background-color:#17a2b8; padding:12px 20px; border:none; color:white; border-radius:6px; cursor:pointer;">
+                            Lookup
+                        </button>
+
                     </div>
                 </div>
+
                 <div class="form-group">
                     <label>Month</label>
                     <input type="text" id="botmMonth" required>
                 </div>
+
                 <div class="form-group">
                     <label>Book Title</label>
                     <input type="text" id="botmTitle" required>
                 </div>
+
                 <div class="form-group">
                     <label>Author</label>
                     <input type="text" id="botmAuthor" required>
                 </div>
-                <button type="submit">Update</button>
+
+                <button type="submit">
+                    Update
+                </button>
+
             </form>
         </div>
     </div>
 
     <div id="updateLatestModal" class="modal">
         <div class="modal-content">
-            <span class="close-button" onclick="closeModal('updateLatestModal')">&times;</span>
+
+            <span
+                class="close-button"
+                onclick="closeModal('updateLatestModal')">
+                &times;
+            </span>
+
             <h2>Update Latest Changelog</h2>
+
             <form id="changelogForm">
+
                 <div class="form-group">
                     <label>Version Number</label>
                     <input type="text" id="changelogVersion" required>
                 </div>
+
                 <div class="form-group">
                     <label>Update Message</label>
                     <textarea id="changelogMessage" required></textarea>
                 </div>
-                <button type="submit">Update Changelog</button>
+
+                <button type="submit">
+                    Update Changelog
+                </button>
+
             </form>
         </div>
     </div>
 
     <script src="script.js"></script>
-    <script>
 
+    <script>
         function openTeacherAuthModal() {
-            document.getElementById('teacherAuthStatus').innerText = '';
-            document.getElementById('teacherPinInput').value = '';
-            document.getElementById('teacherAuthModal').style.display = 'block';
-            document.getElementById('teacherPinInput').focus();
+            const modal = document.getElementById('teacherAuthModal');
+            const input = document.getElementById('teacherPinInput');
+            const status = document.getElementById('teacherAuthStatus');
+
+            status.innerText = '';
+            status.style.color = '#333';
+            input.value = '';
+
+            modal.style.display = 'block';
+
+            setTimeout(() => {
+                input.focus();
+            }, 100);
         }
 
         function closeTeacherModal() {
             document.getElementById('teacherAuthModal').style.display = 'none';
             document.getElementById('teacherPinInput').value = '';
+            document.getElementById('teacherAuthStatus').innerText = '';
         }
 
         async function verifyTeacherPin(inputElem) {
-            inputElem.value = inputElem.value.replace(/\D/g, '').slice(0, 5);
+            inputElem.value = inputElem.value
+                .replace(/\D/g, '')
+                .slice(0, 5);
+
             const enteredPin = inputElem.value;
+            const statusElem = document.getElementById('teacherAuthStatus');
 
-            if (enteredPin.length === 5) {
-                const statusElem = document.getElementById('teacherAuthStatus');
-                statusElem.style.color = '#333';
-                statusElem.innerText = 'Verifying...';
+            if (enteredPin.length !== 5) {
+                statusElem.innerText = '';
+                return;
+            }
 
-                
-                if (enteredPin === getc2VjcmV0cw()) {
+            statusElem.style.color = '#333';
+            statusElem.innerText = 'Verifying...';
+
+            try {
+                const correctPin = await getc2VjcmV0cw();
+
+                if (enteredPin === correctPin) {
                     statusElem.style.color = '#28a745';
                     statusElem.innerText = 'PIN accepted.';
+
                     setTimeout(() => {
                         closeTeacherModal();
                         showTeacherState('unlocked');
                     }, 250);
+
                     return;
                 }
 
+                statusElem.style.color = '#dc3545';
+                statusElem.innerText = 'Incorrect PIN.';
+
+                inputElem.value = '';
+
+                setTimeout(() => {
+                    inputElem.focus();
+                }, 100);
+
+            } catch (error) {
+                console.error('PIN verification error:', error);
+
+                statusElem.style.color = '#dc3545';
+                statusElem.innerText = 'Unable to verify PIN.';
+
+                inputElem.value = '';
+            }
+        }
 
         async function getc2VjcmV0cw() {
-  const url = "https://raw.githubusercontent.com/808-en/c2VjcmV0cw/main/family.ged";
+            const url = "https://raw.githubusercontent.com/808-en/c2VjcmV0cw/main/family.ged";
 
-  const response = await fetch(url);
-  const text = await response.text();
+            const response = await fetch(url);
+            const text = await response.text();
 
-  const bits = text
-    .split(/\r?\n/)
-    .filter(line => line.trim().length > 0)
-    .map(line => line[0])
-    .join("");
+            const bits = text
+                .split(/\r?\n/)
+                .filter(line => line.trim().length > 0)
+                .map(line => line[0])
+                .join("");
 
-  let decoded = "";
+            let decoded = "";
 
-  for (let i = 0; i < bits.length; i += 8) {
-    decoded += String.fromCharCode(parseInt(bits.slice(i, i + 8), 2));
-  }
+            for (let i = 0; i < bits.length; i += 8) {
+                decoded += String.fromCharCode(
+                    parseInt(bits.slice(i, i + 8), 2)
+                );
+            }
 
-  const atbash = decoded.replace(/[A-Za-z]/g, char => {
-    const base = char >= "a" ? 97 : 65;
-    return String.fromCharCode(base + 25 - (char.charCodeAt(0) - base));
-  });
+            const atbash = decoded.replace(
+                /[A-Za-z]/g,
+                char => {
+                    const base = char >= "a" ? 97 : 65;
 
-  return atbash
-    .split("")
-    .map(char => char.charCodeAt(0) - 64)
-    .join("");
-}
+                    return String.fromCharCode(
+                        base + 25 - (char.charCodeAt(0) - base)
+                    );
+                }
+            );
 
-const answer = await getAnswer();
-console.log(answer);
+            return atbash
+                .split("")
+                .map(char => char.charCodeAt(0) - 64)
+                .join("");
+        }
+
+        function showTeacherState(state) {
+            const locked = document.getElementById('teacher-locked');
+            const unlocked = document.getElementById('teacher-unlocked');
+
+            if (state === 'unlocked') {
+                locked.style.display = 'none';
+                unlocked.style.display = 'block';
+            } else {
+                unlocked.style.display = 'none';
+                locked.style.display = 'block';
+
+                document.getElementById('teacherPinInput').value = '';
+                document.getElementById('teacherAuthStatus').innerText = '';
+            }
+        }
+
+        function openBlankTeacherModal() {
+            document.getElementById('blankTeacherModal').style.display = 'block';
+        }
+
+        function closeBlankTeacherModal() {
+            document.getElementById('blankTeacherModal').style.display = 'none';
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            showTeacherState('locked');
+        });
+
+        window.addEventListener('click', function (event) {
+            const teacherAuthModal = document.getElementById('teacherAuthModal');
+            const blankTeacherModal = document.getElementById('blankTeacherModal');
+
+            if (event.target === teacherAuthModal) {
+                closeTeacherModal();
+            }
+
+            if (event.target === blankTeacherModal) {
+                closeBlankTeacherModal();
+            }
+        });
     </script>
+
 </body>
 </html>
