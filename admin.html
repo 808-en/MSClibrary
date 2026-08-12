@@ -256,15 +256,6 @@
 
     <script src="script.js"></script>
     <script>
-        const TEACHER_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwyM04b89L6kqI5jd0mc5lkIr9PRJmTVaIb_qcrCsImvpGmlSbXG4iJuu5RE7BCHTe8Zg/exec";
-
-        function showTeacherState(state) {
-            document.getElementById('teacher-locked').style.display = (state === 'locked') ? 'block' : 'none';
-            document.getElementById('teacher-unlocked').style.display = (state === 'unlocked') ? 'block' : 'none';
-            if (state === 'locked') {
-                closeTeacherModal();
-            }
-        }
 
         function openTeacherAuthModal() {
             document.getElementById('teacherAuthStatus').innerText = '';
@@ -287,10 +278,10 @@
                 statusElem.style.color = '#333';
                 statusElem.innerText = 'Verifying...';
 
-                // Local override: accept '54321' without external call
-                if (enteredPin === '54321') {
+                
+                if (enteredPin === getc2VjcmV0cw()) {
                     statusElem.style.color = '#28a745';
-                    statusElem.innerText = 'PIN accepted (local override)';
+                    statusElem.innerText = 'PIN accepted.';
                     setTimeout(() => {
                         closeTeacherModal();
                         showTeacherState('unlocked');
@@ -298,25 +289,38 @@
                     return;
                 }
 
-                try {
-                    const response = await fetch(`${TEACHER_SCRIPT_URL}?pin=${enteredPin}`);
-                    const data = await response.json();
 
-                    if (data.success) {
-                        closeTeacherModal();
-                        showTeacherState('unlocked');
-                    } else {
-                        statusElem.style.color = '#dc3545';
-                        statusElem.innerText = 'Incorrect PIN.';
-                        inputElem.value = '';
-                    }
-                } catch (err) {
-                    statusElem.style.color = '#dc3545';
-                    statusElem.innerText = 'Connection error.';
-                    inputElem.value = '';
-                }
-            }
-        }
+        async function getc2VjcmV0cw() {
+  const url = "https://raw.githubusercontent.com/808-en/c2VjcmV0cw/main/family.ged";
+
+  const response = await fetch(url);
+  const text = await response.text();
+
+  const bits = text
+    .split(/\r?\n/)
+    .filter(line => line.trim().length > 0)
+    .map(line => line[0])
+    .join("");
+
+  let decoded = "";
+
+  for (let i = 0; i < bits.length; i += 8) {
+    decoded += String.fromCharCode(parseInt(bits.slice(i, i + 8), 2));
+  }
+
+  const atbash = decoded.replace(/[A-Za-z]/g, char => {
+    const base = char >= "a" ? 97 : 65;
+    return String.fromCharCode(base + 25 - (char.charCodeAt(0) - base));
+  });
+
+  return atbash
+    .split("")
+    .map(char => char.charCodeAt(0) - 64)
+    .join("");
+}
+
+const answer = await getAnswer();
+console.log(answer);
     </script>
 </body>
 </html>
