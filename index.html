@@ -31,7 +31,6 @@
  CSS3
  JavaScript (ES6+)
  Tailwind CSS
- Firebase Authentication
  Google Sheets / CSV Data
  Font Awesome
  Cloudflare Insights
@@ -60,11 +59,6 @@
 
  External services and libraries used by this project retain their respective
  copyrights, trademarks, licenses, and terms of use.
-
- Firebase configuration values contained in this project are intended for
- client-side Firebase initialization. Access control and authorization should
- always be enforced through Firebase Security Rules and server-side controls,
- not solely through client-side code.
 
  To site Developers:
  Please update the Version and Last Updated fields whenever a significant
@@ -98,7 +92,7 @@
         <img id="userPfp" src="user-solid.svg" alt="Profile Picture">
         <span class="name" id="userName">Guest</span>
         <div class="account-dropdown">
-            <button id="logoutBtn" style="display:none;" onclick="window.logoutFirebase()">Logout</button>
+            <button id="logoutBtn" style="display:none;" onclick="logout()">Logout</button>
             <button id="openPermissions" style="display:block;">Account Permissions</button>
             <button id="loginDropdownBtn" onclick="window.location.href='login.html'">Log In</button>
         </div>
@@ -140,7 +134,6 @@
                     <article>
                         <p data-i18n="featuredBook">This month's featured book is:</p>
                         <ul>
-
                             <li id="botmTitleDisplay" data-i18n="harryPotterTitle"><strong>Title:</strong> Harry Potter and the Deathly Hallows</li>
                             <li id="botmAuthorDisplay" data-i18n="jkRowling"><strong>Author:</strong> JK Rowling</li>
                         </ul>
@@ -440,35 +433,35 @@
             <span class="close-button" onclick="closeModal('permissionsModal')">&times;</span>
             <h2>Account Permissions</h2>
             <table>
-  <tr>
-    <th>Permission</th>
-    <th>Y/N</th>
-  </tr>
-  <tr>
-    <td>Add/Delete Books</td>
-    <td><div id="addDeleteBooksPermission"></div></td>
-  </tr>
-  <tr>
-    <td>Download Book Borrow/Return Requests</td>
-    <td><div id="exportRequestsPermission"></div></td>
-  </tr>
-  <tr>
-    <td>Update Changelog / Book of the Month</td>
-    <td><div id="updateChangesBotmPermission"></div></td>
-  </tr>
-  <tr>
-    <td>Use Teacher Tools</td>
-    <td><div id="teacherToolsPermission"></div></td>
-  </tr>
-  <tr>
-    <td>Borrow/Return Books</td>
-    <td style="color: green; font-weight: bold;">Y</td>
-  </tr>
-  <tr>
-    <td>Download Online Resources</td>
-    <td style="color: green; font-weight: bold;">Y</td>
-  </tr>
-</table>
+              <tr>
+                <th>Permission</th>
+                <th>Y/N</th>
+              </tr>
+              <tr>
+                <td>Add/Delete Books</td>
+                <td><span style="color: green; font-weight: bold;">Y</span></td>
+              </tr>
+              <tr>
+                <td>Download Book Borrow/Return Requests</td>
+                <td><span style="color: green; font-weight: bold;">Y</span></td>
+              </tr>
+              <tr>
+                <td>Update Changelog / Book of the Month</td>
+                <td><span style="color: green; font-weight: bold;">Y</span></td>
+              </tr>
+              <tr>
+                <td>Use Teacher Tools</td>
+                <td><span style="color: green; font-weight: bold;">Y</span></td>
+              </tr>
+              <tr>
+                <td>Borrow/Return Books</td>
+                <td style="color: green; font-weight: bold;">Y</td>
+              </tr>
+              <tr>
+                <td>Download Online Resources</td>
+                <td style="color: green; font-weight: bold;">Y</td>
+              </tr>
+            </table>
         </div>
     </div>
 
@@ -486,7 +479,6 @@
             if (botmRows.length > 0) {
                 const latestBotm = botmRows[botmRows.length - 1].split(','); 
 
-                const month = latestBotm[1] ? latestBotm[1].trim() : 'Unknown Month';
                 const title = latestBotm[1] ? latestBotm[1].trim() : 'Unknown Title';
                 const author = latestBotm[2] ? latestBotm[2].trim() : 'Unknown Author';
 
@@ -505,9 +497,7 @@
 
             if (updateRows.length > 0) {
                 const latestUpdateRow = updateRows[updateRows.length - 1].split(',');
-                
                 const updateMessage = latestUpdateRow.slice(1).join(',').trim();
-                
                 if (updateMessage && document.getElementById('latestUpdateDisplay')) {
                     document.getElementById('latestUpdateDisplay').textContent = updateMessage;
                 }
@@ -515,89 +505,34 @@
         } catch (error) {
             console.error('Error fetching Changelog:', error);
         }
-    });
-    </script>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyBOEU6zCbp66le6Dr06GpmGx1yeT5WHNk0",
-            authDomain: "msc-library-808-en.firebaseapp.com",
-            projectId: "msc-library-808-en",
-            storageBucket: "msc-library-808-en.firebasestorage.app",
-            messagingSenderId: "62522328857",
-            appId: "1:62522328857:web:b56829c3d41238f0866788"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-
-        let currentUser = null;
-
-        window.logoutFirebase = () => {
-            signOut(auth).then(() => {
-                window.location.reload();
-            });
-        };
-
+        const isLoggedIn = sessionStorage.getItem('adminLoggedIn') === 'true';
+        const pfp = document.getElementById('userPfp');
+        const nameEl = document.getElementById('userName');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const loginDropdownBtn = document.getElementById('loginDropdownBtn');
         const navLoginBtn = document.getElementById('AdminLogin');
-        if (navLoginBtn) {
-            navLoginBtn.addEventListener('click', (e) => {
-                if (currentUser && window.checkForSpecialLogin) {
-                    window.checkForSpecialLogin(currentUser);
-                }
-            });
-        }
 
-        onAuthStateChanged(auth, (user) => {
-            currentUser = user;
-
-            const pfp = document.getElementById('userPfp');
-            const nameEl = document.getElementById('userName');
-            const logoutBtn = document.getElementById('logoutBtn');
-            const openPermsBtn = document.getElementById('openPermissions');
-            const loginDropdownBtn = document.getElementById('loginDropdownBtn');
-
-            if (openPermsBtn) openPermsBtn.style.display = 'block';
-
-            if (user) {
-                if(pfp) pfp.src = 'face-smile-solid-full.svg';
-                if(nameEl) nameEl.textContent = user.displayName || user.email.split('@')[0];
-                if(logoutBtn) logoutBtn.style.display = 'block';
-                if(loginDropdownBtn) loginDropdownBtn.style.display = 'none';
-                if(navLoginBtn) {
-                    navLoginBtn.innerHTML = 'Admin Panel <i class="fa-solid fa-lock"></i>';
-                    navLoginBtn.href = 'admin.html';
-                }
-
-                const borrowName = document.getElementById('borrowName');
-                if (borrowName) borrowName.value = user.displayName || user.email.split('@')[0];
-                const returnName = document.getElementById('returnName');
-                if (returnName) returnName.value = user.displayName || user.email.split('@')[0];
-                const borrowManualName = document.getElementById('borrowManualName');
-                if (borrowManualName) borrowManualName.value = user.displayName || user.email.split('@')[0];
-                const returnManualName = document.getElementById('returnManualName');
-                if (returnManualName) returnManualName.value = user.displayName || user.email.split('@')[0];
-
-                if (window.updateAccountPermissions) {
-                    window.updateAccountPermissions(user);
-                }
-            } else {
-                if(pfp) pfp.src = 'user-solid-full.svg';
-                if(nameEl) nameEl.textContent = 'Guest';
-                if(logoutBtn) logoutBtn.style.display = 'none';
-                if(loginDropdownBtn) loginDropdownBtn.style.display = 'block';
-                if(navLoginBtn) {
-                    navLoginBtn.innerHTML = 'Log In <i class="fa-solid fa-user-lock"></i>';
-                    navLoginBtn.href = 'login.html';
-                }
-
-                if (window.updateAccountPermissions) {
-                    window.updateAccountPermissions(null);
-                }
+        if (isLoggedIn) {
+            if(pfp) pfp.src = 'face-smile-solid-full.svg';
+            if(nameEl) nameEl.textContent = 'Admin';
+            if(logoutBtn) logoutBtn.style.display = 'block';
+            if(loginDropdownBtn) loginDropdownBtn.style.display = 'none';
+            if(navLoginBtn) {
+                navLoginBtn.innerHTML = 'Admin Panel <i class="fa-solid fa-lock"></i>';
+                navLoginBtn.href = 'admin.html';
             }
-        });
+        } else {
+            if(pfp) pfp.src = 'user-solid-full.svg';
+            if(nameEl) nameEl.textContent = 'Guest';
+            if(logoutBtn) logoutBtn.style.display = 'none';
+            if(loginDropdownBtn) loginDropdownBtn.style.display = 'block';
+            if(navLoginBtn) {
+                navLoginBtn.innerHTML = 'Log In <i class="fa-solid fa-user-lock"></i>';
+                navLoginBtn.href = 'login.html';
+            }
+        }
+    });
     </script>
     <script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "082695a43f814cc7871a76922df6162e"}'></script>
 </body>
