@@ -10,13 +10,20 @@
         #sessionCountdown {
             color: #ff0000;
             font-weight: 700;
-            font-size: 0.95rem;
-            margin-left: 10px;
+            font-size: 1rem;
+            margin-right: 15px;
         }
         .countdown-container {
             display: flex;
             align-items: center;
-            gap: 8px;
+            justify-content: center;
+            gap: 10px;
+        }
+        .teacher-section {
+            margin-top: 40px;
+            padding: 20px;
+            border-top: 2px dashed #ff8c00;
+            text-align: center;
         }
     </style>
 </head>
@@ -29,7 +36,8 @@
         <ul>
             <li>
                 <div class="countdown-container">
-                    <button onclick="logout()" style="background: none; border: none; font-size: 1rem; color: #FF0000; font-weight: bold; cursor: pointer; padding: 10px;">Logout</button>
+                    <span id="sessionCountdown">Session: 20:00</span>
+                    <button onclick="logout()" style="background: none; border: none; font-size: 1rem; color: #FF0000; font-weight: bold; cursor: pointer;">Logout</button>
                 </div>
             </li>
         </ul>
@@ -47,72 +55,59 @@
         <div class="prominent-actions">
             <button id="openAddBookModal" class="action-btn return-btn" style="font-size: 1.1rem; padding: 15px; background-color: #28a745;">Add New Book</button>
             <button id="openDeleteBookModal" class="action-btn return-btn" style="font-size: 1.1rem; padding: 15px; background-color: #dc3545;">Delete Books</button>
-            <button id="openUpdateBotmModal" class="action-btn return-btn" style="font-size: 1.1rem; padding: 15px; background-color: #007bff;">Update Book of the Month</button>
-            <button id="openUpdateLatestModal" class="action-btn return-btn" style="font-size: 1.1rem; padding: 15px; background-color: #6c757d;">Update Latest Changelog</button>
-        </div>
-    </div>
-    <div class="dashboard-container">
-        <h2>Download Data</h2>
-        <div class="prominent-actions">
-        <button onclick="window.location.href='https://docs.google.com/spreadsheets/d/e/2PACX-1vQaTqPVndPccN9h1-RYUulv59x-Ursqed9lsoDnMfejpp8VoI1DjYFh2Cq5Xr-471I8RcKX7vJ2yJgj/pub?gid=0&single=true&output=csv'" class="action-btn return-btn" style="font-size: 1.1rem; padding: 15px; background-color: #28a745;">Export Borrow CSV</button>
-        <button onclick="window.location.href='https://docs.google.com/spreadsheets/d/e/2PACX-1vQaTqPVndPccN9h1-RYUulv59x-Ursqed9lsoDnMfejpp8VoI1DjYFh2Cq5Xr-471I8RcKX7vJ2yJgj/pub?gid=2128186552&single=true&output=csv'" class="action-btn return-btn" style="font-size: 1.1rem; padding: 15px; background-color: #a7288a;">Export Return Requests CSV</button>
         </div>
     </div>
 
-    <footer>
-        <p>&copy; 2025 MSC Book Collection - Admin Area</p>
-    </footer>
+    <div class="teacher-section">
+        <button id="btnTeacherControls" class="teacher-btn" style="background-color: #ff8c00; font-size: 1.2rem; padding: 15px 30px; border-radius: 8px;">
+            <i class="fas fa-user-shield"></i> Teacher Controls
+        </button>
+
+        <div id="unlockedTeacherControls" style="display: none; margin-top: 25px;">
+            <h3 style="color: #ff8c00; margin-bottom: 20px;">Teacher Management Panel</h3>
+            <div class="prominent-actions">
+                <button id="btnUpdateMonthlyPasswords" class="teacher-btn"><i class="fas fa-key"></i> Update Monthly Passwords</button>
+                <button id="btnRemovePasswords" class="teacher-btn"><i class="fas fa-trash-alt"></i> Remove All or Some Passwords</button>
+                <button id="btnUpdateCurrentMonthPassword" class="teacher-btn"><i class="fas fa-lock-open"></i> Update Current Month Password</button>
+                <button id="btnUpdateTimePeriod" class="teacher-btn"><i class="fas fa-calendar-alt"></i> Update Time-Period</button>
+            </div>
+        </div>
+    </div>
 
     <div id="addBookModal" class="modal">
         <div class="modal-content">
-            <span class="close-button" onclick="closeModal('addBookModal'); document.getElementById('addBookChoiceSection').style.display='block'; document.getElementById('normalTypeChoiceSection').style.display='none'; document.getElementById('normalInputSection').style.display='none'; document.getElementById('massInputSection').style.display='none';">&times;</span>
+            <span class="close-button" onclick="closeModal('addBookModal')">&times;</span>
             <h2>Add New Book</h2>
-            
             <div id="addBookChoiceSection" class="choice-modal-content">
-                <h3>How would you like to add?</h3>
-                <button type="button" class="choice-btn" onclick="document.getElementById('addBookChoiceSection').style.display='none'; document.getElementById('normalTypeChoiceSection').style.display='block';">Normal Input</button>
-                <button type="button" class="choice-btn" onclick="document.getElementById('addBookChoiceSection').style.display='none'; document.getElementById('massInputSection').style.display='block'; setTimeout(() => { const first = document.querySelector('.mass-isbn-input'); if(first) first.focus(); }, 100);">Mass Input</button>
+                <button class="choice-btn" onclick="document.getElementById('addBookChoiceSection').style.display='none'; document.getElementById('normalInputSection').style.display='block';">Single Book Entry</button>
+                <button class="choice-btn" onclick="document.getElementById('addBookChoiceSection').style.display='none'; document.getElementById('massInputSection').style.display='block';">Mass ISBN Entry (up to 15)</button>
             </div>
 
-            <div id="normalTypeChoiceSection" class="choice-modal-content" style="display:none;">
-                <h3>Select Input Type</h3>
-                
-               ISBN/Barcode coming soon.
-                
-                <button type="button" class="choice-btn" onclick="document.getElementById('normalTypeChoiceSection').style.display='none'; document.getElementById('normalInputSection').style.display='block'; document.getElementById('normalIsbnGroup').style.display='none'; setTimeout(() => document.getElementById('addNormalTitle').focus(), 100);">Manual</button>
-                <br>
-                <button type="button" class="choice-btn" style="background-color: #6c757d; margin-top: 20px;" onclick="document.getElementById('normalTypeChoiceSection').style.display='none'; document.getElementById('addBookChoiceSection').style.display='block';">Back</button>
-            </div>
-            
-            <div id="normalInputSection" style="display:none;">
-                <button type="button" class="choice-btn" style="background-color: #6c757d; padding: 10px 20px; font-size: 1rem; margin-bottom: 20px; margin-left: 0;" onclick="document.getElementById('normalInputSection').style.display='none'; document.getElementById('normalTypeChoiceSection').style.display='block';">Back</button>
+            <div id="normalInputSection" style="display: none;">
                 <form id="addBookNormalForm">
-                    <div id="normalIsbnGroup" class="form-group">
-                        <label>ISBN/Barcode</label>
-                        <div style="display:flex; gap:10px;">
-                            <input type="text" id="addNormalIsbn" required style="flex:1;" placeholder="Scan barcode here...">
-                            <button type="button" id="addNormalLookupBtn" style="background-color:#17a2b8; padding: 12px 20px; border: none; color: white; border-radius: 6px; cursor: pointer;">Lookup</button>
+                    <div class="form-group">
+                        <label>ISBN</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" id="addNormalIsbn" placeholder="Scan or enter ISBN">
+                            <button type="button" id="addNormalLookupBtn" style="width: auto; margin-top: 0; background-color: #17a2b8;">Auto-Fill</button>
                         </div>
                     </div>
-                    <div class="form-group"><label>Book Title</label><input type="text" id="addNormalTitle" required></div>
+                    <div class="form-group"><label>Title</label><input type="text" id="addNormalTitle" required></div>
                     <div class="form-group"><label>Author</label><input type="text" id="addNormalAuthor" required></div>
                     <div class="form-group"><label>Genre</label><input type="text" id="addNormalGenre"></div>
                     <div class="form-group"><label>Grade Level</label><input type="text" id="addNormalGrade"></div>
                     <div class="form-group"><label>MSC+ Grade Level</label><input type="text" id="addNormalMsc"></div>
                     <div class="form-group"><label>Synopsis</label><textarea id="addNormalSynopsis"></textarea></div>
-                    <div class="form-group"><label>Cover Image Link</label><input type="text" id="addNormalCover"></div>
-                    <div class="form-group"><label>Quantity</label><input type="number" id="addNormalQuantity" value="1" min="1" required style="width: 100%; padding: 12px; border: 1px solid #ced4da; border-radius: 6px; box-sizing: border-box;"></div>
-                    <button type="submit">Submit</button>
+                    <div class="form-group"><label>Cover Image URL</label><input type="url" id="addNormalCover"></div>
+                    <div class="form-group"><label>Quantity</label><input type="number" id="addNormalQuantity" value="1" min="1"></div>
+                    <button type="submit">Add Book</button>
                 </form>
             </div>
 
-            <div id="massInputSection" style="display:none;">
-                <button type="button" class="choice-btn" style="background-color: #6c757d; padding: 10px 20px; font-size: 1rem; margin-bottom: 20px; margin-left: 0;" onclick="document.getElementById('massInputSection').style.display='none'; document.getElementById('addBookChoiceSection').style.display='block';">Back</button>
+            <div id="massInputSection" style="display: none;">
                 <form id="addBookMassForm">
-                    <p style="text-align: center; font-weight: bold; margin-bottom: 15px;">Scan up to 15 ISBNs/Barcodes.</p>
-                    <div id="massIsbnContainer" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
-                    </div>
-                    <button type="submit">Submit Mass Input</button>
+                    <div id="massIsbnContainer"></div>
+                    <button type="submit">Add Mass Books</button>
                 </form>
             </div>
         </div>
@@ -123,100 +118,49 @@
             <span class="close-button" onclick="closeModal('deleteBookModal')">&times;</span>
             <h2>Delete Books</h2>
             <div class="form-group">
-                <input type="text" id="deleteSearchInput" placeholder="Search by Book Name or Author..." style="width:100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #ced4da;">
+                <input type="text" id="deleteSearchInput" placeholder="Search book to delete...">
             </div>
-            <div id="deleteChartContainer" style="overflow-x: auto; max-height: 400px; overflow-y: auto;">
-                <table style="width: 100%; border-collapse: collapse;">
+            <div style="max-height: 300px; overflow-y: auto; margin-bottom: 15px;">
+                <table>
                     <thead>
                         <tr>
-                            <th style="width: 50px; text-align: center;"><input type="checkbox" id="selectAllDelete"></th>
-                            <th>Book Name</th>
+                            <th><input type="checkbox" id="selectAllDelete"></th>
+                            <th>Title</th>
                             <th>Author</th>
                             <th>Quantity</th>
                         </tr>
                     </thead>
-                    <tbody id="deleteBooksBody">
-                    </tbody>
+                    <tbody id="deleteBooksBody"></tbody>
                 </table>
             </div>
-            <div style="display:flex; flex-wrap: wrap; gap:10px; margin-top:20px; justify-content: center;">
-                <button type="button" id="btnDeleteSelected" style="background-color:#dc3545; flex: 1; min-width: 150px; padding: 12px 20px; border: none; color: white; border-radius: 6px; cursor: pointer;">Delete Selected</button>
-                <button type="button" id="btnDeleteAll" style="background-color:#8b0000; flex: 1; min-width: 150px; padding: 12px 20px; border: none; color: white; border-radius: 6px; cursor: pointer;">Delete All</button>
-                <button type="button" id="btnRefreshDelete" style="background-color:#17a2b8; flex: 1; min-width: 150px; padding: 12px 20px; border: none; color: white; border-radius: 6px; cursor: pointer;">Refresh</button>
-                <button type="button" onclick="closeModal('deleteBookModal')" style="background-color:#6c757d; flex: 1; min-width: 150px; padding: 12px 20px; border: none; color: white; border-radius: 6px; cursor: pointer;">Cancel</button>
+            <div style="display: flex; gap: 10px;">
+                <button type="button" id="btnDeleteSelected" style="background-color: #dc3545;">Delete Selected</button>
+                <button type="button" id="btnDeleteAll" style="background-color: #8b0000;">Delete ALL Books</button>
+                <button type="button" id="btnRefreshDelete" style="background-color: #6c757d;">Refresh List</button>
             </div>
         </div>
     </div>
 
-    <div id="updateBotmModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button" onclick="closeModal('updateBotmModal')">&times;</span>
-            <h2>Update Book of the Month</h2>
-            <form id="botmForm">
-                <div class="form-group">
-                    <label>ISBN (10, 13, or Barcode)</label>
-                    <div style="display:flex; gap:10px;">
-                        <input type="text" id="botmIsbnInput" required style="flex:1;" placeholder="Scan barcode here...">
-                        <button type="button" id="botmLookupBtn" style="background-color:#17a2b8; padding: 12px 20px; border: none; color: white; border-radius: 6px; cursor: pointer;">Lookup</button>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Month</label>
-                    <input type="text" id="botmMonth" required>
-                </div>
-                <div class="form-group">
-                    <label>Book Title</label>
-                    <input type="text" id="botmTitle" required>
-                </div>
-                <div class="form-group">
-                    <label>Author</label>
-                    <input type="text" id="botmAuthor" required>
-                </div>
-                <button type="submit">Update</button>
+    <div id="teacherAuthModal" class="modal">
+        <div class="modal-content" style="max-width: 400px; text-align: center;">
+            <span class="close-button" onclick="closeModal('teacherAuthModal')">&times;</span>
+            <h2 style="color: #ff8c00;">Teacher Verification</h2>
+            <p>Please enter the 5-digit teacher security code:</p>
+            <form id="teacherAuthForm" style="margin-top: 15px;">
+                <input type="password" id="teacherPinInput" maxlength="5" pattern="\d{5}" placeholder="e.g. 54321" required class="form-group" style="text-align: center; font-size: 1.5em; tracking-widest: 4px;">
+                <button type="submit" class="teacher-btn" style="width: 100%;">Unlock Controls</button>
             </form>
         </div>
     </div>
 
-    <div id="updateLatestModal" class="modal">
+    <div id="teacherActionModal" class="modal">
         <div class="modal-content">
-            <span class="close-button" onclick="closeModal('updateLatestModal')">&times;</span>
-            <h2>Update Latest Changelog</h2>
-            <form id="changelogForm">
-                <div class="form-group">
-                    <label>Version Number</label>
-                    <input type="text" id="changelogVersion" required>
-                </div>
-                <div class="form-group">
-                    <label>Update Message</label>
-                    <textarea id="changelogMessage" required></textarea>
-                </div>
-                <button type="submit">Update Changelog</button>
-            </form>
+            <span class="close-button" onclick="closeModal('teacherActionModal')">&times;</span>
+            <h2 id="teacherModalTitle" style="color: #ff8c00;">Teacher Action</h2>
+            <div id="teacherModalBody"></div>
         </div>
     </div>
-    
+
     <script src="script.js"></script>
-    <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyBOEU6zCbp66le6Dr06GpmGx1yeT5WHNk0",
-        authDomain: "msc-library-808-en.firebaseapp.com",
-        projectId: "msc-library-808-en",
-        storageBucket: "msc-library-808-en.firebasestorage.app",
-        messagingSenderId: "62522328857",
-        appId: "1:62522328857:web:b56829c3d41238f0866788"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-
-    onAuthStateChanged(auth, (user) => {
-        if (!user) {
-            document.body.innerHTML = '<h1 style="text-align:center; margin-top: 50px; color: red;">THIS ACCOUNT IS NOT AUTHORIZED TO VISIT THIS PAGE.</h1>';
-        }
-    });
-</script>
 </body>
 </html>
