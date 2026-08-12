@@ -35,7 +35,7 @@
     <img id="userPfp" src="guestpfp.png" alt="Profile Picture">
     <span class="name" id="userName">Guest</span>
     <div class="account-dropdown">
-        <button id="logoutBtn" style="display:none;" onclick="window.logoutFirebase()">Logout</button>
+        <button id="logoutBtn" style="display:none;" onclick="logout()">Logout</button>
         <button id="loginDropdownBtn" onclick="window.location.href='login.html'">Log In</button>
     </div>
 </div>
@@ -80,38 +80,18 @@
     <p>5th grade class 2024-2025</p>
 </footer>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyBOEU6zCbp66le6Dr06GpmGx1yeT5WHNk0",
-        authDomain: "msc-library-808-en.firebaseapp.com",
-        projectId: "msc-library-808-en",
-        storageBucket: "msc-library-808-en.firebasestorage.app",
-        messagingSenderId: "62522328857",
-        appId: "1:62522328857:web:b56829c3d41238f0866788"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-
-    window.logoutFirebase = () => {
-        signOut(auth).then(() => {
-            window.location.reload();
-        });
-    };
-
-    onAuthStateChanged(auth, (user) => {
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const isLoggedIn = sessionStorage.getItem('adminLoggedIn') === 'true';
         const pfp = document.getElementById('userPfp');
         const nameEl = document.getElementById('userName');
         const logoutBtn = document.getElementById('logoutBtn');
         const loginDropdownBtn = document.getElementById('loginDropdownBtn');
         const navLoginBtn = document.getElementById('AdminLogin');
 
-        if (user) {
+        if (isLoggedIn) {
             if(pfp) pfp.src = 'loggedinpfp.png';
-            if(nameEl) nameEl.textContent = user.displayName || user.email.split('@')[0];
+            if(nameEl) nameEl.textContent = 'Admin';
             if(logoutBtn) logoutBtn.style.display = 'block';
             if(loginDropdownBtn) loginDropdownBtn.style.display = 'none';
             if(navLoginBtn) {
