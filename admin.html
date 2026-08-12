@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - MSC Book Collection</title>
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        .countdown-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .teacher-btn-orange {
+            background-color: #FF8C00;
+            color: white;
+            font-weight: bold;
+            border: none;
+            padding: 15px 25px;
+            font-size: 1.1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .teacher-pin-input {
+            font-size: 24px;
+            letter-spacing: 8px;
+            text-align: center;
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            margin: 15px 0;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+        }
+
+        .teacher-unlocked-card {
+            border: 2px solid #28a745;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+        }
+
+        .code-mgmt-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        .code-mgmt-btn {
+            padding: 10px 20px;
+            border: none;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .code-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .page-badge {
+            font-size: 0.72rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        .page-badge-admin { background: #e3f2fd; color: #1565c0; }
+        .page-badge-teacher { background: #fff3e0; color: #e65100; }
+
+        .mass-code-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+            align-items: center;
+        }
+        .mass-code-row input[type="text"] {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+        .mass-code-row select {
+            padding: 8px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            box-sizing: border-box;
+            min-width: 110px;
+        }
+        .mass-code-row .row-num {
+            font-size: 0.8rem;
+            color: #6c757d;
+            min-width: 24px;
+            text-align: right;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>Admin Dashboard - MSC Book Collection</h1>
+</header>
+
+<div class="navbar">
+    <ul>
+        <li>
+            <div class="countdown-container">
+                <button
+                    onclick="logout()"
+                    style="background:none;border:none;font-size:1rem;color:#FF0000;font-weight:bold;cursor:pointer;padding:10px;">
+                    Logout
+                </button>
+            </div>
+        </li>
+    </ul>
+</div>
+
+<div class="dashboard-container">
+    <h2>Current Borrow & Return Requests</h2>
+
+    <div id="data-container" style="overflow-x:auto;width:100%;">
+        <p>Loading collection data...</p>
+    </div>
+</div>
+
+<div class="dashboard-container admin-book-actions">
+    <h2>Management Options</h2>
+
+    <div class="prominent-actions">
+        <button
+            id="openAddBookModal"
+            class="action-btn return-btn"
+            style="font-size:1.1rem;padding:15px;background-color:#28a745;">
+            Add New Book
+        </button>
+
+        <button
+            id="openDeleteBookModal"
+            class="action-btn return-btn"
+            style="font-size:1.1rem;padding:15px;background-color:#dc3545;">
+            Delete Books
+        </button>
+
+        <button
+            id="openUpdateBotmModal"
+            class="action-btn return-btn"
+            style="font-size:1.1rem;padding:15px;background-color:#007bff;">
+            Update Book of the Month
+        </button>
+
+        <button
+            id="openUpdateLatestModal"
+            class="action-btn return-btn"
+            style="font-size:1.1rem;padding:15px;background-color:#6c757d;">
+            Update Latest Changelog
+        </button>
+    </div>
+</div>
+
+<div class="dashboard-container">
+    <h2>Download Data</h2>
+
+    <div class="prominent-actions">
+        <button
+            onclick="window.location.href='https://docs.google.com/spreadsheets/d/e/2PACX-1vQaTqPVndPccN9h1-RYUulv59x-Ursqed9lsoDnMfejpp8VoI1DjYFh2Cq5Xr-471I8RcKX7vJ2yJgj/pub?gid=0&single=true'">
+            Download Current Requests
+        </button>
+
+        <button
+            onclick="window.location.href='https://docs.google.com/spreadsheets/d/e/2PACX-1vQaTqPVndPccN9h1-RYUulv59x-Ursqed9lsoDnMfejpp8VoI1DjYFh2Cq5Xr-471I8RcKX7vJ2yJgj/pub?gid=2128186552&single=true'">
+            Download Collection Data
+        </button>
+    </div>
+</div>
+
+<div class="dashboard-container">
+    <h2>Teacher Administration</h2>
+
+    <div id="teacher-locked">
+        <button
+            onclick="openTeacherAuthModal()"
+            class="teacher-btn-orange">
+            🔒 Teacher Controls
+        </button>
+    </div>
+
+    <div
+        id="teacher-unlocked"
+        class="teacher-unlocked-card"
+        style="display:none;">
+
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+            <h3 style="color:#28a745;margin:0;">
+                🔓 Teacher Controls Unlocked
+            </h3>
+
+            <button
+                onclick="showTeacherState('locked')"
+                style="background:#dc3545;color:white;border:none;padding:8px 16px;border-radius:4px;cursor:pointer;font-weight:bold;">
+                Lock Controls
+            </button>
+        </div>
+
+        <hr style="margin:15px 0;">
+
+        <div class="prominent-actions">
+            <button
+                onclick="openAddAccountModal()"
+                class="action-btn return-btn"
+                style="font-size:1rem;padding:12px;background-color:#17a2b8;">
+                Add / Update Accounts
+            </button>
+
+            <button
+                onclick="openBlankTeacherModal()"
+                class="action-btn return-btn"
+                style="font-size:1rem;padding:12px;background-color:#6f42c1;">
+                Configure Class Periods
+            </button>
+        </div>
+
+        <hr style="margin:15px 0;">
+
+        <h3 style="color:#28a745;margin-bottom:10px;">Manage Access Codes</h3>
+
+        <div id="codeMgmtLocked">
+            <div class="form-group">
+                <label>Admin Key (for code management)</label>
+                <input
+                    type="password"
+                    id="codeAdminKey"
+                    class="code-mgmt-input"
+                    placeholder="Enter admin key">
+            </div>
+            <button
+                onclick="unlockCodeMgmt()"
+                class="code-mgmt-btn"
+                style="background-color:#007bff;">
+                Unlock Code Management
+            </button>
+            <p id="codeMgmtMsg" style="font-weight:bold;margin-top:10px;"></p>
+        </div>
+
+        <div id="codeMgmtUnlocked" style="display:none;">
+
+            <div style="margin-bottom:20px;">
+                <h4 style="margin-bottom:10px;">Add New Code</h4>
+                <button
+                    onclick="openAddCodeModal()"
+                    class="code-mgmt-btn"
+                    style="background-color:#28a745;">
+                    + Add Codes
+                </button>
+            </div>
+
+            <div>
+                <h4 style="margin-bottom:10px;">
+                    Existing Codes
+                    <span
+                        id="codeCount"
+                        style="font-size:0.8rem;background:#e9ecef;padding:2px 8px;border-radius:4px;">
+                        0
+                    </span>
+                </h4>
+                <div id="codeList" style="max-height:300px;overflow-y:auto;"></div>
+                <button
+                    onclick="loadCodes()"
+                    style="background-color:#17a2b8;padding:8px 16px;border:none;color:white;border-radius:6px;cursor:pointer;margin-top:10px;">
+                    Refresh List
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <p>&copy; 2025 MSC Book Collection - Admin Area</p>
+</footer>
+
+<!-- Teacher Auth Modal -->
+<div id="teacherAuthModal" class="modal">
+    <div class="modal-content" style="max-width:350px;text-align:center;">
+
+        <span
+            class="close-button"
+            onclick="closeTeacherModal()">
+            &times;
+        </span>
+
+        <h2>Teacher Controls</h2>
+
+        <p>Enter 5-Digit PIN</p>
+
+        <input
+            type="password"
+            id="teacherPinInput"
+            class="teacher-pin-input"
+            maxlength="5"
+            placeholder="•••••"
+            inputmode="numeric"
+            oninput="verifyTeacherPin(this)">
+
+        <p
+            id="teacherAuthStatus"
+            style="font-weight:bold;margin-top:10px;">
+        </p>
+
+        <button
+            type="button"
+            onclick="closeTeacherModal()"
+            style="background-color:#6c757d;padding:10px 20px;border:none;color:white;border-radius:6px;cursor:pointer;width:100%;">
+            Cancel
+        </button>
+    </div>
+</div>
+
+<!-- Blank Teacher Modal -->
+<div id="blankTeacherModal" class="modal">
+    <div class="modal-content" style="max-width:500px;">
+
+        <span
+            class="close-button"
+            onclick="closeBlankTeacherModal()">
+            &times;
+        </span>
+
+        <h2>Teacher Controls</h2>
+
+    </div>
+</div>
+
+<!-- Add / Update Accounts Modal -->
+<div id="addAccountModal" class="modal">
+    <div class="modal-content" style="max-width:500px;">
+
+        <span
+            class="close-button"
+            onclick="closeModal('addAccountModal')">
+            &times;
+        </span>
+
+        <h2>Add / Update Accounts</h2>
+
+        <p style="color:#6c757d;margin-bottom:15px;">
+            Manage student and teacher access codes from the code management panel below.
+        </p>
+
+        <div class="prominent-actions">
+            <button
+                onclick="closeModal('addAccountModal');openAddCodeModal();"
+                style="background-color:#28a745;color:white;border:none;padding:12px 20px;border-radius:6px;cursor:pointer;font-size:1rem;">
+                + Add New Codes
+            </button>
+
+            <button
+                onclick="closeModal('addAccountModal');document.getElementById('codeMgmtUnlocked').scrollIntoView({behavior:'smooth'});"
+                style="background-color:#007bff;color:white;border:none;padding:12px 20px;border-radius:6px;cursor:pointer;font-size:1rem;">
+                View Existing Codes
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Add Code Modal (single + mass input) -->
+<div id="addCodeModal" class="modal">
+    <div class="modal-content" style="max-width:600px;">
+
+        <span
+            class="close-button"
+            onclick="closeModal('addCodeModal')">
+            &times;
+        </span>
+
+        <h2>Add Access Codes</h2>
+
+        <!-- Choice: Single vs Mass -->
+        <div id="addCodeChoiceSection" class="choice-modal-content">
+            <h3>How would you like to add?</h3>
+
+            <button
+                type="button"
+                class="choice-btn"
+                onclick="showAddCodeSection('single')">
+                Single Input
+            </button>
+
+            <button
+                type="button"
+                class="choice-btn"
+                onclick="showAddCodeSection('mass')">
+                Mass Input (up to 15)
+            </button>
+        </div>
+
+        <!-- Single Input -->
+        <div id="addCodeSingleSection" style="display:none;">
+
+            <button
+                type="button"
+                class="choice-btn"
+                style="background-color:#6c757d;padding:10px 20px;font-size:1rem;margin-bottom:20px;margin-left:0;"
+                onclick="showAddCodeSection('choice')">
+                Back
+            </button>
+
+            <div class="form-group">
+                <label>5-Digit Code</label>
+                <input
+                    type="text"
+                    id="singleCode"
+                    class="code-mgmt-input"
+                    maxlength="5"
+                    placeholder="e.g. 12345"
+                    inputmode="numeric">
+            </div>
+
+            <div class="form-group">
+                <label>Label / Tag (optional)</label>
+                <input
+                    type="text"
+                    id="singleLabel"
+                    class="code-mgmt-input"
+                    maxlength="100"
+                    placeholder="e.g. Mr. Smith, Room 12">
+            </div>
+
+            <div class="form-group">
+                <label>Unlocks Page</label>
+                <select
+                    id="singlePage"
+                    class="code-mgmt-input"
+                    onchange="onSinglePageChange()">
+                    <option value="admin">Admin / Librarian Page</option>
+                    <option value="teacher">Teacher Controls</option>
+                </select>
+            </div>
+
+            <!-- Double-auth for teacher codes -->
+            <div id="singleDoubleAuth" style="display:none;margin-top:10px;">
+                <div style="background:#fff3e0;border:1px solid #ffe0b2;border-radius:6px;padding:12px;">
+                    <p style="font-weight:bold;color:#e65100;margin-bottom:8px;">
+                        ⚠ Teacher codes require double-authorization
+                    </p>
+                    <div class="form-group">
+                        <label>Confirm Admin Key</label>
+                        <input
+                            type="password"
+                            id="singleConfirmKey"
+                            class="code-mgmt-input"
+                            placeholder="Re-enter admin key">
+                    </div>
+                </div>
+            </div>
+
+            <button
+                onclick="submitSingleCode()"
+                class="code-mgmt-btn"
+                style="background-color:#28a745;margin-top:15px;">
+                Add Code
+            </button>
+
+            <p id="singleAddMsg" style="font-weight:bold;margin-top:10px;"></p>
+        </div>
+
+        <!-- Mass Input -->
+        <div id="addCodeMassSection" style="display:none;">
+
+            <button
+                type="button"
+                class="choice-btn"
+                style="background-color:#6c757d;padding:10px 20px;font-size:1rem;margin-bottom:20px;margin-left:0;"
+                onclick="showAddCodeSection('choice')">
+                Back
+            </button>
+
+            <p style="text-align:center;font-weight:bold;margin-bottom:15px;">
+                Add up to 15 codes at once. Each needs a 5-digit code and an optional tag.
+            </p>
+
+            <div class="form-group" style="margin-bottom:15px;">
+                <label>Default Page for All Codes</label>
+                <select id="massDefaultPage" class="code-mgmt-input" onchange="onMassPageChange()">
+                    <option value="admin">Admin / Librarian Page</option>
+                    <option value="teacher">Teacher Controls</option>
+                </select>
+            </div>
+
+            <!-- Double-auth for teacher codes -->
+            <div id="massDoubleAuth" style="display:none;margin-bottom:15px;">
+                <div style="background:#fff3e0;border:1px solid #ffe0b2;border-radius:6px;padding:12px;">
+                    <p style="font-weight:bold;color:#e65100;margin-bottom:8px;">
+                        ⚠ Teacher codes require double-authorization
+                    </p>
+                    <div class="form-group">
+                        <label>Confirm Admin Key</label>
+                        <input
+                            type="password"
+                            id="massConfirmKey"
+                            class="code-mgmt-input"
+                            placeholder="Re-enter admin key">
+                    </div>
+                </div>
+            </div>
+
+            <div id="massCodeContainer"></div>
+
+            <button
+                onclick="addMassRow()"
+                style="background-color:#6c757d;color:white;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;margin-bottom:15px;">
+                + Add Row
+            </button>
+
+            <button
+                onclick="submitMassCodes()"
+                class="code-mgmt-btn"
+                style="background-color:#28a745;">
+                Submit All Codes
+            </button>
+
+            <p id="massAddMsg" style="font-weight:bold;margin-top:10px;"></p>
+        </div>
+    </div>
+</div>
+
+<div id="addBookModal" class="modal">
+    <div class="modal-content">
+
+        <span
+            class="close-button"
+            onclick="closeModal('addBookModal');document.getElementById('addBookChoiceSection').style.display='block';document.getElementById('normalTypeChoiceSection').style.display='none';document.getElementById('normalInputSection').style.display='none';document.getElementById('massInputSection').style.display='none';">
+            &times;
+        </span>
+
+        <h2>Add New Book</h2>
+
+        <div id="addBookChoiceSection" class="choice-modal-content">
+            <h3>How would you like to add?</h3>
+
+            <button
+                type="button"
+                class="choice-btn"
+                onclick="document.getElementById('addBookChoiceSection').style.display='none';document.getElementById('normalTypeChoiceSection').style.display='block';">
+                Normal Entry
+            </button>
+
+            <button
+                type="button"
+                class="choice-btn"
+                onclick="document.getElementById('addBookChoiceSection').style.display='none';document.getElementById('massInputSection').style.display='block';">
+                Mass Input
+            </button>
+        </div>
+
+        <div
+            id="normalTypeChoiceSection"
+            class="choice-modal-content"
+            style="display:none;">
+
+            <h3>Select Input Type</h3>
+
+            <p>ISBN/Barcode coming soon.</p>
+
+            <button
+                type="button"
+                class="choice-btn"
+                onclick="document.getElementById('normalTypeChoiceSection').style.display='none';document.getElementById('normalInputSection').style.display='block';">
+                Proceed
+            </button>
+
+            <br>
+
+            <button
+                type="button"
+                class="choice-btn"
+                style="background-color:#6c757d;margin-top:20px;"
+                onclick="document.getElementById('normalTypeChoiceSection').style.display='none';document.getElementById('addBookChoiceSection').style.display='block';">
+                Back
+            </button>
+        </div>
+
+        <div id="normalInputSection" style="display:none;">
+
+            <button
+                type="button"
+                class="choice-btn"
+                style="background-color:#6c757d;padding:10px 20px;font-size:1rem;margin-bottom:20px;margin-left:0;"
+                onclick="document.getElementById('normalInputSection').style.display='none';document.getElementById('normalTypeChoiceSection').style.display='block';">
+                Back
+            </button>
+
+            <form id="addBookNormalForm">
+
+                <div id="normalIsbnGroup" class="form-group">
+                    <label>ISBN/Barcode</label>
+
+                    <div style="display:flex;gap:10px;">
+                        <input
+                            type="text"
+                            id="addNormalIsbn"
+                            required
+                            style="flex:1;"
+                            placeholder="Scan barcode here...">
+
+                        <button
+                            type="button"
+                            id="addNormalLookupBtn"
+                            style="background-color:#17a2b8;padding:12px 20px;border:none;color:white;border-radius:6px;cursor:pointer;">
+                            Lookup
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Book Title</label>
+                    <input type="text" id="addNormalTitle" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Author</label>
+                    <input type="text" id="addNormalAuthor" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Genre</label>
+                    <input type="text" id="addNormalGenre">
+                </div>
+
+                <div class="form-group">
+                    <label>Grade Level</label>
+                    <input type="text" id="addNormalGrade">
+                </div>
+
+                <div class="form-group">
+                    <label>MSC+ Grade Level</label>
+                    <input type="text" id="addNormalMsc">
+                </div>
+
+                <div class="form-group">
+                    <label>Synopsis</label>
+                    <textarea id="addNormalSynopsis"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Cover Image Link</label>
+                    <input type="text" id="addNormalCover">
+                </div>
+
+                <div class="form-group">
+                    <label>Quantity</label>
+                    <input
+                        type="number"
+                        id="addNormalQuantity"
+                        value="1"
+                        min="1"
+                        required
+                        style="width:100%;padding:12px;border:1px solid #ced4da;border-radius:6px;box-sizing:border-box;">
+                </div>
+
+                <button type="submit">Submit</button>
+
+            </form>
+        </div>
+
+        <div id="massInputSection" style="display:none;">
+
+            <button
+                type="button"
+                class="choice-btn"
+                style="background-color:#6c757d;padding:10px 20px;font-size:1rem;margin-bottom:20px;margin-left:0;"
+                onclick="document.getElementById('massInputSection').style.display='none';document.getElementById('addBookChoiceSection').style.display='block';">
+                Back
+            </button>
+
+            <form id="addBookMassForm">
+
+                <p style="text-align:center;font-weight:bold;margin-bottom:15px;">
+                    Scan up to 15 ISBNs/Barcodes.
+                </p>
+
+                <div
+                    id="massIsbnContainer"
+                    style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+                </div>
+
+                <button type="submit">Submit Mass Input</button>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="deleteBookModal" class="modal">
+    <div class="modal-content" style="max-width:800px;">
+
+        <span
+            class="close-button"
+            onclick="closeModal('deleteBookModal')">
+            &times;
+        </span>
+
+        <h2>Delete Books</h2>
+
+        <div class="form-group">
+            <input
+                type="text"
+                id="deleteSearchInput"
+                placeholder="Search by Book Name or Author..."
+                style="width:100%;padding:10px;margin-bottom:15px;border-radius:6px;border:1px solid #ced4da;">
+        </div>
+
+        <div
+            id="deleteChartContainer"
+            style="overflow-x:auto;max-height:400px;overflow-y:auto;">
+
+            <table style="width:100%;border-collapse:collapse;">
+                <thead>
+                    <tr>
+                        <th style="width:50px;text-align:center;">
+                            <input type="checkbox" id="selectAllDelete">
+                        </th>
+                        <th>Book Name</th>
+                        <th>Author</th>
+                        <th>Quantity</th>
+                    </tr>
+                </thead>
+
+                <tbody id="deleteBooksBody"></tbody>
+            </table>
+        </div>
+
+        <div
+            style="display:flex;flex-wrap:wrap;gap:10px;margin-top:20px;justify-content:center;">
+
+            <button
+                type="button"
+                id="btnDeleteSelected"
+                style="background-color:#dc3545;flex:1;min-width:150px;padding:12px 20px;border:none;color:white;border-radius:6px;cursor:pointer;">
+                Delete Selected
+            </button>
+
+            <button
+                type="button"
+                id="btnDeleteAll"
+                style="background-color:#8b0000;flex:1;min-width:150px;padding:12px 20px;border:none;color:white;border-radius:6px;cursor:pointer;">
+                Delete All
+            </button>
+
+            <button
+                type="button"
+                id="btnRefreshDelete"
+                style="background-color:#17a2b8;flex:1;min-width:150px;padding:12px 20px;border:none;color:white;border-radius:6px;cursor:pointer;">
+                Refresh
+            </button>
+
+            <button
+                type="button"
+                onclick="closeModal('deleteBookModal')"
+                style="background-color:#6c757d;flex:1;min-width:150px;padding:12px 20px;border:none;color:white;border-radius:6px;">
+                Cancel
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="updateBotmModal" class="modal">
+    <div class="modal-content">
+
+        <span
+            class="close-button"
+            onclick="closeModal('updateBotmModal')">
+            &times;
+        </span>
+
+        <h2>Update Book of the Month</h2>
+
+        <form id="botmForm">
+
+            <div class="form-group">
+                <label>ISBN (10, 13, or Barcode)</label>
+
+                <div style="display:flex;gap:10px;">
+                    <input
+                        type="text"
+                        id="botmIsbnInput"
+                        required
+                        style="flex:1;"
+                        placeholder="Scan barcode here...">
+
+                    <button
+                        type="button"
+                        id="botmLookupBtn"
+                        style="background-color:#17a2b8;padding:12px 20px;border:none;color:white;border-radius:6px;cursor:pointer;">
+                        Lookup
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Month</label>
+                <input type="text" id="botmMonth" required>
+            </div>
+
+            <div class="form-group">
+                <label>Book Title</label>
+                <input type="text" id="botmTitle" required>
+            </div>
+
+            <div class="form-group">
+                <label>Author</label>
+                <input type="text" id="botmAuthor" required>
+            </div>
+
+            <button type="submit">Update</button>
+
+        </form>
+    </div>
+</div>
+
+<div id="updateLatestModal" class="modal">
+    <div class="modal-content">
+
+        <span
+            class="close-button"
+            onclick="closeModal('updateLatestModal')">
+            &times;
+        </span>
+
+        <h2>Update Latest Changelog</h2>
+
+        <form id="changelogForm">
+
+            <div class="form-group">
+                <label>Version Number</label>
+                <input type="text" id="changelogVersion" required>
+            </div>
+
+            <div class="form-group">
+                <label>Update Message</label>
+                <textarea id="changelogMessage" required></textarea>
+            </div>
+
+            <button type="submit">Update Changelog</button>
+
+        </form>
+    </div>
+</div>
+
+<script src="script.js"></script>
+
+<script>
+    /* ==================== TEACHER AUTH ==================== */
+
+    function openTeacherAuthModal() {
+        const modal = document.getElementById('teacherAuthModal');
+        const input = document.getElementById('teacherPinInput');
+        const status = document.getElementById('teacherAuthStatus');
+
+        status.innerText = '';
+        status.style.color = '#333';
+        input.value = '';
+        modal.style.display = 'block';
+
+        setTimeout(() => {
+            input.focus();
+        }, 100);
+    }
+
+    function closeTeacherModal() {
+        document.getElementById('teacherAuthModal').style.display = 'none';
+        document.getElementById('teacherPinInput').value = '';
+        document.getElementById('teacherAuthStatus').innerText = '';
+    }
+
+    async function verifyTeacherPin(inputElem) {
+        inputElem.value = inputElem.value.replace(/\D/g, '').slice(0, 5);
+
+        const enteredPin = inputElem.value;
+        const statusElem = document.getElementById('teacherAuthStatus');
+
+        if (enteredPin.length !== 5) {
+            statusElem.innerText = '';
+            return;
+        }
+
+        statusElem.style.color = '#333';
+        statusElem.innerText = 'Verifying...';
+
+        try {
+            const response = await fetch(`/api/codes?code=${encodeURIComponent(enteredPin)}`);
+            const data = await response.json();
+
+            if (data.valid) {
+                statusElem.style.color = '#28a745';
+                statusElem.innerText = 'PIN accepted.';
+
+                setTimeout(() => {
+                    closeTeacherModal();
+                    showTeacherState('unlocked');
+                }, 250);
+
+                return;
+            }
+
+            statusElem.style.color = '#dc3545';
+            statusElem.innerText = 'Incorrect PIN.';
+            inputElem.value = '';
+
+            setTimeout(() => {
+                inputElem.focus();
+            }, 100);
+
+        } catch (error) {
+            console.error('PIN verification error:', error);
+            statusElem.style.color = '#dc3545';
+            statusElem.innerText = 'Unable to verify PIN.';
+            inputElem.value = '';
+        }
+    }
+
+    function showTeacherState(state) {
+        const locked = document.getElementById('teacher-locked');
+        const unlocked = document.getElementById('teacher-unlocked');
+
+        if (state === 'unlocked') {
+            locked.style.display = 'none';
+            unlocked.style.display = 'block';
+        } else {
+            unlocked.style.display = 'none';
+            locked.style.display = 'block';
+            document.getElementById('teacherPinInput').value = '';
+            document.getElementById('teacherAuthStatus').innerText = '';
+        }
+    }
+
+    function openBlankTeacherModal() {
+        document.getElementById('blankTeacherModal').style.display = 'block';
+    }
+
+    function closeBlankTeacherModal() {
+        document.getElementById('blankTeacherModal').style.display = 'none';
+    }
+
+    function openAddAccountModal() {
+        document.getElementById('addAccountModal').style.display = 'block';
+    }
+
+    /* ==================== CODE MANAGEMENT ==================== */
+
+    const CODES_API = "/api/codes";
+    let codeMgmtKey = "";
+
+    function showCodeMgmtMsg(text, color) {
+        const el = document.getElementById('codeMgmtMsg');
+        el.innerText = text;
+        el.style.color = color || '#333';
+    }
+
+    function unlockCodeMgmt() {
+        codeMgmtKey = document.getElementById('codeAdminKey').value.trim();
+
+        if (!codeMgmtKey) {
+            showCodeMgmtMsg("Please enter the admin key.", "#dc3545");
+            return;
+        }
+
+        sessionStorage.setItem("msc_code_key", codeMgmtKey);
+
+        loadCodes().then(ok => {
+            if (ok) {
+                document.getElementById('codeMgmtLocked').style.display = 'none';
+                document.getElementById('codeMgmtUnlocked').style.display = 'block';
+                showCodeMgmtMsg("", "");
+            } else {
+                showCodeMgmtMsg("Invalid admin key.", "#dc3545");
+                sessionStorage.removeItem("msc_code_key");
+            }
+        });
+    }
+
+    async function loadCodes() {
+        try {
+            const res = await fetch(CODES_API, {
+                headers: { "X-Admin-Key": codeMgmtKey }
+            });
+
+            if (!res.ok) return false;
+
+            const data = await res.json();
+            const list = document.getElementById('codeList');
+
+            document.getElementById('codeCount').textContent = data.codes.length;
+
+            if (data.codes.length === 0) {
+                list.innerHTML = '<p style="color:#6c757d;text-align:center;padding:10px;">No codes stored yet.</p>';
+            } else {
+                list.innerHTML = data.codes.map(c => {
+                    const pageBadge = c.page === 'teacher'
+                        ? '<span class="page-badge page-badge-teacher">Teacher</span>'
+                        : '<span class="page-badge page-badge-admin">Admin</span>';
+
+                    return `
+                    <div class="code-list-item">
+                        <div>
+                            <div style="font-weight:500;">
+                                ${c.label || 'Unlabeled'}
+                                ${pageBadge}
+                            </div>
+                            <div style="font-size:0.8rem;color:#6c757d;font-family:monospace;">${c.id.slice(0, 12)}…</div>
+                        </div>
+                        <button
+                            onclick="removeCode('${c.id}')"
+                            style="background:#dc3545;color:white;border:none;padding:5px 12px;border-radius:4px;cursor:pointer;font-size:0.85rem;">
+                            Remove
+                        </button>
+                    </div>
+                    `;
+                }).join('');
+            }
+
+            return true;
+        } catch {
+            return false;
+        }
+    }
+
+    async function removeCode(hashId) {
+        try {
+            const res = await fetch(`${CODES_API}?delete_id=${encodeURIComponent(hashId)}`, {
+                method: "DELETE",
+                headers: { "X-Admin-Key": codeMgmtKey },
+            });
+
+            if (res.ok) {
+                await loadCodes();
+            } else {
+                const data = await res.json();
+                alert(data.error || "Failed to remove code.");
+            }
+        } catch {
+            alert("Network error.");
+        }
+    }
+
+    /* ==================== ADD CODE MODAL ==================== */
+
+    function openAddCodeModal() {
+        // Reset to choice view
+        showAddCodeSection('choice');
+        document.getElementById('addCodeModal').style.display = 'block';
+    }
+
+    function showAddCodeSection(section) {
+        document.getElementById('addCodeChoiceSection').style.display = 'none';
+        document.getElementById('addCodeSingleSection').style.display = 'none';
+        document.getElementById('addCodeMassSection').style.display = 'none';
+
+        if (section === 'choice') {
+            document.getElementById('addCodeChoiceSection').style.display = 'block';
+        } else if (section === 'single') {
+            document.getElementById('addCodeSingleSection').style.display = 'block';
+            // Reset
+            document.getElementById('singleCode').value = '';
+            document.getElementById('singleLabel').value = '';
+            document.getElementById('singlePage').value = 'admin';
+            document.getElementById('singleDoubleAuth').style.display = 'none';
+            document.getElementById('singleConfirmKey').value = '';
+            document.getElementById('singleAddMsg').innerText = '';
+        } else if (section === 'mass') {
+            document.getElementById('addCodeMassSection').style.display = 'block';
+            document.getElementById('massDefaultPage').value = 'admin';
+            document.getElementById('massDoubleAuth').style.display = 'none';
+            document.getElementById('massConfirmKey').value = '';
+            document.getElementById('massAddMsg').innerText = '';
+            // Initialize with 3 rows
+            initMassRows();
+        }
+    }
+
+    function onSinglePageChange() {
+        const page = document.getElementById('singlePage').value;
+        document.getElementById('singleDoubleAuth').style.display =
+            page === 'teacher' ? 'block' : 'none';
+    }
+
+    function onMassPageChange() {
+        const page = document.getElementById('massDefaultPage').value;
+        document.getElementById('massDoubleAuth').style.display =
+            page === 'teacher' ? 'block' : 'none';
+    }
+
+    async function submitSingleCode() {
+        const code = document.getElementById('singleCode').value.trim();
+        const label = document.getElementById('singleLabel').value.trim();
+        const page = document.getElementById('singlePage').value;
+        const msgEl = document.getElementById('singleAddMsg');
+
+        if (!/^\d{5}$/.test(code)) {
+            msgEl.innerText = "Code must be exactly 5 digits.";
+            msgEl.style.color = "#dc3545";
+            return;
+        }
+
+        // Double-auth for teacher codes
+        if (page === 'teacher') {
+            const confirmKey = document.getElementById('singleConfirmKey').value.trim();
+            if (!confirmKey) {
+                msgEl.innerText = "Please confirm admin key for teacher code.";
+                msgEl.style.color = "#dc3545";
+                return;
+            }
+            if (confirmKey !== codeMgmtKey) {
+                msgEl.innerText = "Admin key confirmation does not match.";
+                msgEl.style.color = "#dc3545";
+                return;
+            }
+        }
+
+        try {
+            const res = await fetch(CODES_API, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-Admin-Key": codeMgmtKey
+                },
+                body: JSON.stringify({ code, label: label || undefined, page }),
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                msgEl.innerText = "Code added successfully!";
+                msgEl.style.color = "#28a745";
+                document.getElementById('singleCode').value = '';
+                document.getElementById('singleLabel').value = '';
+                await loadCodes();
+            } else {
+                msgEl.innerText = data.error || "Failed to add code.";
+                msgEl.style.color = "#dc3545";
+            }
+        } catch {
+            msgEl.innerText = "Network error.";
+            msgEl.style.color = "#dc3545";
+        }
+    }
+
+    /* --- Mass Input --- */
+
+    function initMassRows() {
+        const container = document.getElementById('massCodeContainer');
+        container.innerHTML = '';
+        for (let i = 0; i < 3; i++) {
+            addMassRow();
+        }
+    }
+
+    function addMassRow() {
+        const container = document.getElementById('massCodeContainer');
+        const existingRows = container.querySelectorAll('.mass-code-row').length;
+
+        if (existingRows >= 15) {
+            document.getElementById('massAddMsg').innerText = "Maximum 15 rows.";
+            document.getElementById('massAddMsg').style.color = "#dc3545";
+            return;
+        }
+
+        const rowNum = existingRows + 1;
+        const row = document.createElement('div');
+        row.className = 'mass-code-row';
+        row.innerHTML = `
+            <span class="row-num">${rowNum}.</span>
+            <input type="text" maxlength="5" placeholder="5-digit code" inputmode="numeric" data-field="code">
+            <input type="text" maxlength="100" placeholder="Tag (optional)" data-field="label">
+        `;
+        container.appendChild(row);
+    }
+
+    async function submitMassCodes() {
+        const defaultPage = document.getElementById('massDefaultPage').value;
+        const msgEl = document.getElementById('massAddMsg');
+
+        // Double-auth for teacher codes
+        if (defaultPage === 'teacher') {
+            const confirmKey = document.getElementById('massConfirmKey').value.trim();
+            if (!confirmKey) {
+                msgEl.innerText = "Please confirm admin key for teacher codes.";
+                msgEl.style.color = "#dc3545";
+                return;
+            }
+            if (confirmKey !== codeMgmtKey) {
+                msgEl.innerText = "Admin key confirmation does not match.";
+                msgEl.style.color = "#dc3545";
+                return;
+            }
+        }
+
+        const rows = document.querySelectorAll('#massCodeContainer .mass-code-row');
+        const codes = [];
+
+        rows.forEach(row => {
+            const codeInput = row.querySelector('[data-field="code"]');
+            const labelInput = row.querySelector('[data-field="label"]');
+            const code = codeInput.value.trim();
+            const label = labelInput.value.trim();
+
+            if (code) {
+                if (!/^\d{5}$/.test(code)) {
+                    msgEl.innerText = `Row ${codes.length + 1}: "${code}" is not a valid 5-digit code.`;
+                    msgEl.style.color = "#dc3545";
+                    return;
+                }
+                codes.push({ code, label: label || undefined, page: defaultPage });
+            }
+        });
+
+        // Check if we hit the validation return above
+        if (msgEl.style.color === 'rgb(220, 53, 69)') return;
+
+        if (codes.length === 0) {
+            msgEl.innerText = "No valid codes entered.";
+            msgEl.style.color = "#dc3545";
+            return;
+        }
+
+        msgEl.style.color = '#333';
+        msgEl.innerText = `Adding ${codes.length} code(s)...`;
+
+        let successCount = 0;
+        let errorMessages = [];
+
+        for (const entry of codes) {
+            try {
+                const res = await fetch(CODES_API, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-Admin-Key": codeMgmtKey
+                    },
+                    body: JSON.stringify(entry),
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    successCount++;
+                } else {
+                    errorMessages.push(`${entry.code}: ${data.error || "failed"}`);
+                }
+            } catch {
+                errorMessages.push(`${entry.code}: network error`);
+            }
+        }
+
+        if (errorMessages.length === 0) {
+            msgEl.innerText = `✓ ${successCount} code(s) added successfully!`;
+            msgEl.style.color = "#28a745";
+            // Clear inputs
+            document.querySelectorAll('#massCodeContainer input').forEach(i => i.value = '');
+            await loadCodes();
+        } else {
+            msgEl.innerHTML = `Added ${successCount} of ${codes.length}.<br>Errors: ${errorMessages.join('; ')}`;
+            msgEl.style.color = "#dc3545";
+            await loadCodes();
+        }
+    }
+
+    /* ==================== INIT ==================== */
+
+    document.addEventListener('DOMContentLoaded', () => {
+        showTeacherState('locked');
+
+        const savedKey = sessionStorage.getItem("msc_code_key");
+
+        if (savedKey) {
+            codeMgmtKey = savedKey;
+            document.getElementById('codeAdminKey').value = savedKey;
+
+            loadCodes().then(ok => {
+                if (ok) {
+                    document.getElementById('codeMgmtLocked').style.display = 'none';
+                    document.getElementById('codeMgmtUnlocked').style.display = 'block';
+                }
+            });
+        }
+    });
+
+    window.addEventListener('click', event => {
+        const teacherAuthModal = document.getElementById('teacherAuthModal');
+        const blankTeacherModal = document.getElementById('blankTeacherModal');
+        const addAccountModal = document.getElementById('addAccountModal');
+        const addCodeModal = document.getElementById('addCodeModal');
+
+        if (event.target === teacherAuthModal) {
+            closeTeacherModal();
+        }
+
+        if (event.target === blankTeacherModal) {
+            closeBlankTeacherModal();
+        }
+
+        if (event.target === addAccountModal) {
+            closeModal('addAccountModal');
+        }
+
+        if (event.target === addCodeModal) {
+            closeModal('addCodeModal');
+        }
+    });
+</script>
+
+</body>
+</html>
