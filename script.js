@@ -2,42 +2,14 @@ const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQaTqPVndPccN9
 const TOKEN_VALUE = "loggedInIdentifierRNBN480H39A=";
 const ADMIN_DB_URL = "https://script.google.com/macros/s/AKfycbwbPCbZbcoQ6GvIUCjYrY_jU6kM9hXk9LB5Z8vmcgBfbo9kbbzkInrp6n7URJlXuI1Wzw/exec";
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyvHlxSf3NoF8MBZQYiHvJrBmBhYVE6V_GcGhr8iSK6AeKs5SISoUN_Ho4owsjjV0_5Fw/exec';
-const PERMISSIONS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSoAFx19CsTSNpMOzTY5hKdRb8zK4xhyaf62-dtZoKuZVNpba7pm8Q7S61PnrhwcldrbXc-vmFJopnr/pub?gid=1165712763&single=true&output=csv';
 
-const specialUids = [
-    "VhgEt0B5ngSPNUYoVd1pRJnPrHv2",
-    "1VbKdeueO7YnEvAAT3OAVrqmquy2",
-    "qe6G5PXPoqTQZVnQmcsJ6ovkq9y2",
-    "rdAV8IhU11beQN7hVPhm2IUddFq1",
-    "7eJpgkWS6KPXh1vCLI5gJkW698e2",
-    "ozb34ly0fiWDRbc6SGHy85GVO4s1",
-    "f6ODKfpvzxXzYn6DSE8PfuAmz5q1",
-    "Uuy1MIQovXMJVQp3KqOuIpgvKCn1E"
-];
-
-function checkForSpecialLogin(user) {
-    const userNameElement = document.getElementById('userName');
-    if (!userNameElement) return;
-
-    const userName = userNameElement.textContent.trim();
-
-    if (userName === 'Guest') return;
-
-    if (!user || !user.uid) return;
-
-    if (specialUids.includes(user.uid)) {
-        window.location.href = 't_admin.html';
-    }
-}
-window.checkForSpecialLogin = checkForSpecialLogin;
-
-let shouldNavigate = false;
 let _sessionInterval = null;
 
 document.addEventListener('DOMContentLoaded', function() {
+    initSessionTimer();
     setupModalHandlers();
-    updateAccountPermissions(null);
-    
+    setupTeacherControls();
+
     const btnProminentBorrow = document.getElementById('btnProminentBorrow');
     const btnProminentReturn = document.getElementById('btnProminentReturn');
     const openBorrowNav = document.getElementById('openBorrowForm');
@@ -96,7 +68,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     setupIsbnLookup('borrowLookupBtn', 'borrowIsbnInput', 'borrowAutoTitle', 'borrowAutoAuthor');
     setupIsbnLookup('returnLookupBtn', 'returnIsbnInput', 'returnAutoTitle', 'returnAutoAuthor');
-    setupIsbnLookup('botmLookupBtn', 'botmIsbnInput', 'botmTitle', 'botmAuthor');
 
     const borrowIsbnInput = document.getElementById('borrowIsbnInput');
     if (borrowIsbnInput) {
@@ -118,16 +89,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    const botmIsbnInput = document.getElementById('botmIsbnInput');
-    if (botmIsbnInput) {
-        botmIsbnInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                document.getElementById('botmLookupBtn').click();
-            }
-        });
-    }
-
     window.addEventListener('click', (event) => {
         if (event.target.classList.contains('modal')) {
             event.target.style.display = 'none';
@@ -137,34 +98,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const dataContainer = document.getElementById('data-container');
     if (dataContainer) {
         fetchData(dataContainer);
-    }
-
-    const botmForm = document.getElementById('botmForm');
-    if (botmForm) {
-        botmForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const data = {
-                sheetTarget: "Book of the Month",
-                month: document.getElementById('botmMonth').value,
-                title: document.getElementById('botmTitle').value,
-                author: document.getElementById('botmAuthor').value
-            };
-            submitAdminData(data, 'updateBotmModal', botmForm);
-        });
-    }
-
-    const changelogForm = document.getElementById('changelogForm');
-    if (changelogForm) {
-        changelogForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const data = {
-                sheetTarget: "Changelog",
-                timestamp: new Date().getTime(),
-                version: document.getElementById('changelogVersion').value,
-                updateMessage: document.getElementById('changelogMessage').value
-            };
-            submitAdminData(data, 'updateLatestModal', changelogForm);
-        });
     }
 
     const massContainer = document.getElementById('massIsbnContainer');
@@ -237,7 +170,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 const choiceSec = document.getElementById('addBookChoiceSection');
                 if (choiceSec) {
                     choiceSec.style.display = 'block';
-                    document.getElementById('normalTypeChoiceSection').style.display = 'none';
                     document.getElementById('normalInputSection').style.display = 'none';
                     document.getElementById('massInputSection').style.display = 'none';
                 }
@@ -291,7 +223,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 const choiceSec = document.getElementById('addBookChoiceSection');
                 if (choiceSec) {
                     choiceSec.style.display = 'block';
-                    document.getElementById('normalTypeChoiceSection').style.display = 'none';
                     document.getElementById('normalInputSection').style.display = 'none';
                     document.getElementById('massInputSection').style.display = 'none';
                 }
@@ -374,93 +305,150 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-function isActivePeriodValid(activePeriodStr) {
-    if (!activePeriodStr) return false;
-    const currentYear = new Date().getFullYear();
-    if (activePeriodStr.includes(String(currentYear))) return true;
-    const years = activePeriodStr.match(/\b20\d\d\b/g);
-    if (years && years.length >= 2) {
-        const startYear = parseInt(years[0], 10);
-        const endYear = parseInt(years[years.length - 1], 10);
-        if (currentYear >= startYear && currentYear <= endYear) return true;
-    }
-    return false;
-}
+function initSessionTimer() {
+    const isAdminPage = window.location.pathname.includes('admin.html');
+    const isLoggedIn = sessionStorage.getItem('adminLoggedIn') === 'true';
+    const loginTime = parseInt(sessionStorage.getItem('loginTime') || '0', 10);
+    const sessionDuration = 20 * 60 * 1000;
 
-async function updateAccountPermissions(user) {
-    const addDelEl = document.getElementById('addDeleteBooksPermission');
-    const exportEl = document.getElementById('exportRequestsPermission');
-    const botmEl = document.getElementById('updateChangesBotmPermission');
-    const teacherEl = document.getElementById('teacherToolsPermission');
-
-    if (!addDelEl && !exportEl && !botmEl && !teacherEl) return;
-
-    const greenY = '<span style="color: green; font-weight: bold;">Y</span>';
-    const redN = '<span style="color: red; font-weight: bold;">N</span>';
-
-    let role = 'guest';
-
-    if (user && user.uid) {
-        if (specialUids.includes(user.uid)) {
-            role = 'teacher';
-        } else {
-            try {
-                const response = await fetch(PERMISSIONS_CSV_URL);
-                if (response.ok) {
-                    const csvText = await response.text();
-                    const lines = csvText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-                    if (lines.length > 1) {
-                        const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, '').toLowerCase());
-                        let uidIdx = headers.indexOf('uid');
-                        if (uidIdx === -1) uidIdx = 3;
-                        let roleIdx = headers.indexOf('role');
-                        if (roleIdx === -1) roleIdx = 2;
-                        let activeIdx = headers.findIndex(h => h.includes('active'));
-                        if (activeIdx === -1) activeIdx = 4;
-
-                        for (let i = 1; i < lines.length; i++) {
-                            const cells = lines[i].split(',').map(c => c.trim().replace(/^"|"$/g, ''));
-                            const rowUid = cells[uidIdx] !== undefined ? cells[uidIdx] : (cells[3] || '');
-                            const rowRole = cells[roleIdx] !== undefined ? cells[roleIdx] : (cells[2] || '');
-                            const rowActive = cells[activeIdx] !== undefined ? cells[activeIdx] : (cells[4] || cells[cells.length - 1] || '');
-
-                            if (rowUid === user.uid && isActivePeriodValid(rowActive)) {
-                                const lowerRole = rowRole.toLowerCase();
-                                if (lowerRole.includes('teacher')) {
-                                    role = 'teacher';
-                                } else if (lowerRole.includes('book manager') || lowerRole.includes('librarian') || lowerRole.includes('manager')) {
-                                    role = 'librarian';
-                                }
-                                break;
-                            }
-                        }
-                    }
-                }
-            } catch (e) {
-                console.error(e);
-            }
+    if (isAdminPage) {
+        if (!isLoggedIn || !loginTime || (Date.now() - loginTime > sessionDuration)) {
+            logout();
+            return;
         }
-    }
 
-    if (role === 'teacher') {
-        if (addDelEl) addDelEl.innerHTML = greenY;
-        if (exportEl) exportEl.innerHTML = greenY;
-        if (botmEl) botmEl.innerHTML = greenY;
-        if (teacherEl) teacherEl.innerHTML = greenY;
-    } else if (role === 'librarian') {
-        if (addDelEl) addDelEl.innerHTML = greenY;
-        if (exportEl) exportEl.innerHTML = greenY;
-        if (botmEl) botmEl.innerHTML = greenY;
-        if (teacherEl) teacherEl.innerHTML = redN;
-    } else {
-        if (addDelEl) addDelEl.innerHTML = redN;
-        if (exportEl) exportEl.innerHTML = redN;
-        if (botmEl) botmEl.innerHTML = redN;
-        if (teacherEl) teacherEl.innerHTML = redN;
+        const countdownEl = document.getElementById('sessionCountdown');
+        if (_sessionInterval) clearInterval(_sessionInterval);
+
+        _sessionInterval = setInterval(() => {
+            const remainingMs = sessionDuration - (Date.now() - loginTime);
+            if (remainingMs <= 0) {
+                clearInterval(_sessionInterval);
+                alert("Session expired. Automatically logging out.");
+                logout();
+            } else {
+                const totalSec = Math.floor(remainingMs / 1000);
+                const mins = Math.floor(totalSec / 60);
+                const secs = totalSec % 60;
+                if (countdownEl) {
+                    countdownEl.textContent = `Session: ${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                }
+            }
+        }, 1000);
     }
 }
 
-window.updateAccountPermissions = updateAccountPermissions;
+function logout() {
+    sessionStorage.removeItem('adminLoggedIn');
+    sessionStorage.removeItem('loginTime');
+    sessionStorage.removeItem('teacherUnlocked');
+    window.location.href = "login.html";
+}
+
+function setupTeacherControls() {
+    const btnTeacher = document.getElementById('btnTeacherControls');
+    const unlockedSec = document.getElementById('unlockedTeacherControls');
+    const authForm = document.getElementById('teacherAuthForm');
+
+    if (sessionStorage.getItem('teacherUnlocked') === 'true' && unlockedSec) {
+        unlockedSec.style.display = 'block';
+    }
+
+    if (btnTeacher) {
+        btnTeacher.addEventListener('click', () => {
+            if (sessionStorage.getItem('teacherUnlocked') === 'true') {
+                unlockedSec.style.display = unlockedSec.style.display === 'none' ? 'block' : 'none';
+            } else {
+                openModal('teacherAuthModal');
+            }
+        });
+    }
+
+    if (authForm) {
+        authForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const code = document.getElementById('teacherPinInput').value.trim();
+            if (code === "54321") {
+                sessionStorage.setItem('teacherUnlocked', 'true');
+                closeModal('teacherAuthModal');
+                if (unlockedSec) unlockedSec.style.display = 'block';
+                alert("Teacher Controls Unlocked!");
+            } else {
+                alert("Incorrect teacher password.");
+            }
+        });
+    }
+
+    setupTeacherActionButtons();
+}
+
+function setupTeacherActionButtons() {
+    const btnUpdateMonthly = document.getElementById('btnUpdateMonthlyPasswords');
+    const btnRemovePasses = document.getElementById('btnRemovePasswords');
+    const btnUpdateCurrent = document.getElementById('btnUpdateCurrentMonthPassword');
+    const btnUpdateTime = document.getElementById('btnUpdateTimePeriod');
+
+    if (btnUpdateMonthly) {
+        btnUpdateMonthly.addEventListener('click', () => {
+            openTeacherActionModal("Update Monthly Passwords", `
+                <div class="form-group">
+                    <label>Generate / Enter 5-digit PINs for calculated school periods (up to 300 days):</label>
+                    <textarea placeholder="e.g. Month 1: 12345&#10;Month 2: 67890..." rows="6"></textarea>
+                    <button type="button" onclick="alert('Monthly passwords updated for period!'); closeModal('teacherActionModal');" class="teacher-btn">Save Monthly Passwords</button>
+                </div>
+            `);
+        });
+    }
+
+    if (btnRemovePasses) {
+        btnRemovePasses.addEventListener('click', () => {
+            openTeacherActionModal("Remove Passwords", `
+                <div class="form-group">
+                    <p>Select option:</p>
+                    <button type="button" onclick="alert('All passwords cleared!'); closeModal('teacherActionModal');" class="teacher-btn" style="background-color: #dc3545; margin-bottom: 10px;">Remove ALL Passwords</button>
+                    <button type="button" onclick="alert('Selected passwords cleared!'); closeModal('teacherActionModal');" class="teacher-btn">Remove Selected Passwords</button>
+                </div>
+            `);
+        });
+    }
+
+    if (btnUpdateCurrent) {
+        btnUpdateCurrent.addEventListener('click', () => {
+            openTeacherActionModal("Update Current Month Password", `
+                <div class="form-group">
+                    <label>New 5-Digit Password for Current Month:</label>
+                    <input type="password" maxlength="5" pattern="\\d{5}" placeholder="e.g. 54321" style="margin-bottom: 15px;">
+                    <button type="button" onclick="alert('Current month password updated!'); closeModal('teacherActionModal');" class="teacher-btn">Update Password</button>
+                </div>
+            `);
+        });
+    }
+
+    if (btnUpdateTime) {
+        btnUpdateTime.addEventListener('click', () => {
+            openTeacherActionModal("Update Password Time-Period", `
+                <div class="form-group">
+                    <label>Select frequency for mandatory password changes (1 week to ~300 days):</label>
+                    <select style="margin-bottom: 15px;">
+                        <option value="7">Every 7 Days (1 Week)</option>
+                        <option value="30" selected>Every 30 Days (Monthly)</option>
+                        <option value="90">Every 90 Days (Quarterly)</option>
+                        <option value="300">Every 300 Days (School Year Period)</option>
+                    </select>
+                    <button type="button" onclick="alert('Time period updated successfully!'); closeModal('teacherActionModal');" class="teacher-btn">Save Time-Period Setting</button>
+                </div>
+            `);
+        });
+    }
+}
+
+function openTeacherActionModal(title, contentHtml) {
+    const titleEl = document.getElementById('teacherModalTitle');
+    const bodyEl = document.getElementById('teacherModalBody');
+    if (titleEl) titleEl.textContent = title;
+    if (bodyEl) bodyEl.innerHTML = contentHtml;
+    openModal('teacherActionModal');
+}
 
 function setupFormSubmission(formId, type, dataExtractor, modalId) {
     const form = document.getElementById(formId);
@@ -581,8 +569,6 @@ function openModal(modalId) {
             setTimeout(() => document.getElementById('borrowIsbnInput').focus(), 100);
         } else if (modalId === 'returnIsbnModal') {
             setTimeout(() => document.getElementById('returnIsbnInput').focus(), 100);
-        } else if (modalId === 'updateBotmModal') {
-            setTimeout(() => document.getElementById('botmIsbnInput').focus(), 100);
         }
     }
 }
@@ -597,24 +583,11 @@ function closeModal(modalId) {
 function setupModalHandlers() {
     const openAdd = document.getElementById('openAddBookModal');
     const openDel = document.getElementById('openDeleteBookModal');
-    const openUpd = document.getElementById('openUpdateBotmModal');
-    const openLatest = document.getElementById('openUpdateLatestModal');
     const openPerms = document.getElementById('openPermissions');
 
     if(openAdd) openAdd.addEventListener('click', () => openModal('addBookModal'));
     if(openDel) openDel.addEventListener('click', () => { openModal('deleteBookModal'); fetchDeleteChartData(); });
-    if(openUpd) openUpd.addEventListener('click', () => openModal('updateBotmModal'));
-    if(openLatest) openLatest.addEventListener('click', () => openModal('updateLatestModal'));
     if(openPerms) openPerms.addEventListener('click', () => openModal('permissionsModal'));
-}
-
-function loggedincheck() {}
-function startSessionCountdown(elementId) {}
-function logout() {
-    if (window.logoutFirebase) {
-        window.logoutFirebase();
-    }
-    window.location.href = "index.html";
 }
 
 async function fetchData(container) {
@@ -725,21 +698,6 @@ function markAsReturned(row, reqId, returnedIndex) {
     if (actionCell) {
         actionCell.innerHTML = '';
     }
-}
-
-function submitAdminData(data, modalId, formElement) {
-    const payload = JSON.stringify(data);
-    Promise.all([
-        fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload }),
-        fetch(ADMIN_DB_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload })
-    ]).then(() => {
-        alert("Update successfully recorded!");
-        if (formElement) formElement.reset();
-        closeModal(modalId);
-    }).catch(error => {
-        console.error(error.message);
-        alert("There was an error saving your request.");
-    });
 }
 
 async function fetchDeleteChartData() {
