@@ -43,6 +43,31 @@
             border-radius: 8px;
             background-color: #f8f9fa;
         }
+
+        .code-mgmt-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        .code-mgmt-btn {
+            padding: 10px 20px;
+            border: none;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .code-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
     </style>
 </head>
 
@@ -168,6 +193,78 @@
                 style="font-size:1rem;padding:12px;background-color:#6f42c1;">
                 Configure Class Periods
             </button>
+        </div>
+
+        <hr style="margin:15px 0;">
+
+        <h3 style="color:#28a745;margin-bottom:10px;">Manage Access Codes</h3>
+
+        <div id="codeMgmtLocked">
+            <div class="form-group">
+                <label>Admin Key (for code management)</label>
+                <input
+                    type="password"
+                    id="codeAdminKey"
+                    class="code-mgmt-input"
+                    placeholder="Enter admin key">
+            </div>
+            <button
+                onclick="unlockCodeMgmt()"
+                class="code-mgmt-btn"
+                style="background-color:#007bff;">
+                Unlock Code Management
+            </button>
+            <p id="codeMgmtMsg" style="font-weight:bold;margin-top:10px;"></p>
+        </div>
+
+        <div id="codeMgmtUnlocked" style="display:none;">
+
+            <div style="margin-bottom:20px;">
+                <h4 style="margin-bottom:10px;">Add New Code</h4>
+                <div class="form-group">
+                    <label>5-Digit Code</label>
+                    <input
+                        type="text"
+                        id="newCode"
+                        class="code-mgmt-input"
+                        maxlength="5"
+                        placeholder="e.g. 12345"
+                        inputmode="numeric">
+                </div>
+                <div class="form-group">
+                    <label>Label (optional)</label>
+                    <input
+                        type="text"
+                        id="newCodeLabel"
+                        class="code-mgmt-input"
+                        maxlength="100"
+                        placeholder="e.g. Mr. Smith">
+                </div>
+                <button
+                    onclick="addCode()"
+                    class="code-mgmt-btn"
+                    style="background-color:#28a745;">
+                    Add Code
+                </button>
+                <p id="addCodeMsg" style="font-weight:bold;margin-top:10px;"></p>
+            </div>
+
+            <div>
+                <h4 style="margin-bottom:10px;">
+                    Existing Codes
+                    <span
+                        id="codeCount"
+                        style="font-size:0.8rem;background:#e9ecef;padding:2px 8px;border-radius:4px;">
+                        0
+                    </span>
+                </h4>
+                <div id="codeList" style="max-height:200px;overflow-y:auto;"></div>
+                <button
+                    onclick="loadCodes()"
+                    style="background-color:#17a2b8;padding:8px 16px;border:none;color:white;border-radius:6px;cursor:pointer;margin-top:10px;">
+                    Refresh List
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -588,9 +685,10 @@
         statusElem.innerText = 'Verifying...';
 
         try {
-            const correctPin = await getc2VjcmV0cw();
+            const response = await fetch(`/api/codes?code=${encodeURIComponent(enteredPin)}`);
+            const data = await response.json();
 
-            if (enteredPin === correctPin) {
+            if (data.valid) {
                 statusElem.style.color = '#28a745';
                 statusElem.innerText = 'PIN accepted.';
 
@@ -618,31 +716,6 @@
         }
     }
 
-    async function getc2VjcmV0cw() {
-        const response = await fetch(
-            'data.b64'
-        );
-
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
-
-        const bytes = new Uint8Array(await response.arrayBuffer());
-        const decoded = new TextDecoder().decode(bytes);
-
-        const atbash = decoded.replace(/[A-Za-z]/g, char => {
-            const base = char >= 'a' ? 97 : 65;
-            return String.fromCharCode(
-                base + 25 - (char.charCodeAt(0) - base)
-            );
-        });
-
-        return atbash
-            .split('')
-            .map(char => char.charCodeAt(0) - 64)
-            .join('');
-    }
-
     function showTeacherState(state) {
         const locked = document.getElementById('teacher-locked');
         const unlocked = document.getElementById('teacher-unlocked');
@@ -666,8 +739,147 @@
         document.getElementById('blankTeacherModal').style.display = 'none';
     }
 
+    const CODES_API = "/api/codes";
+    let codeMgmtKey = "";
+
+    function showCodeMgmtMsg(text, color) {
+        const el = document.getElementById('codeMgmtMsg');
+        el.innerText = text;
+        el.style.color = color || '#333';
+    }
+
+    function unlockCodeMgmt() {
+        codeMgmtKey = document.getElementById('codeAdminKey').value.trim();
+
+        if (!codeMgmtKey) {
+            showCodeMgmtMsg("Please enter the admin key.", "#dc3545");
+            return;
+        }
+
+        sessionStorage.setItem("msc_code_key", codeMgmtKey);
+
+        loadCodes().then(ok => {
+            if (ok) {
+                document.getElementById('codeMgmtLocked').style.display = 'none';
+                document.getElementById('codeMgmtUnlocked').style.display = 'block';
+                showCodeMgmtMsg("", "");
+            } else {
+                showCodeMgmtMsg("Invalid admin key.", "#dc3545");
+                sessionStorage.removeItem("msc_code_key");
+            }
+        });
+    }
+
+    async function loadCodes() {
+        try {
+            const res = await fetch(CODES_API, {
+                headers: { "X-Admin-Key": codeMgmtKey }
+            });
+
+            if (!res.ok) return false;
+
+            const data = await res.json();
+            const list = document.getElementById('codeList');
+
+            document.getElementById('codeCount').textContent = data.codes.length;
+
+            if (data.codes.length === 0) {
+                list.innerHTML = '<p style="color:#6c757d;text-align:center;padding:10px;">No codes stored yet.</p>';
+            } else {
+                list.innerHTML = data.codes.map(c => `
+                    <div class="code-list-item">
+                        <div>
+                            <div style="font-weight:500;">${c.label || 'Unlabeled'}</div>
+                            <div style="font-size:0.8rem;color:#6c757d;font-family:monospace;">${c.id.slice(0, 12)}…</div>
+                        </div>
+                        <button
+                            onclick="removeCode('${c.id}')"
+                            style="background:#dc3545;color:white;border:none;padding:5px 12px;border-radius:4px;cursor:pointer;font-size:0.85rem;">
+                            Remove
+                        </button>
+                    </div>
+                `).join('');
+            }
+
+            return true;
+        } catch {
+            return false;
+        }
+    }
+
+    async function addCode() {
+        const code = document.getElementById('newCode').value.trim();
+        const label = document.getElementById('newCodeLabel').value.trim();
+        const msgEl = document.getElementById('addCodeMsg');
+
+        if (!/^\d{5}$/.test(code)) {
+            msgEl.innerText = "Code must be exactly 5 digits.";
+            msgEl.style.color = "#dc3545";
+            return;
+        }
+
+        try {
+            const res = await fetch(CODES_API, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-Admin-Key": codeMgmtKey
+                },
+                body: JSON.stringify({ code, label: label || undefined }),
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                msgEl.innerText = "Code added successfully!";
+                msgEl.style.color = "#28a745";
+                document.getElementById('newCode').value = "";
+                document.getElementById('newCodeLabel').value = "";
+                await loadCodes();
+            } else {
+                msgEl.innerText = data.error || "Failed to add code.";
+                msgEl.style.color = "#dc3545";
+            }
+        } catch {
+            msgEl.innerText = "Network error.";
+            msgEl.style.color = "#dc3545";
+        }
+    }
+
+    async function removeCode(hashId) {
+        try {
+            const res = await fetch(`${CODES_API}?delete_id=${encodeURIComponent(hashId)}`, {
+                method: "DELETE",
+                headers: { "X-Admin-Key": codeMgmtKey },
+            });
+
+            if (res.ok) {
+                await loadCodes();
+            } else {
+                const data = await res.json();
+                alert(data.error || "Failed to remove code.");
+            }
+        } catch {
+            alert("Network error.");
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         showTeacherState('locked');
+
+        const savedKey = sessionStorage.getItem("msc_code_key");
+
+        if (savedKey) {
+            codeMgmtKey = savedKey;
+            document.getElementById('codeAdminKey').value = savedKey;
+
+            loadCodes().then(ok => {
+                if (ok) {
+                    document.getElementById('codeMgmtLocked').style.display = 'none';
+                    document.getElementById('codeMgmtUnlocked').style.display = 'block';
+                }
+            });
+        }
     });
 
     window.addEventListener('click', event => {
