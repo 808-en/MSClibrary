@@ -661,7 +661,7 @@
     .filter(line => line.trim().length > 0)
     .map(line => line[0])
     .join("")
-    .slice(0, 40); // Decode exactly 5 bytes
+    .slice(0, 40);
 
   let decoded = "";
 
@@ -683,9 +683,6 @@
     .map(char => char.charCodeAt(0) - 64)
     .join("");
 }
-
-const answer = await getc2VjcmV0cw();
-console.log(answer);
 
         function showTeacherState(state) {
             const locked = document.getElementById('teacher-locked');
