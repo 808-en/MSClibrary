@@ -342,7 +342,7 @@ function logout() {
     sessionStorage.removeItem('adminLoggedIn');
     sessionStorage.removeItem('loginTime');
     sessionStorage.removeItem('teacherUnlocked');
-    window.location.href = "login.html";
+    window.location.href = "index.html";
 }
 
 function setupTeacherControls() {
