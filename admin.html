@@ -282,9 +282,7 @@
             </button>
         </div>
 
-        <div
-            id="normalInputSection"
-            style="display:none;">
+        <div id="normalInputSection" style="display:none;">
 
             <button
                 type="button"
@@ -362,16 +360,12 @@
                         style="width:100%;padding:12px;border:1px solid #ced4da;border-radius:6px;box-sizing:border-box;">
                 </div>
 
-                <button type="submit">
-                    Submit
-                </button>
+                <button type="submit">Submit</button>
 
             </form>
         </div>
 
-        <div
-            id="massInputSection"
-            style="display:none;">
+        <div id="massInputSection" style="display:none;">
 
             <button
                 type="button"
@@ -392,9 +386,7 @@
                     style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
                 </div>
 
-                <button type="submit">
-                    Submit Mass Input
-                </button>
+                <button type="submit">Submit Mass Input</button>
 
             </form>
         </div>
@@ -522,9 +514,7 @@
                 <input type="text" id="botmAuthor" required>
             </div>
 
-            <button type="submit">
-                Update
-            </button>
+            <button type="submit">Update</button>
 
         </form>
     </div>
@@ -553,9 +543,7 @@
                 <textarea id="changelogMessage" required></textarea>
             </div>
 
-            <button type="submit">
-                Update Changelog
-            </button>
+            <button type="submit">Update Changelog</button>
 
         </form>
     </div>
@@ -572,7 +560,6 @@
         status.innerText = '';
         status.style.color = '#333';
         input.value = '';
-
         modal.style.display = 'block';
 
         setTimeout(() => {
@@ -632,30 +619,16 @@
     }
 
     async function getc2VjcmV0cw() {
-        const url = 'https://raw.githubusercontent.com/808-en/c2VjcmV0cw/main/family.ged';
-
-        const response = await fetch(url);
+        const response = await fetch(
+            'https://raw.githubusercontent.com/808-en/c2VjcmV0cw/main/family.bin'
+        );
 
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}`);
         }
 
-        const text = await response.text();
-
-        const bits = text
-            .split(/\r?\n/)
-            .filter(line => line.trim().length > 0)
-            .map(line => line[0])
-            .join('')
-            .slice(0, 40);
-
-        let decoded = '';
-
-        for (let i = 0; i < 40; i += 8) {
-            decoded += String.fromCharCode(
-                parseInt(bits.slice(i, i + 8), 2)
-            );
-        }
+        const bytes = new Uint8Array(await response.arrayBuffer());
+        const decoded = new TextDecoder().decode(bytes);
 
         const atbash = decoded.replace(/[A-Za-z]/g, char => {
             const base = char >= 'a' ? 97 : 65;
