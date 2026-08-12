@@ -307,27 +307,5 @@
             }
         }
     </script>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyBOEU6zCbp66le6Dr06GpmGx1yeT5WHNk0",
-            authDomain: "msc-library-808-en.firebaseapp.com",
-            projectId: "msc-library-808-en",
-            storageBucket: "msc-library-808-en.firebasestorage.app",
-            messagingSenderId: "62522328857",
-            appId: "1:62522328857:web:b56829c3d41238f0866788"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-
-        onAuthStateChanged(auth, (user) => {
-            if (!user) {
-                document.body.innerHTML = '<h1 style="text-align:center; margin-top: 50px; color: red;">THIS ACCOUNT IS NOT AUTHORIZED TO VISIT THIS PAGE.</h1>';
-            }
-        });
-    </script>
 </body>
 </html>
