@@ -5,9 +5,9 @@
 
  Project:       MSC Book Collection
  Project Type:  School Library Management Website
- Version:       4.95.7
+ Version:       5.00.0
  Status:        Active Development
- Deployment:    #166
+ Deployment:    #202
 
 --------------------------------------------------------------------------------
  LAST UPDATED
@@ -34,6 +34,7 @@
  Google Sheets / CSV Data
  Font Awesome
  Cloudflare Insights
+ Cloudflare KV Database
 
 --------------------------------------------------------------------------------
  MAIN FEATURES
@@ -42,7 +43,6 @@
  • Book borrowing and return requests
  • ISBN / barcode lookup
  • Manual book entry
- • User account authentication
  • Account permission system
  • Admin panel integration
  • Book of the Month system
@@ -428,43 +428,7 @@
         </div>
     </div>
 
-    <div id="permissionsModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button" onclick="closeModal('permissionsModal')">&times;</span>
-            <h2>Account Permissions</h2>
-            <table>
-              <tr>
-                <th>Permission</th>
-                <th>Y/N</th>
-              </tr>
-              <tr>
-                <td>Add/Delete Books</td>
-                <td><span style="color: green; font-weight: bold;">Y</span></td>
-              </tr>
-              <tr>
-                <td>Download Book Borrow/Return Requests</td>
-                <td><span style="color: green; font-weight: bold;">Y</span></td>
-              </tr>
-              <tr>
-                <td>Update Changelog / Book of the Month</td>
-                <td><span style="color: green; font-weight: bold;">Y</span></td>
-              </tr>
-              <tr>
-                <td>Use Teacher Tools</td>
-                <td><span style="color: green; font-weight: bold;">Y</span></td>
-              </tr>
-              <tr>
-                <td>Borrow/Return Books</td>
-                <td style="color: green; font-weight: bold;">Y</td>
-              </tr>
-              <tr>
-                <td>Download Online Resources</td>
-                <td style="color: green; font-weight: bold;">Y</td>
-              </tr>
-            </table>
-        </div>
-    </div>
-
+   
     <script src="script.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', async () => {
@@ -506,32 +470,6 @@
             console.error('Error fetching Changelog:', error);
         }
 
-        const isLoggedIn = sessionStorage.getItem('adminLoggedIn') === 'true';
-        const pfp = document.getElementById('userPfp');
-        const nameEl = document.getElementById('userName');
-        const logoutBtn = document.getElementById('logoutBtn');
-        const loginDropdownBtn = document.getElementById('loginDropdownBtn');
-        const navLoginBtn = document.getElementById('AdminLogin');
-
-        if (isLoggedIn) {
-            if(pfp) pfp.src = 'face-smile-solid-full.svg';
-            if(nameEl) nameEl.textContent = 'Admin';
-            if(logoutBtn) logoutBtn.style.display = 'block';
-            if(loginDropdownBtn) loginDropdownBtn.style.display = 'none';
-            if(navLoginBtn) {
-                navLoginBtn.innerHTML = 'Admin Panel <i class="fa-solid fa-lock"></i>';
-                navLoginBtn.href = 'admin.html';
-            }
-        } else {
-            if(pfp) pfp.src = 'user-solid-full.svg';
-            if(nameEl) nameEl.textContent = 'Guest';
-            if(logoutBtn) logoutBtn.style.display = 'none';
-            if(loginDropdownBtn) loginDropdownBtn.style.display = 'block';
-            if(navLoginBtn) {
-                navLoginBtn.innerHTML = 'Log In <i class="fa-solid fa-user-lock"></i>';
-                navLoginBtn.href = 'login.html';
-            }
-        }
     });
     </script>
     <script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "082695a43f814cc7871a76922df6162e"}'></script>
