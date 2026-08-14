@@ -27,15 +27,24 @@
         const pin = document.getElementById('pinInput').value.trim();
         const errorMsg = document.getElementById('loginError');
 
-        if (pin === "12345") {
-            sessionStorage.setItem('adminLoggedIn', 'true');
+        try {
+            const response = await fetch(`/api/codes?code=${encodeURIComponent(enteredPin)}`);
+            const data = await response.json();
+
+            if (data.valid && data.active) {
+                sessionStorage.setItem('adminLoggedIn', 'true');
             sessionStorage.setItem('loginTime', Date.now().toString());
-            window.location.href = 'admin.html';
-        } else {
+
+                setTimeout(() => {
+                    window.location.href = 'admin.html';
+                }, 250);
+
+                return;
+            }
+              else {
             errorMsg.classList.remove('hidden');
             errorMsg.innerText = "Invalid 5-digit PIN. Please try again.";
-        }
-    });
+              }
   </script>
 </body>
 </html>
