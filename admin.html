@@ -1261,12 +1261,8 @@
 
     /* ==================== CODE MANAGEMENT ==================== */
 
-    const CODES_API = "/api/codes";
+    const CODES_API = "functions/api/codes.js";
 
-    /*
-     * The old long admin key is no longer used.
-     * The authenticated 5-digit teacher code is used instead.
-     */
     function getCodeManagementKey() {
         return teacherCode ||
             sessionStorage.getItem("msc_teacher_code") ||
@@ -1280,10 +1276,6 @@
         el.style.color = color || '#6c757d';
     }
 
-    /*
-     * This is the button's actual action.
-     * It loads the codes and then filters them to active codes.
-     */
     async function viewCurrentActiveCodes() {
         if (!getCodeManagementKey()) {
             showActiveCodesMsg(
@@ -1316,10 +1308,7 @@
         const activeList = document.getElementById('activeCodeList');
         const allCodeElements = document.querySelectorAll('.code-list-item');
 
-        /*
-         * loadCodes creates both the full list and the active list.
-         * The active list is generated directly from the API data.
-         */
+       
         if (allCodeElements.length === 0) {
             activeList.innerHTML =
                 '<p style="color:#6c757d;text-align:center;padding:10px;">No active codes found.</p>';
@@ -1413,9 +1402,6 @@
         }
 
         try {
-            /*
-             * The teacher code replaces the old long admin key.
-             */
             const res = await fetch(CODES_API, {
                 headers: {
                     "X-Admin-Key": authCode
