@@ -42,9 +42,7 @@ function isCurrentlyActive(metadata) {
   const start = metadata.startDate ? new Date(metadata.startDate).getTime() : null;
   const end = metadata.endDate ? new Date(metadata.endDate).getTime() : null;
 
-  // If start date is in the future, not yet active
   if (start && now < start) return false;
-  // If end date has passed, expired (end date is inclusive: +1 day)
   if (end && now > end + 86_400_000) return false;
   return true;
 }
@@ -60,14 +58,11 @@ export async function onRequestOptions() {
   });
 }
 
-// GET /api/codes        → list all codes with metadata (admin only)
-// GET /api/codes?code=X → verify a code (public, returns valid + active + page)
 export async function onRequestGet(context) {
   const { request, env } = context;
   const url = new URL(request.url);
   const codeParam = url.searchParams.get("code");
 
-  // Public verification endpoint
   if (codeParam) {
     if (!CODE_REGEX.test(codeParam)) {
       return json({ valid: false, error: "Code must be exactly 5 digits." }, 400);
@@ -81,7 +76,6 @@ export async function onRequestGet(context) {
       return json({ valid: false });
     }
 
-    // Robust null check — getWithMetadata may return null OR { value: null }
     if (!result || result.value === null || result.value === undefined) {
       return json({ valid: false });
     }
