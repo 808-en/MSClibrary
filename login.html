@@ -28,7 +28,7 @@
         const errorMsg = document.getElementById('loginError');
 
         try {
-            const response = await fetch(`/functions/api/codes?code=${encodeURIComponent(enteredPin)}`);
+            const response = await fetch(`/api/codes?code=${encodeURIComponent(enteredPin)}`);
             const data = await response.json();
 
             if (data.valid && data.active) {
