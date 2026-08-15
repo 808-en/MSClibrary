@@ -1,4 +1,5 @@
 const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQaTqPVndPccN9h1-RYUulv59x-Ursqed9lsoDnMfejpp8VoI1DjYFh2Cq5Xr-471I8RcKX7vJ2yJgj/pub?output=csv';
+const sheetReturnUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQaTqPVndPccN9h1-RYUulv59x-Ursqed9lsoDnMfejpp8VoI1DjYFh2Cq5Xr-471I8RcKX7vJ2yJgj/pubhtml?gid=2128186552&single=true';
 const TOKEN_VALUE = "loggedInIdentifierRNBN480H39A=";
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyvHlxSf3NoF8MBZQYiHvJrBmBhYVE6V_GcGhr8iSK6AeKs5SISoUN_Ho4owsjjV0_5Fw/exec';
 const ADMIN_DB_URL = 'https://script.google.com/macros/s/AKfycbyvHlxSf3NoF8MBZQYiHvJrBmBhYVE6V_GcGhr8iSK6AeKs5SISoUN_Ho4owsjjV0_5Fw/exec';
@@ -98,6 +99,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const dataContainer = document.getElementById('data-container');
     if (dataContainer) {
         fetchData(dataContainer);
+    }
+
+    // New: load return requests (HTML-published sheet) into data-container1
+    const dataContainer1 = document.getElementById('data-container1');
+    if (dataContainer1) {
+        fetchReturnData(dataContainer1);
     }
 
     const massContainer = document.getElementById('massIsbnContainer');
@@ -404,7 +411,7 @@ function setupTeacherActionButtons() {
             openTeacherActionModal("Remove Passwords", `
                 <div class="form-group">
                     <p>Select option:</p>
-                    <button type="button" onclick="alert('All passwords cleared!'); closeModal('teacherActionModal');" class="teacher-btn" style="background-color: #dc3545; margin-bottom: 10px;">Remove ALL Passwords</button>
+                    <button type="button" onclick="alert('All passwords cleared!'); closeModal('teacherActionModal');" class="teacher-btn" style="background-color: #dc3545; margin-bottom: 10px;">Remov[...]
                     <button type="button" onclick="alert('Selected passwords cleared!'); closeModal('teacherActionModal');" class="teacher-btn">Remove Selected Passwords</button>
                 </div>
             `);
@@ -588,6 +595,77 @@ function setupModalHandlers() {
     if(openPerms) openPerms.addEventListener('click', () => openModal('permissionsModal'));
 }
 
+/* ---------- Rendering shared function ---------- */
+function renderSheetRows(container, rows) {
+    if (!rows || rows.length === 0) {
+        container.innerHTML = '<p>No data available.</p>';
+        return;
+    }
+
+    const headers = rows[0].map(h => h || '');
+    let maxCols = headers.length;
+    rows.forEach(row => { if (row.length > maxCols) maxCols = row.length; });
+
+    let returnedIndex = headers.findIndex(h => h.toLowerCase().includes('returned'));
+    if (returnedIndex === -1) returnedIndex = 9;
+
+    let reqIdIndex = headers.findIndex(h => h.toLowerCase().includes('request id') || h.toLowerCase().includes('requestid'));
+    if (reqIdIndex === -1) reqIdIndex = 1;
+
+    let tableHtml = '<table><thead><tr>';
+    for (let i = 0; i < maxCols; i++) {
+        tableHtml += `<th>${headers[i] || `Col ${i+1}`}</th>`;
+    }
+    tableHtml += '<th>Actions</th>';
+    tableHtml += '</tr></thead><tbody>';
+
+    rows.slice(1).forEach(rowData => {
+        const returnedVal = (rowData[returnedIndex] || '').toString().trim().toUpperCase();
+        const isReturned = returnedVal === 'Y' || returnedVal === 'YES' || returnedVal === 'RETURNED';
+        const reqId = rowData[reqIdIndex] || '';
+        const rowStyle = isReturned ? 'text-decoration: line-through; color: green; font-weight: bold;' : '';
+
+        tableHtml += `<tr style="${rowStyle}">`;
+        
+        for (let i = 0; i < maxCols; i++) {
+            let cell = rowData[i] || '';
+            if (i === returnedIndex) {
+                cell = isReturned ? 'Y' : cell;
+            }
+            // Escape HTML in cell content to avoid markup injection
+            const safeCell = String(cell).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            tableHtml += `<td>${safeCell}</td>`; 
+        }
+        
+        if (!isReturned) {
+            tableHtml += `<td><button class="action-btn return-btn" style="padding: 5px 15px; font-size: 1rem; min-width: auto;" data-reqid="${reqId}">Mark as Returned</button></td>`;
+        } else {
+            tableHtml += `<td></td>`;
+        }
+        
+        tableHtml += '</tr>';
+    });
+    tableHtml += '</tbody></table>';
+
+    container.innerHTML = tableHtml;
+
+    const returnBtns = container.querySelectorAll('.return-btn');
+    returnBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const reqId = this.getAttribute('data-reqid');
+            const row = this.closest('tr');
+            // attempt to detect returnedIndex again from rendered headers
+            const headerCells = container.querySelectorAll('thead th');
+            let detectedReturnedIndex = -1;
+            headerCells.forEach((th, idx) => {
+                if (th.textContent.toLowerCase().includes('returned')) detectedReturnedIndex = idx;
+            });
+            markAsReturned(row, reqId, detectedReturnedIndex);
+        });
+    });
+}
+
+/* ---------- CSV-based fetch (existing behavior) ---------- */
 async function fetchData(container) {
     try {
         const response = await fetch(sheetUrl);
@@ -597,67 +675,39 @@ async function fetchData(container) {
         const lines = textData.split('\n').map(line => line.trim()).filter(line => line.length > 0);
         const rows = lines.map(row => row.split(',').map(cell => cell.trim().replace(/^"|"$/g, '')));
 
-        if (rows.length === 0) {
-            container.innerHTML = '<p>No data available.</p>';
-            return;
-        }
-
-        const headers = rows[0];
-        let maxCols = headers.length;
-        rows.forEach(row => { if (row.length > maxCols) maxCols = row.length; });
-
-        let returnedIndex = headers.findIndex(h => h.toLowerCase().includes('returned'));
-        if (returnedIndex === -1) returnedIndex = 9;
-
-        let reqIdIndex = headers.findIndex(h => h.toLowerCase().includes('request id') || h.toLowerCase().includes('requestid'));
-        if (reqIdIndex === -1) reqIdIndex = 1;
-
-        let tableHtml = '<table><thead><tr>';
-        for (let i = 0; i < maxCols; i++) {
-            tableHtml += `<th>${headers[i] || `Col ${i+1}`}</th>`;
-        }
-        tableHtml += '<th>Actions</th>';
-        tableHtml += '</tr></thead><tbody>';
-
-        rows.slice(1).forEach(rowData => {
-            const returnedVal = rowData[returnedIndex] ? rowData[returnedIndex].trim().toUpperCase() : '';
-            const isReturned = returnedVal === 'Y' || returnedVal === 'YES' || returnedVal === 'RETURNED';
-            const reqId = rowData[reqIdIndex] || '';
-            const rowStyle = isReturned ? 'text-decoration: line-through; color: green; font-weight: bold;' : '';
-
-            tableHtml += `<tr style="${rowStyle}">`;
-            
-            for (let i = 0; i < maxCols; i++) {
-                let cell = rowData[i] || '';
-                if (i === returnedIndex) {
-                    cell = isReturned ? 'Y' : cell;
-                }
-                tableHtml += `<td>${cell}</td>`; 
-            }
-            
-            if (!isReturned) {
-                tableHtml += `<td><button class="action-btn return-btn" style="padding: 5px 15px; font-size: 1rem; min-width: auto;" data-reqid="${reqId}">Mark as Returned</button></td>`;
-            } else {
-                tableHtml += `<td></td>`;
-            }
-            
-            tableHtml += '</tr>';
-        });
-        tableHtml += '</tbody></table>';
-
-        container.innerHTML = tableHtml;
-
-        const returnBtns = container.querySelectorAll('.return-btn');
-        returnBtns.forEach(btn => {
-            btn.addEventListener('click', function() {
-                const reqId = this.getAttribute('data-reqid');
-                const row = this.closest('tr');
-                markAsReturned(row, reqId, returnedIndex);
-            });
-        });
+        renderSheetRows(container, rows);
     } catch (error) {
         console.error(error);
         container.innerHTML = '<p>Could not load data.</p>';
+    }
+}
+
+/* ---------- HTML-published sheet fetch (for return requests) ---------- */
+async function fetchReturnData(container) {
+    try {
+        const response = await fetch(sheetReturnUrl);
+        if (!response.ok) throw new Error('Network response was not ok');
+
+        const text = await response.text();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(text, 'text/html');
+        // Google Sheets published HTML usually includes a table; pick the first table
+        const table = doc.querySelector('table');
+        if (!table) {
+            container.innerHTML = '<p>Could not find sheet table in the returned HTML.</p>';
+            return;
+        }
+
+        const htmlRows = Array.from(table.querySelectorAll('tr'));
+        const rows = htmlRows.map(tr => {
+            const cells = Array.from(tr.querySelectorAll('th,td'));
+            return cells.map(cell => cell.textContent.trim());
+        });
+
+        renderSheetRows(container, rows);
+    } catch (error) {
+        console.error(error);
+        container.innerHTML = '<p>Could not load return data.</p>';
     }
 }
 
@@ -680,7 +730,7 @@ function markAsReturned(row, reqId, returnedIndex) {
     ]).then(() => {
         alert("Marked as returned successfully!");
     }).catch(error => {
-        console.error(error.message);
+        console.error(error && error.message);
     });
 
     row.style.textDecoration = 'line-through';
@@ -688,7 +738,7 @@ function markAsReturned(row, reqId, returnedIndex) {
     row.style.fontWeight = 'bold';
 
     const cells = row.querySelectorAll('td');
-    if (cells[returnedIndex]) {
+    if (returnedIndex >= 0 && cells[returnedIndex]) {
         cells[returnedIndex].textContent = 'Y';
     }
 
