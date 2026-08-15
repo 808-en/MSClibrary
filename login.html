@@ -9,42 +9,83 @@
 <body class="min-h-screen bg-gray-100 flex items-center justify-center p-6">
   <div class="w-full max-w-md bg-white p-8 rounded-lg shadow-md">
     <h2 class="text-2xl font-semibold text-gray-800 mb-6 text-center">Log In</h2>
+
     <form id="pinLoginForm" class="space-y-4">
       <div>
-        <label for="pinInput" class="block text-sm font-medium text-gray-700 mb-1">Enter 5-Digit PIN:</label>
-        <input type="password" id="pinInput" maxlength="5" pattern="\d{5}" placeholder="e.g. 12345" required class="block w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-300 text-center text-xl tracking-widest" />
+        <label for="pinInput" class="block text-sm font-medium text-gray-700 mb-1">
+          Enter 5-Digit PIN:
+        </label>
+
+        <input
+          type="password"
+          id="pinInput"
+          maxlength="5"
+          pattern="[0-9]{5}"
+          inputmode="numeric"
+          autocomplete="off"
+          placeholder="e.g. 12345"
+          required
+          class="block w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-300 text-center text-xl tracking-widest"
+        />
       </div>
 
-      <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded font-semibold transition-colors">Log In</button>
+      <button
+        type="submit"
+        class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded font-semibold transition-colors"
+      >
+        Log In
+      </button>
 
-      <div id="loginError" class="hidden text-red-600 text-sm mt-2 text-center"></div>
+      <div
+        id="loginError"
+        class="hidden text-red-600 text-sm mt-2 text-center"
+      ></div>
     </form>
   </div>
 
   <script>
-    document.getElementById('pinLoginForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const pin = document.getElementById('pinInput').value.trim();
-        const errorMsg = document.getElementById('loginError');
+    document.getElementById('pinLoginForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
 
-        try {
-            const response = await fetch(`/api/codes?code=${encodeURIComponent(enteredPin)}`);
-            const data = await response.json();
+      const pinInput = document.getElementById('pinInput');
+      const errorMsg = document.getElementById('loginError');
+      const pin = pinInput.value.trim();
 
-            if (data.valid && data.active) {
-                sessionStorage.setItem('adminLoggedIn', 'true');
-            sessionStorage.setItem('loginTime', Date.now().toString());
+      errorMsg.classList.add('hidden');
+      errorMsg.textContent = '';
 
-                setTimeout(() => {
-                    window.location.href = 'admin.html';
-                }, 250);
+      if (!/^[0-9]{5}$/.test(pin)) {
+        errorMsg.classList.remove('hidden');
+        errorMsg.textContent = 'Please enter a valid 5-digit PIN.';
+        return;
+      }
 
-                return;
-            }
-              else {
-            errorMsg.classList.remove('hidden');
-            errorMsg.innerText = "Invalid 5-digit PIN. Please try again.";
-              }
+      try {
+        const response = await fetch(`/api/codes?code=${encodeURIComponent(pin)}`);
+
+        if (!response.ok) {
+          throw new Error(`HTTP error: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (data.valid && data.active) {
+          sessionStorage.setItem('adminLoggedIn', 'true');
+          sessionStorage.setItem('loginTime', Date.now().toString());
+
+          window.location.href = 'admin.html';
+        } else {
+          errorMsg.classList.remove('hidden');
+          errorMsg.textContent = 'Invalid 5-digit PIN. Please try again.';
+          pinInput.value = '';
+          pinInput.focus();
+        }
+      } catch (error) {
+        console.error('Login error:', error);
+        errorMsg.classList.remove('hidden');
+        errorMsg.textContent = 'Unable to verify PIN. Please try again.';
+      }
+    });
   </script>
 </body>
 </html>
