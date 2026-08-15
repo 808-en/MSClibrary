@@ -1,5 +1,5 @@
 const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQaTqPVndPccN9h1-RYUulv59x-Ursqed9lsoDnMfejpp8VoI1DjYFh2Cq5Xr-471I8RcKX7vJ2yJgj/pub?output=csv';
-const sheetReturnUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQaTqPVndPccN9h1-RYUulv59x-Ursqed9lsoDnMfejpp8VoI1DjYFh2Cq5Xr-471I8RcKX7vJ2yJgj/pubhtml?gid=2128186552&single=true';
+const sheetReturnUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQaTqPVndPccN9h1-RYUulv59x-Ursqed9lsoDnMfejpp8VoI1DjYFh2Cq5Xr-471I8RcKX7vJ2yJgj/pub?gid=2128186552&single=true&output=csv';
 const TOKEN_VALUE = "loggedInIdentifierRNBN480H39A=";
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyvHlxSf3NoF8MBZQYiHvJrBmBhYVE6V_GcGhr8iSK6AeKs5SISoUN_Ho4owsjjV0_5Fw/exec';
 const ADMIN_DB_URL = 'https://script.google.com/macros/s/AKfycbyvHlxSf3NoF8MBZQYiHvJrBmBhYVE6V_GcGhr8iSK6AeKs5SISoUN_Ho4owsjjV0_5Fw/exec';
@@ -98,13 +98,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const dataContainer = document.getElementById('data-container');
     if (dataContainer) {
-        fetchData(dataContainer);
+        fetchAndRenderCsv(dataContainer, sheetUrl);
     }
 
-    // New: load return requests (HTML-published sheet) into data-container1
     const dataContainer1 = document.getElementById('data-container1');
     if (dataContainer1) {
-        fetchReturnData(dataContainer1);
+        fetchAndRenderCsv(dataContainer1, sheetReturnUrl);
     }
 
     const massContainer = document.getElementById('massIsbnContainer');
@@ -411,7 +410,7 @@ function setupTeacherActionButtons() {
             openTeacherActionModal("Remove Passwords", `
                 <div class="form-group">
                     <p>Select option:</p>
-                    <button type="button" onclick="alert('All passwords cleared!'); closeModal('teacherActionModal');" class="teacher-btn" style="background-color: #dc3545; margin-bottom: 10px;">Remov[...]
+                    <button type="button" onclick="alert('All passwords cleared!'); closeModal('teacherActionModal');" class="teacher-btn" style="background-color: #dc3545; margin-bottom: 10px;">[...] 
                     <button type="button" onclick="alert('Selected passwords cleared!'); closeModal('teacherActionModal');" class="teacher-btn">Remove Selected Passwords</button>
                 </div>
             `);
@@ -477,125 +476,59 @@ function setupFormSubmission(formId, type, dataExtractor, modalId) {
     }
 }
 
-async function fetchBookDetailsFromAPI(isbn) {
-    if (!isbn) return null;
-    const cleanIsbn = isbn.replace(/[^0-9X]/gi, '');
-    if (!cleanIsbn) return null;
-
-    try {
-        const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${cleanIsbn}`);
-        if (response.ok) {
-            const data = await response.json();
-            if (data.items && data.items.length > 0) {
-                const vol = data.items[0].volumeInfo;
-                return {
-                    title: vol.title || '',
-                    author: vol.authors ? vol.authors.join(', ') : '',
-                    genre: vol.categories ? vol.categories.join(', ') : '',
-                    synopsis: vol.description || '',
-                    cover: vol.imageLinks ? (vol.imageLinks.thumbnail || vol.imageLinks.smallThumbnail || '').replace('http:', 'https:') : '',
-                    grade: '',
-                    msc: '',
-                    quantity: 1
-                };
+function parseCSV(text) {
+    const rows = [];
+    let cur = [];
+    let field = '';
+    let inQuotes = false;
+    for (let i = 0; i < text.length; i++) {
+        const ch = text[i];
+        const next = i + 1 < text.length ? text[i + 1] : null;
+        if (ch === '"') {
+            if (inQuotes && next === '"') {
+                field += '"';
+                i++;
+            } else {
+                inQuotes = !inQuotes;
             }
-        }
-    } catch(e) {}
-
-    try {
-        const response = await fetch(`https://openlibrary.org/api/books?bibkeys=ISBN:${cleanIsbn}&format=json&jscmd=data`);
-        if (response.ok) {
-            const data = await response.json();
-            const book = data[`ISBN:${cleanIsbn}`];
-            if (book) {
-                return {
-                    title: book.title || '',
-                    author: book.authors ? book.authors.map(a => a.name).join(', ') : '',
-                    genre: book.subjects ? book.subjects.map(s => s.name).join(', ') : '',
-                    synopsis: typeof book.notes === 'string' ? book.notes : '',
-                    cover: book.cover ? (book.cover.large || book.cover.medium || book.cover.small || '') : '',
-                    grade: '',
-                    msc: '',
-                    quantity: 1
-                };
+        } else if (ch === ',' && !inQuotes) {
+            cur.push(field);
+            field = '';
+        } else if ((ch === '\n' || ch === '\r') && !inQuotes) {
+            if (ch === '\r' && next === '\n') {
+                i++;
             }
-        }
-    } catch(e) {}
-
-    return null;
-}
-
-async function lookupIsbn(isbn, titleInputId, authorInputId) {
-    if (!isbn) return;
-    const details = await fetchBookDetailsFromAPI(isbn);
-    if (details) {
-        if (titleInputId && document.getElementById(titleInputId)) {
-            document.getElementById(titleInputId).value = details.title;
-        }
-        if (authorInputId && document.getElementById(authorInputId)) {
-            document.getElementById(authorInputId).value = details.author;
-        }
-    } else {
-        alert("Book details not found automatically. You can proceed with standard text entry.");
-    }
-}
-
-function setupIsbnLookup(btnId, isbnInputId, titleInputId, authorInputId) {
-    const btn = document.getElementById(btnId);
-    if (btn) {
-        btn.addEventListener('click', () => {
-            const isbn = document.getElementById(isbnInputId).value.trim();
-            lookupIsbn(isbn, titleInputId, authorInputId);
-        });
-    }
-}
-
-function submitToGoogleSheet(data, generatedId) {
-    const payload = JSON.stringify(data);
-    Promise.all([
-        fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload })
-    ]).then(() => {
-        if (generatedId) {
-            alert(`Request successfully recorded! Your Return Request ID is: ${generatedId}. Please store it somewhere safe for when you return the book.`);
+            cur.push(field);
+            field = '';
+            rows.push(cur);
+            cur = [];
         } else {
-            alert("Request successfully recorded!");
+            field += ch;
         }
-    }).catch(error => {
-        console.error(error.message);
-        alert("There was an error saving your request.");
-    });
+    }
+    cur.push(field);
+    rows.push(cur);
+    const cleaned = rows.map(r => r.map(c => {
+        let v = c;
+        if (v.startsWith('"') && v.endsWith('"')) v = v.slice(1, -1);
+        return v.trim();
+    }));
+    return cleaned.filter(r => r.length > 1 || (r.length === 1 && r[0] !== ''));
 }
 
-function openModal(modalId) {
-    const modal = document.getElementById(modalId);
-    if (modal) {
-        modal.style.display = 'flex';
-        if (modalId === 'borrowIsbnModal') {
-            setTimeout(() => document.getElementById('borrowIsbnInput').focus(), 100);
-        } else if (modalId === 'returnIsbnModal') {
-            setTimeout(() => document.getElementById('returnIsbnInput').focus(), 100);
-        }
+async function fetchAndRenderCsv(container, url) {
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Network response was not ok');
+        const textData = await response.text();
+        const rows = parseCSV(textData);
+        renderSheetRows(container, rows);
+    } catch (error) {
+        console.error(error);
+        container.innerHTML = '<p>Could not load data.</p>';
     }
 }
 
-function closeModal(modalId) {
-    const modal = document.getElementById(modalId);
-    if (modal) {
-        modal.style.display = 'none';
-    }
-}
-
-function setupModalHandlers() {
-    const openAdd = document.getElementById('openAddBookModal');
-    const openDel = document.getElementById('openDeleteBookModal');
-    const openPerms = document.getElementById('openPermissions');
-
-    if(openAdd) openAdd.addEventListener('click', () => openModal('addBookModal'));
-    if(openDel) openDel.addEventListener('click', () => { openModal('deleteBookModal'); fetchDeleteChartData(); });
-    if(openPerms) openPerms.addEventListener('click', () => openModal('permissionsModal'));
-}
-
-/* ---------- Rendering shared function ---------- */
 function renderSheetRows(container, rows) {
     if (!rows || rows.length === 0) {
         container.innerHTML = '<p>No data available.</p>';
@@ -632,9 +565,8 @@ function renderSheetRows(container, rows) {
             if (i === returnedIndex) {
                 cell = isReturned ? 'Y' : cell;
             }
-            // Escape HTML in cell content to avoid markup injection
             const safeCell = String(cell).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-            tableHtml += `<td>${safeCell}</td>`; 
+            tableHtml += `<td>${safeCell}</td>`;
         }
         
         if (!isReturned) {
@@ -654,7 +586,6 @@ function renderSheetRows(container, rows) {
         btn.addEventListener('click', function() {
             const reqId = this.getAttribute('data-reqid');
             const row = this.closest('tr');
-            // attempt to detect returnedIndex again from rendered headers
             const headerCells = container.querySelectorAll('thead th');
             let detectedReturnedIndex = -1;
             headerCells.forEach((th, idx) => {
@@ -665,50 +596,20 @@ function renderSheetRows(container, rows) {
     });
 }
 
-/* ---------- CSV-based fetch (existing behavior) ---------- */
-async function fetchData(container) {
-    try {
-        const response = await fetch(sheetUrl);
-        if (!response.ok) throw new Error('Network response was not ok');
-
-        const textData = await response.text();
-        const lines = textData.split('\n').map(line => line.trim()).filter(line => line.length > 0);
-        const rows = lines.map(row => row.split(',').map(cell => cell.trim().replace(/^"|"$/g, '')));
-
-        renderSheetRows(container, rows);
-    } catch (error) {
-        console.error(error);
-        container.innerHTML = '<p>Could not load data.</p>';
-    }
-}
-
-/* ---------- HTML-published sheet fetch (for return requests) ---------- */
-async function fetchReturnData(container) {
-    try {
-        const response = await fetch(sheetReturnUrl);
-        if (!response.ok) throw new Error('Network response was not ok');
-
-        const text = await response.text();
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(text, 'text/html');
-        // Google Sheets published HTML usually includes a table; pick the first table
-        const table = doc.querySelector('table');
-        if (!table) {
-            container.innerHTML = '<p>Could not find sheet table in the returned HTML.</p>';
-            return;
+function submitToGoogleSheet(data, generatedId) {
+    const payload = JSON.stringify(data);
+    Promise.all([
+        fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload })
+    ]).then(() => {
+        if (generatedId) {
+            alert(`Request successfully recorded! Your Return Request ID is: ${generatedId}. Please store it somewhere safe for when you return the book.`);
+        } else {
+            alert("Request successfully recorded!");
         }
-
-        const htmlRows = Array.from(table.querySelectorAll('tr'));
-        const rows = htmlRows.map(tr => {
-            const cells = Array.from(tr.querySelectorAll('th,td'));
-            return cells.map(cell => cell.textContent.trim());
-        });
-
-        renderSheetRows(container, rows);
-    } catch (error) {
+    }).catch(error => {
         console.error(error);
-        container.innerHTML = '<p>Could not load return data.</p>';
-    }
+        alert("There was an error saving your request.");
+    });
 }
 
 function markAsReturned(row, reqId, returnedIndex) {
@@ -730,7 +631,7 @@ function markAsReturned(row, reqId, returnedIndex) {
     ]).then(() => {
         alert("Marked as returned successfully!");
     }).catch(error => {
-        console.error(error && error.message);
+        console.error(error);
     });
 
     row.style.textDecoration = 'line-through';
