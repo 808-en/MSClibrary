@@ -10,6 +10,8 @@ document.addEventListener('DOMContentLoaded', function() {
     initSessionTimer();
     setupModalHandlers();
     setupTeacherControls();
+    setupBotmForm();
+    setupChangelogForm();
 
     const btnProminentBorrow = document.getElementById('btnProminentBorrow');
     const btnProminentReturn = document.getElementById('btnProminentReturn');
@@ -308,6 +310,19 @@ document.addEventListener('DOMContentLoaded', function() {
     if (btnRefresh) {
         btnRefresh.addEventListener('click', fetchDeleteChartData);
     }
+
+    const openBotmBtn = document.getElementById('openUpdateBotmModal');
+    if (openBotmBtn) {
+        openBotmBtn.addEventListener('click', () => openModal('updateBotmModal'));
+    }
+
+    const openChangelogBtn = document.getElementById('openUpdateLatestModal');
+    if (openChangelogBtn) {
+        openChangelogBtn.addEventListener('click', () => openModal('updateLatestModal'));
+    }
+
+    fetchBotm();
+    fetchChangelog();
 });
 
 function initSessionTimer() {
@@ -801,5 +816,147 @@ async function fetchDeleteChartData() {
         }
     } catch (error) {
         bodyEl.innerHTML = '<tr><td colspan="4" style="text-align:center;">Error loading books.</td></tr>';
+    }
+}
+
+// ==================== BOOK OF THE MONTH ====================
+
+function setupBotmForm() {
+    const form = document.getElementById('botmForm');
+    if (form) {
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const botmData = {
+                action: "updateBotm",
+                sheetTarget: "BOTM",
+                isbn: document.getElementById('botmIsbnInput').value,
+                month: document.getElementById('botmMonth').value,
+                title: document.getElementById('botmTitle').value,
+                author: document.getElementById('botmAuthor').value,
+                timestamp: new Date().getTime()
+            };
+
+            const payload = JSON.stringify(botmData);
+            
+            try {
+                await Promise.all([
+                    fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload }),
+                    fetch(ADMIN_DB_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload })
+                ]);
+                alert("Book of the Month updated successfully!");
+                form.reset();
+                closeModal('updateBotmModal');
+            } catch(error) {
+                alert("Error updating Book of the Month. Please try again.");
+                console.error(error);
+            }
+        });
+    }
+
+    const botmLookupBtn = document.getElementById('botmLookupBtn');
+    if (botmLookupBtn) {
+        botmLookupBtn.addEventListener('click', async () => {
+            const isbn = document.getElementById('botmIsbnInput').value.trim();
+            if (!isbn) {
+                alert("Please enter an ISBN first.");
+                return;
+            }
+            
+            const details = await fetchBookDetailsFromAPI(isbn);
+            if (details) {
+                document.getElementById('botmTitle').value = details.title;
+                document.getElementById('botmAuthor').value = details.author;
+            } else {
+                alert("Book details not found. Please enter manually.");
+            }
+        });
+    }
+}
+
+async function fetchBotm() {
+    try {
+        const botmContainer = document.getElementById('botmContainer');
+        if (!botmContainer) return;
+
+        const response = await fetch('YOUR_BOTM_SHEET_URL');
+        const data = await response.text();
+        const lines = data.split('\n').filter(line => line.trim().length > 0);
+        
+        if (lines.length > 1) {
+            const latest = lines[lines.length - 1].split(',');
+            botmContainer.innerHTML = `
+                <div class="botm-card">
+                    <h3>📚 Book of the Month</h3>
+                    <p><strong>${latest[2] || ''}</strong></p>
+                    <p>by ${latest[3] || ''}</p>
+                    <p>${latest[1] || ''}</p>
+                </div>
+            `;
+        }
+    } catch(error) {
+        console.error('Error fetching BOTM:', error);
+    }
+}
+
+// ==================== CHANGELOG ====================
+
+function setupChangelogForm() {
+    const form = document.getElementById('changelogForm');
+    if (form) {
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const changelogData = {
+                action: "updateChangelog",
+                sheetTarget: "Changelog",
+                version: document.getElementById('changelogVersion').value,
+                message: document.getElementById('changelogMessage').value,
+                timestamp: new Date().getTime()
+            };
+
+            const payload = JSON.stringify(changelogData);
+            
+            try {
+                await Promise.all([
+                    fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload }),
+                    fetch(ADMIN_DB_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload })
+                ]);
+                alert("Changelog updated successfully!");
+                form.reset();
+                closeModal('updateLatestModal');
+            } catch(error) {
+                alert("Error updating Changelog. Please try again.");
+                console.error(error);
+            }
+        });
+    }
+}
+
+async function fetchChangelog() {
+    try {
+        const changelogContainer = document.getElementById('changelogContainer');
+        if (!changelogContainer) return;
+
+        const response = await fetch('YOUR_CHANGELOG_SHEET_URL');
+        const data = await response.text();
+        const lines = data.split('\n').filter(line => line.trim().length > 0);
+        
+        if (lines.length > 1) {
+            let changelogHtml = '<div class="changelog-card"><h3>📝 Latest Updates</h3>';
+            
+            const recentEntries = lines.slice(Math.max(1, lines.length - 6)).reverse();
+            recentEntries.forEach(line => {
+                const parts = line.split(',');
+                if (parts.length >= 2) {
+                    changelogHtml += `<div class="changelog-entry"><p><strong>v${parts[0] || ''}</strong>: ${parts[1] || ''}</p></div>`;
+                }
+            });
+            
+            changelogHtml += '</div>';
+            changelogContainer.innerHTML = changelogHtml;
+        }
+    } catch(error) {
+        console.error('Error fetching Changelog:', error);
     }
 }
