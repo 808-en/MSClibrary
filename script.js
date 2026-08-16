@@ -1,5 +1,5 @@
 const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQaTqPVndPccN9h1-RYUulv59x-Ursqed9lsoDnMfejpp8VoI1DjYFh2Cq5Xr-471I8RcKX7vJ2yJgj/pub?output=csv';
-const sheetReturnUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQaTqPVndPccN9h1-RYUulv59x-Ursqed9lsoDnMfejpp8VoI1DjYFh2Cq5Xr-471I8RcKX7vJ2yJgj/pubhtml?gid=2128186552&single=true';
+const sheetReturnUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQaTqPVndPccN9h1-RYUulv59x-Ursqed9lsoDnMfejpp8VoI1DjYFh2Cq5Xr-471I8RcKX7vJ2yJgj/pub?output=csv&gid=2128186552';
 const TOKEN_VALUE = "loggedInIdentifierRNBN480H39A=";
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyvHlxSf3NoF8MBZQYiHvJrBmBhYVE6V_GcGhr8iSK6AeKs5SISoUN_Ho4owsjjV0_5Fw/exec';
 const ADMIN_DB_URL = 'https://script.google.com/macros/s/AKfycbyvHlxSf3NoF8MBZQYiHvJrBmBhYVE6V_GcGhr8iSK6AeKs5SISoUN_Ho4owsjjV0_5Fw/exec';
@@ -101,7 +101,6 @@ document.addEventListener('DOMContentLoaded', function() {
         fetchData(dataContainer);
     }
 
-    // New: load return requests (HTML-published sheet) into data-container1
     const dataContainer1 = document.getElementById('data-container1');
     if (dataContainer1) {
         fetchReturnData(dataContainer1);
@@ -411,7 +410,7 @@ function setupTeacherActionButtons() {
             openTeacherActionModal("Remove Passwords", `
                 <div class="form-group">
                     <p>Select option:</p>
-                    <button type="button" onclick="alert('All passwords cleared!'); closeModal('teacherActionModal');" class="teacher-btn" style="background-color: #dc3545; margin-bottom: 10px;">Remov[...]
+                    <button type="button" onclick="alert('All passwords cleared!'); closeModal('teacherActionModal');" class="teacher-btn" style="background-color: #dc3545; margin-bottom: 10px;">Remove All Passwords</button>
                     <button type="button" onclick="alert('Selected passwords cleared!'); closeModal('teacherActionModal');" class="teacher-btn">Remove Selected Passwords</button>
                 </div>
             `);
@@ -595,7 +594,28 @@ function setupModalHandlers() {
     if(openPerms) openPerms.addEventListener('click', () => openModal('permissionsModal'));
 }
 
-/* ---------- Rendering shared function ---------- */
+function parseCSV(text) {
+    const lines = text.split(/\r?\n/).filter(line => line.trim().length > 0);
+    return lines.map(line => {
+        const row = [];
+        let insideQuote = false;
+        let cell = '';
+        for (let i = 0; i < line.length; i++) {
+            const char = line[i];
+            if (char === '"') {
+                insideQuote = !insideQuote;
+            } else if (char === ',' && !insideQuote) {
+                row.push(cell.trim().replace(/^"|"$/g, ''));
+                cell = '';
+            } else {
+                cell += char;
+            }
+        }
+        row.push(cell.trim().replace(/^"|"$/g, ''));
+        return row;
+    });
+}
+
 function renderSheetRows(container, rows) {
     if (!rows || rows.length === 0) {
         container.innerHTML = '<p>No data available.</p>';
@@ -606,10 +626,13 @@ function renderSheetRows(container, rows) {
     let maxCols = headers.length;
     rows.forEach(row => { if (row.length > maxCols) maxCols = row.length; });
 
-    let returnedIndex = headers.findIndex(h => h.toLowerCase().includes('returned'));
+    let returnedIndex = headers.findIndex(h => (h || '').toLowerCase().includes('returned'));
     if (returnedIndex === -1) returnedIndex = 9;
 
-    let reqIdIndex = headers.findIndex(h => h.toLowerCase().includes('request id') || h.toLowerCase().includes('requestid'));
+    let reqIdIndex = headers.findIndex(h => {
+        const lower = (h || '').toLowerCase().trim();
+        return lower.includes('request id') || lower.includes('requestid') || lower === 'id';
+    });
     if (reqIdIndex === -1) reqIdIndex = 1;
 
     let tableHtml = '<table><thead><tr>';
@@ -632,7 +655,6 @@ function renderSheetRows(container, rows) {
             if (i === returnedIndex) {
                 cell = isReturned ? 'Y' : cell;
             }
-            // Escape HTML in cell content to avoid markup injection
             const safeCell = String(cell).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
             tableHtml += `<td>${safeCell}</td>`; 
         }
@@ -654,7 +676,6 @@ function renderSheetRows(container, rows) {
         btn.addEventListener('click', function() {
             const reqId = this.getAttribute('data-reqid');
             const row = this.closest('tr');
-            // attempt to detect returnedIndex again from rendered headers
             const headerCells = container.querySelectorAll('thead th');
             let detectedReturnedIndex = -1;
             headerCells.forEach((th, idx) => {
@@ -665,15 +686,13 @@ function renderSheetRows(container, rows) {
     });
 }
 
-/* ---------- CSV-based fetch (existing behavior) ---------- */
 async function fetchData(container) {
     try {
         const response = await fetch(sheetUrl);
         if (!response.ok) throw new Error('Network response was not ok');
 
         const textData = await response.text();
-        const lines = textData.split('\n').map(line => line.trim()).filter(line => line.length > 0);
-        const rows = lines.map(row => row.split(',').map(cell => cell.trim().replace(/^"|"$/g, '')));
+        const rows = parseCSV(textData);
 
         renderSheetRows(container, rows);
     } catch (error) {
@@ -682,29 +701,39 @@ async function fetchData(container) {
     }
 }
 
-/* ---------- HTML-published sheet fetch (for return requests) ---------- */
 async function fetchReturnData(container) {
     try {
         const response = await fetch(sheetReturnUrl);
         if (!response.ok) throw new Error('Network response was not ok');
 
-        const text = await response.text();
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(text, 'text/html');
-        // Google Sheets published HTML usually includes a table; pick the first table
-        const table = doc.querySelector('table');
-        if (!table) {
-            container.innerHTML = '<p>Could not find sheet table in the returned HTML.</p>';
-            return;
+        const textData = await response.text();
+        if (textData.trim().startsWith('<')) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(textData, 'text/html');
+            const table = doc.querySelector('table');
+            if (!table) {
+                container.innerHTML = '<p>Could not find sheet table in the returned HTML.</p>';
+                return;
+            }
+
+            const htmlRows = Array.from(table.querySelectorAll('tr'));
+            const rawRows = htmlRows.map(tr => {
+                const cells = Array.from(tr.querySelectorAll('th,td'));
+                return cells.map(cell => cell.textContent.trim());
+            }).filter(row => row.some(cell => cell.length > 0));
+
+            let rows = rawRows;
+            if (rows.length > 0 && rows[0].every(c => !c || /^[A-Z]+$/.test(c) || /^\d+$/.test(c))) {
+                rows = rows.slice(1);
+            }
+            if (rows.length > 0 && /^\d+$/.test(rows[0][0])) {
+                rows = rows.map(r => r.slice(1));
+            }
+            renderSheetRows(container, rows);
+        } else {
+            const rows = parseCSV(textData);
+            renderSheetRows(container, rows);
         }
-
-        const htmlRows = Array.from(table.querySelectorAll('tr'));
-        const rows = htmlRows.map(tr => {
-            const cells = Array.from(tr.querySelectorAll('th,td'));
-            return cells.map(cell => cell.textContent.trim());
-        });
-
-        renderSheetRows(container, rows);
     } catch (error) {
         console.error(error);
         container.innerHTML = '<p>Could not load return data.</p>';
