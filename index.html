@@ -95,20 +95,18 @@
     <div class="navbar">
         <ul>
             <li><a href="index.html" data-i18n="home">Home</a></li>
-            <li><a href="library.html">Library</a></li>
-            <li><a href="changelog.html">Changelog</a></li>
             <li><a href="#" id="openReturnForm" data-i18n="bookReturn">Book Return</a></li>
             <li><a href="HelpForum.html" data-i18n="help">Help</a></li>
             <li><a href="#" id="openBorrowForm" data-i18n="borrowBook">Borrow Book</a></li>
-            <li><a href="login.html" id="AdminLogin" data-i18n="login">Log In <i class="fa-solid fa-user-lock"></i></a></li>
+            <li><a href="login.html" id="AdminLogin" data-i18n="login">Log In<i class="fa-solid fa-user-lock"></i></a></li>
         </ul>
     </div>
 
     <div id="mainContent">
         <div class="prominent-actions">
-            <button id="btnProminentBorrow" class="action-btn borrow-btn"><i class="fa-solid fa-book-open"></i> Borrow a Book</button>
-            <button id="btnProminentReturn" class="action-btn return-btn"><i class="fa-solid fa-hand-holding-hand"></i> Return a Book</button>
-        </div>
+                <button id="btnProminentBorrow" class="action-btn borrow-btn"><i class="fa-solid fa-book-open"></i> Borrow a Book</button>
+                <button id="btnProminentReturn" class="action-btn return-btn"><i class="fa-solid fa-hand-holding-hand"></i> Return a Book</button>
+            </div>
         <section>
             <div class="container">
                 <img src="Header-IMG.jpg" alt="Welcome to MSC School Library" class="responsive">
@@ -117,24 +115,23 @@
 
             <div class="body-containers-items">
                 <div class="latest-update">
-                    <h2 data-i18n="latestUpdate">Latest Update <i class="fa-solid fa-download"></i></h2>
-                    <p id="latestUpdateDisplay" data-i18n="welcomeText">Loading latest update...</p>
+                    <h2 data-i18n="latestUpdate">Latest Update<i class="fa-solid fa-download"></i></h2>
+                    <p id="latestUpdateDisplay" data-i18n="welcomeText">Welcome to the MSC School Library website!</p>
                 </div>
 
                 <div class="book-of-the-month">
-                    <h2 data-i18n="bookOfTheMonth">Book of the Month <i class="fa-solid fa-book"></i></h2>
+                    <h2 data-i18n="bookOfTheMonth">Book of the Month<i class="fa-solid fa-book"></i></h2>
                     <article>
                         <p data-i18n="featuredBook">This month's featured book is:</p>
                         <ul>
-                            <li id="botmMonthDisplay"><strong>Month:</strong> Loading...</li>
-                            <li id="botmTitleDisplay"><strong>Title:</strong> Loading...</li>
-                            <li id="botmAuthorDisplay"><strong>Author:</strong> Loading...</li>
+                            <li id="botmTitleDisplay" data-i18n="harryPotterTitle"><strong>Title:</strong> Harry Potter and the Deathly Hallows</li>
+                            <li id="botmAuthorDisplay" data-i18n="jkRowling"><strong>Author:</strong> JK Rowling</li>
                         </ul>
                     </article>
                 </div>
 
                 <div class="delivery-chart">
-                    <h2 data-i18n="borrowingGuidelines">Borrowing Guidelines <i class="fa-solid fa-hand-holding-hand"></i></h2>
+                    <h2 data-i18n="borrowingGuidelines">Borrowing Guidelines<i class="fa-solid fa-hand-holding-hand"></i></h2>
                     <p data-i18n="borrowingInfo">Please see the chart below for information on borrowing periods for different user types:</p>
                     <table>
                         <thead>
@@ -151,54 +148,43 @@
                                 <td data-i18n="yesOnce">Yes (once)</td>
                             </tr>
                             <tr>
-                                <td data-i18n="teachers">Teachers</td>
-                                <td>4 weeks</td>
-                                <td data-i18n="yesMultiple">Yes (multiple)</td>
-                            </tr>
-                            <tr>
-                                <td data-i18n="staff">Staff</td>
-                                <td>3 weeks</td>
-                                <td data-i18n="yesOnce">Yes (once)</td>
+                                <td data-i18n="faculty">Faculty</td>
+                                <td>As long as needed:)</td>
+                                <td data-i18n="yesPleaseKeep">Yes, but please try to keep book in stock!</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
+
+                <div class="explore-section">
+                    <h2 data-i18n="exploreCollection">Explore Our Collection<i class="fa fa-Search"></i></h2>
+                    <a href="library.html" class="explore-button" data-i18n="exploreBooks">Explore Books</a>
+                </div>
+
+                <div class="credits">
+                    <h2 data-i18n="credits">Credits</h2>
+                    <p>&copy; copyright @ 2024 <span>Coding credit: Atticus Herr</span> [all rights reserved!]</p>
+                    <p>5th grade class 2024-2025</p>
+                </div>
             </div>
         </section>
-
-        <footer>
-            <p>&copy; copyright @ 2024 <span>Coding credit: Atticus Herr</span> [all rights reserved!]</p>
-            <p>5th grade class 2024-2025</p>
-        </footer>
     </div>
 
     <div id="borrowChoiceModal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content choice-modal-content">
             <span class="close-button" onclick="closeModal('borrowChoiceModal')">&times;</span>
-            <h2>Borrow Option</h2>
-            <div class="choice-container">
-                <button class="choice-btn" onclick="closeModal('borrowChoiceModal'); openModal('borrowIsbnModal')">
-                    <i class="fa-solid fa-barcode"></i> Scan or Enter ISBN / Barcode
-                </button>
-                <button class="choice-btn" onclick="closeModal('borrowChoiceModal'); openModal('borrowManualModal')">
-                    <i class="fa-solid fa-pen"></i> Enter Book Details Manually
-                </button>
-            </div>
+            <h2>How would you like to borrow?</h2>
+            <button class="choice-btn" onclick="openModal('borrowIsbnModal'); closeModal('borrowChoiceModal')">By ISBN/Barcode</button>
+            <button class="choice-btn" onclick="openModal('borrowManualModal'); closeModal('borrowChoiceModal')">Manual Input</button>
         </div>
     </div>
 
     <div id="returnChoiceModal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content choice-modal-content">
             <span class="close-button" onclick="closeModal('returnChoiceModal')">&times;</span>
-            <h2>Return Option</h2>
-            <div class="choice-container">
-                <button class="choice-btn" onclick="closeModal('returnChoiceModal'); openModal('returnIsbnModal')">
-                    <i class="fa-solid fa-barcode"></i> Scan or Enter ISBN / Barcode
-                </button>
-                <button class="choice-btn" onclick="closeModal('returnChoiceModal'); openModal('returnManualModal')">
-                    <i class="fa-solid fa-pen"></i> Enter Details Manually
-                </button>
-            </div>
+            <h2>How would you like to return?</h2>
+            <button class="choice-btn" onclick="openModal('returnIsbnModal'); closeModal('returnChoiceModal')">By ISBN/Barcode</button>
+            <button class="choice-btn" onclick="openModal('returnManualModal'); closeModal('returnChoiceModal')">Manual Input</button>
         </div>
     </div>
 
@@ -209,60 +195,51 @@
             <form id="borrowIsbnForm">
                 <div class="form-group">
                     <label>ISBN (10, 13, or Barcode)</label>
-                    <input type="text" id="borrowIsbnInput" placeholder="Scan barcode here..." required>
+                    <div style="display:flex; gap:10px;">
+                        <input type="text" id="borrowIsbnInput" required style="flex:1;" placeholder="Scan barcode here...">
+                    </div>
                     <button type="button" id="borrowLookupBtn" style="margin-top:10px; background-color:#17a2b8;">Lookup Book Info</button>
                 </div>
                 <div class="form-group">
                     <label>Book Title (Auto-filled)</label>
-                    <input type="text" id="borrowAutoTitle" readonly required>
+                    <input type="text" id="borrowAutoTitle" readonly>
                 </div>
                 <div class="form-group">
                     <label>Author (Auto-filled)</label>
-                    <input type="text" id="borrowAutoAuthor" readonly required>
+                    <input type="text" id="borrowAutoAuthor" readonly>
                 </div>
                 <div class="form-group">
                     <label>Full Name</label>
-                    <input type="text" id="borrowName" placeholder="e.g. John Doe">
+                    <input type="text" id="borrowName" placeholder="e.g. Billy Bob Joe" required style="width:100%;">
                 </div>
                 <div class="form-group">
-                    <label>Room / Classroom Number</label>
-                    <input type="text" id="borrowRoom" placeholder="e.g. Room 12">
+                    <label>Room Number</label>
+                    <select id="borrowRoom" required style="width:100%;">
+                        <option value="" disabled selected>Select Room</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                        <option value="IDEA Studio">IDEA Studio</option>
+                        <option value="Music Room">Music Room</option>
+                        <option value="Front Office">Front Office</option>
+                        <option value="Staff Room">Staff Room</option>
+                    </select>
                 </div>
                 <div class="form-group">
-                    <label>Digital Signature (Type Full Name)</label>
-                    <input type="text" id="borrowSignature" placeholder="Sign your full name">
+                    <label>Disclaimer Signature</label>
+                    <p style="font-size: 0.85em; color: #666; margin-top:0;">Please recognize that you are fully accountable for the care and return of the book.</p>
+                    <input type="text" id="borrowSignature" placeholder="Type full name to sign" required>
                 </div>
-                <button type="submit" style="background-color:#28a745;">Submit Borrow Request</button>
-            </form>
-        </div>
-    </div>
-
-    <div id="borrowManualModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button" onclick="closeModal('borrowManualModal')">&times;</span>
-            <h2>Borrow Book (Manual Entry)</h2>
-            <form id="borrowManualForm">
-                <div class="form-group">
-                    <label>Book Title</label>
-                    <input type="text" id="borrowManualTitle" placeholder="Title of the book">
-                </div>
-                <div class="form-group">
-                    <label>Author</label>
-                    <input type="text" id="borrowManualAuthor" placeholder="Author name">
-                </div>
-                <div class="form-group">
-                    <label>Full Name</label>
-                    <input type="text" id="borrowManualName" placeholder="e.g. Jane Doe">
-                </div>
-                <div class="form-group">
-                    <label>Room / Classroom Number</label>
-                    <input type="text" id="borrowManualRoom" placeholder="e.g. Room 14">
-                </div>
-                <div class="form-group">
-                    <label>Digital Signature (Type Full Name)</label>
-                    <input type="text" id="borrowManualSignature" placeholder="Sign your full name">
-                </div>
-                <button type="submit" style="background-color:#28a745;">Submit Borrow Request</button>
+                <button type="submit">Submit Borrow Request</button>
             </form>
         </div>
     </div>
@@ -272,42 +249,112 @@
             <span class="close-button" onclick="closeModal('returnIsbnModal')">&times;</span>
             <h2>Return by ISBN</h2>
             <form id="returnIsbnForm">
-                <div class="form-group" style="position:relative;">
-                    <label>Search Request ID (Autocomplete Top 3)</label>
-                    <input type="text" id="returnSearchReqId" placeholder="Type Request ID, Name, or Title..." autocomplete="off">
-                    <div id="returnReqIdSearchResults" class="id-search-results"></div>
-                </div>
                 <div class="form-group">
                     <label>Request ID (Optional if providing Book Details)</label>
                     <input type="text" id="returnRequestId" placeholder="e.g. REQ-ABC123XYZ">
                 </div>
                 <div class="form-group">
                     <label>ISBN (10, 13, or Barcode)</label>
-                    <input type="text" id="returnIsbnInput" placeholder="Scan barcode here...">
+                    <div style="display:flex; gap:10px;">
+                        <input type="text" id="returnIsbnInput" style="flex:1;" placeholder="Scan barcode here...">
+                    </div>
                     <button type="button" id="returnLookupBtn" style="margin-top:10px; background-color:#17a2b8;">Lookup Book Info</button>
                 </div>
                 <div class="form-group">
-                    <label>Book Title</label>
-                    <input type="text" id="returnAutoTitle">
+                    <label>Book Title (Auto-filled)</label>
+                    <input type="text" id="returnAutoTitle" readonly>
                 </div>
                 <div class="form-group">
-                    <label>Author</label>
-                    <input type="text" id="returnAutoAuthor">
+                    <label>Author (Auto-filled)</label>
+                    <input type="text" id="returnAutoAuthor" readonly>
                 </div>
                 <div class="form-group">
                     <label>Full Name</label>
-                    <input type="text" id="returnName" placeholder="e.g. John Doe">
+                    <input type="text" id="returnName" placeholder="e.g. Billy Bob Joe" required style="width:100%;">
                 </div>
                 <div class="form-group">
-                    <label>Room / Classroom Number</label>
-                    <input type="text" id="returnRoom" placeholder="e.g. Room 12">
+                    <label>Room Number</label>
+                    <select id="returnRoom" style="width:100%;">
+                        <option value="" disabled selected>Select Room</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                        <option value="IDEA Studio">IDEA Studio</option>
+                        <option value="Music Room">Music Room</option>
+                        <option value="Front Office">Front Office</option>
+                        <option value="Staff Room">Staff Room</option>
+                    </select>
                 </div>
                 <div class="form-group">
-                    <label>Return Method</label><br>
-                    <label><input type="radio" name="returnMethodIsbn" value="I will drop it off at the library" checked> Drop off at library</label><br>
-                    <label><input type="radio" name="returnMethodIsbn" value="I need my book picked up"> Request pick up</label>
+                    <label>Return Method</label>
+                    <div style="margin-bottom: 5px;">
+                        <input type="radio" id="pickupIsbn" name="returnMethodIsbn" value="I need my book picked up" required>
+                        <label for="pickupIsbn" style="display:inline; font-weight:normal;">I need my book picked up</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="selfIsbn" name="returnMethodIsbn" value="I can return my book myself">
+                        <label for="selfIsbn" style="display:inline; font-weight:normal;">I can return my book myself</label>
+                    </div>
                 </div>
-                <button type="submit" style="background-color:#007bff;">Submit Return Request</button>
+                <button type="submit">Submit Return Request</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="borrowManualModal" class="modal overlay">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal('borrowManualModal')">&times;</span>
+            <h2>Manual Borrow Input</h2>
+            <form id="borrowManualForm">
+                <div class="form-group">
+                    <label>Book Title</label>
+                    <input type="text" id="borrowManualTitle" required>
+                </div>
+                <div class="form-group">
+                    <label>Author</label>
+                    <input type="text" id="borrowManualAuthor" required>
+                </div>
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="borrowManualName" placeholder="e.g. Billy Bob Joe" required style="width:100%;">
+                </div>
+                <div class="form-group">
+                    <label>Room Number</label>
+                    <select id="borrowManualRoom" required style="width:100%;">
+                        <option value="" disabled selected>Select Room</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                        <option value="IDEA Studio">IDEA Studio</option>
+                        <option value="Music Room">Music Room</option>
+                        <option value="Front Office">Front Office</option>
+                        <option value="Staff Room">Staff Room</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Disclaimer Signature</label>
+                    <p style="font-size: 0.85em; color: #666; margin-top:0;">Please recognize that you are fully accountable for the care and return of the book.</p>
+                    <input type="text" id="borrowManualSignature" placeholder="Type full name to sign" required>
+                </div>
+                <button type="submit">Submit Borrow Request</button>
             </form>
         </div>
     </div>
@@ -315,15 +362,10 @@
     <div id="returnManualModal" class="modal">
         <div class="modal-content">
             <span class="close-button" onclick="closeModal('returnManualModal')">&times;</span>
-            <h2>Return Book (Manual Entry)</h2>
+            <h2>Manual Return Input</h2>
             <form id="returnManualForm">
-                <div class="form-group" style="position:relative;">
-                    <label>Search Request ID (Autocomplete Top 3)</label>
-                    <input type="text" id="returnManualSearchReqId" placeholder="Type Request ID, Name, or Title..." autocomplete="off">
-                    <div id="returnManualReqIdSearchResults" class="id-search-results"></div>
-                </div>
                 <div class="form-group">
-                    <label>Request ID</label>
+                    <label>Request ID (Optional if providing Book Details)</label>
                     <input type="text" id="returnManualRequestId" placeholder="e.g. REQ-ABC123XYZ">
                 </div>
                 <div class="form-group">
@@ -336,23 +378,90 @@
                 </div>
                 <div class="form-group">
                     <label>Full Name</label>
-                    <input type="text" id="returnManualName">
+                    <input type="text" id="returnManualName" placeholder="e.g. Billy Bob Joe" style="width:100%;">
                 </div>
                 <div class="form-group">
                     <label>Room Number</label>
-                    <input type="text" id="returnManualRoom">
+                    <select id="returnManualRoom" style="width:100%;">
+                        <option value="" disabled selected>Select Room</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                        <option value="IDEA Studio">IDEA Studio</option>
+                        <option value="Music Room">Music Room</option>
+                        <option value="Front Office">Front Office</option>
+                        <option value="Staff Room">Staff Room</option>
+                    </select>
                 </div>
                 <div class="form-group">
-                    <label>Return Method</label><br>
-                    <label><input type="radio" name="returnMethodManual" value="I will drop it off at the library" checked> Drop off at library</label><br>
-                    <label><input type="radio" name="returnMethodManual" value="I need my book picked up"> Request pick up</label>
+                    <label>Return Method</label>
+                    <div style="margin-bottom: 5px;">
+                        <input type="radio" id="pickupManual" name="returnMethodManual" value="I need my book picked up" required>
+                        <label for="pickupManual" style="display:inline; font-weight:normal;">I need my book picked up</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="selfManual" name="returnMethodManual" value="I can return my book myself">
+                        <label for="selfManual" style="display:inline; font-weight:normal;">I can return my book myself</label>
+                    </div>
                 </div>
-                <button type="submit" style="background-color:#007bff;">Submit Return Request</button>
+                <button type="submit">Submit Return Request</button>
             </form>
         </div>
     </div>
 
+   
     <script src="script.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        const botmCsvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQaTqPVndPccN9h1-RYUulv59x-Ursqed9lsoDnMfejpp8VoI1DjYFh2Cq5Xr-471I8RcKX7vJ2yJgj/pub?gid=399990247&single=true&output=csv'; 
+        const changelogCsvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQaTqPVndPccN9h1-RYUulv59x-Ursqed9lsoDnMfejpp8VoI1DjYFh2Cq5Xr-471I8RcKX7vJ2yJgj/pub?gid=799275151&single=true&output=csv';
+
+        try {
+            const botmResponse = await fetch(botmCsvUrl);
+            const botmText = await botmResponse.text();
+            const botmRows = botmText.split('\n').filter(row => row.trim() !== ''); 
+            
+            if (botmRows.length > 0) {
+                const latestBotm = botmRows[botmRows.length - 1].split(','); 
+
+                const title = latestBotm[1] ? latestBotm[1].trim() : 'Unknown Title';
+                const author = latestBotm[2] ? latestBotm[2].trim() : 'Unknown Author';
+
+                if (document.getElementById('botmMonthDisplay')) document.getElementById('botmMonthDisplay').innerHTML = `<strong>Month:</strong> ${title}`;
+                if (document.getElementById('botmTitleDisplay')) document.getElementById('botmTitleDisplay').innerHTML = `<strong>Title:</strong> ${title}`;
+                if (document.getElementById('botmAuthorDisplay')) document.getElementById('botmAuthorDisplay').innerHTML = `<strong>Author:</strong> ${author}`;
+            }
+        } catch (error) {
+            console.error('Error fetching Book of the Month:', error);
+        }
+
+        try {
+            const updateResponse = await fetch(changelogCsvUrl);
+            const updateText = await updateResponse.text();
+            const updateRows = updateText.split('\n').filter(row => row.trim() !== '');
+
+            if (updateRows.length > 0) {
+                const latestUpdateRow = updateRows[updateRows.length - 1].split(',');
+                const updateMessage = latestUpdateRow.slice(1).join(',').trim();
+                if (updateMessage && document.getElementById('latestUpdateDisplay')) {
+                    document.getElementById('latestUpdateDisplay').textContent = updateMessage;
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching Changelog:', error);
+        }
+
+    });
+    </script>
     <script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "082695a43f814cc7871a76922df6162e"}'></script>
 </body>
 </html>
