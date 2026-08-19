@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Changelog - MSC Book Collection</title>
+    <title>Changelog & Updates - MSC Book Collection</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <script src="https://kit.fontawesome.com/cd38709ddf.js" crossorigin="anonymous"></script>
+    <link rel="icon" href="Prepared Cooper.ico" type="image/x-icon">
 </head>
 <body>
 
     <header>
-        <h1><img src="Prepared Cooper.ico" alt="MSC Book Collection Logo">MSC Book Collection</h1>
+        <h1><img src="Prepared Cooper.ico" alt="MSC Book Collection Logo" style="height:30px; vertical-align:middle; margin-right:10px;">MSC Book Collection</h1>
     </header>
 
     <div class="navbar">
@@ -24,20 +25,65 @@
         </ul>
     </div>
 
-    <div id="mainContent">
-        <section style="width:90%; margin: 20px auto;">
-            <h2 style="text-align:center; color:#333;"><i class="fa-solid fa-list-check"></i> Project Changelog & Updates</h2>
-            <div id="changelogCardsContainer" class="changelog-cards-container">
-                <p style="text-align:center;">Loading updates...</p>
-            </div>
-        </section>
+    <div class="dashboard-container" style="max-width: 900px;">
+        <h2>Website Update History & Changelog <i class="fa-solid fa-clock-rotate-left"></i></h2>
+        <p style="color: #666; font-size: 0.95em;">Stay up to date with the latest features, bug fixes, and library system improvements.</p>
+        <hr style="margin: 15px 0;">
 
-        <footer>
-            <p>&copy; copyright @ 2024 <span>Coding credit: Atticus Herr</span> [all rights reserved!]</p>
-            <p>5th grade class 2024-2025</p>
-        </footer>
+        <div id="changelogFullList">
+            <p style="text-align:center;">Loading update log...</p>
+        </div>
     </div>
 
+    <footer>
+        <p>&copy; copyright @ 2024–2026 <span>Coding credit: Atticus Herr</span> [all rights reserved!]</p>
+        <p>5th grade class 2024-2025</p>
+    </footer>
+
     <script src="script.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        const changelogCsvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQaTqPVndPccN9h1-RYUulv59x-Ursqed9lsoDnMfejpp8VoI1DjYFh2Cq5Xr-471I8RcKX7vJ2yJgj/pub?gid=799275151&single=true&output=csv';
+        const listContainer = document.getElementById('changelogFullList');
+
+        try {
+            const response = await fetch(changelogCsvUrl);
+            const textData = await response.text();
+            const lines = textData.split('\n').filter(line => line.trim().length > 0);
+
+            if (lines.length <= 1) {
+                listContainer.innerHTML = '<p style="text-align:center;">No changelog updates found.</p>';
+                return;
+            }
+
+            let html = '<div class="changelog-feed">';
+            const entries = lines.slice(1).reverse();
+
+            entries.forEach(entryLine => {
+                const parts = entryLine.split(',');
+                const version = parts[0] ? parts[0].trim() : '1.0.0';
+                const message = parts[1] ? parts.slice(1, parts.length - 1).join(',').trim() : parts.slice(1).join(',').trim();
+                const rawTimestamp = parts.length > 2 ? parts[parts.length - 1].trim() : '';
+                const formattedDate = formatTimestamp(rawTimestamp) || 'Recent';
+
+                html += `
+                    <div style="background: #ffffff; border-left: 4px solid #007bff; border-radius: 6px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <span style="background: #e3f2fd; color: #0d6efd; font-weight: bold; padding: 4px 10px; border-radius: 12px; font-size: 0.85rem;">v${version}</span>
+                            <span style="font-size: 0.85rem; color: #888;"><i class="far fa-calendar-alt"></i> ${formattedDate}</span>
+                        </div>
+                        <p style="margin: 0; color: #333; line-height: 1.5; font-size: 0.98rem;">${message}</p>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            listContainer.innerHTML = html;
+        } catch (err) {
+            console.error(err);
+            listContainer.innerHTML = '<p style="text-align:center; color:red;">Unable to load updates at this time.</p>';
+        }
+    });
+    </script>
 </body>
 </html>
