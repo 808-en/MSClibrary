@@ -167,7 +167,8 @@
         <p>Loading data...</p>
     </div>
 </div>
-    <div class="dashboard-container">
+
+<div class="dashboard-container">
     <h2>Current Return Requests</h2>
 
     <div id="data-container1" style="overflow-x:auto;width:100%;">
@@ -339,7 +340,7 @@
 </div>
 
 <footer>
-    <p>&copy; 2025 MSC Book Collection - Admin Area</p>
+    <p>&copy; 2026 MSC Book Collection - Admin Area</p>
 </footer>
 
 <!-- Teacher Auth Modal -->
@@ -692,8 +693,6 @@
 
             <h3>Select Input Type</h3>
 
-            <p>ISBN/Barcode coming soon.</p>
-
             <button
                 type="button"
                 class="choice-btn"
@@ -924,6 +923,11 @@
                 <input type="text" id="botmAuthor" required>
             </div>
 
+            <div class="form-group">
+                <label>ISBN / Barcode (Optional)</label>
+                <input type="text" id="botmIsbn" placeholder="Scan or enter ISBN/Barcode">
+            </div>
+
             <button type="submit">Update</button>
 
         </form>
@@ -945,12 +949,13 @@
 
             <div class="form-group">
                 <label>Version Number</label>
-                <input type="text" id="changelogVersion" required>
+                <input type="text" id="changelogVersion" required placeholder="e.g. v1.2.0">
             </div>
 
             <div class="form-group">
-                <label>Update Message</label>
-                <textarea id="changelogMessage" required></textarea>
+                <label>Update Message (Max 300 characters)</label>
+                <textarea id="changelogMessage" maxlength="300" required placeholder="Enter release summary..."></textarea>
+                <small style="color:#6c757d;display:block;margin-top:4px;">Maximum 300 characters.</small>
             </div>
 
             <button type="submit">Update Changelog</button>
@@ -1537,7 +1542,16 @@
     });
 
     window.addEventListener('click', event => {
-        const modals = ['teacherAuthModal', 'addAccountModal', 'addCodeModal', 'deleteAllModal'];
+        const modals = [
+            'teacherAuthModal', 
+            'addAccountModal', 
+            'addCodeModal', 
+            'deleteAllModal', 
+            'addBookModal', 
+            'deleteBookModal', 
+            'updateBotmModal', 
+            'updateLatestModal'
+        ];
 
         modals.forEach(id => {
             const modal = document.getElementById(id);
