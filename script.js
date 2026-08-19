@@ -5,6 +5,27 @@ const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyvHlxSf3NoF8MBZQYiH
 const ADMIN_DB_URL = 'https://script.google.com/macros/s/AKfycbyvHlxSf3NoF8MBZQYiHvJrBmBhYVE6V_GcGhr8iSK6AeKs5SISoUN_Ho4owsjjV0_5Fw/exec';
 
 let _sessionInterval = null;
+let _borrowRequestsData = [];
+
+function formatTimestamp(value) {
+    if (!value) return '';
+    let strVal = String(value).trim();
+    let num = Number(strVal);
+    if (!isNaN(num) && num > 100000000) {
+        if (num < 10000000000) num = num * 1000;
+        let d = new Date(num);
+        if (!isNaN(d.getTime())) {
+            let m = d.getMonth() + 1;
+            let day = d.getDate();
+            let y = d.getFullYear();
+            let h = d.getHours();
+            let min = String(d.getMinutes()).padStart(2, '0');
+            let sec = String(d.getSeconds()).padStart(2, '0');
+            return `${m}/${day}/${y} ${h}:${min}:${sec}`;
+        }
+    }
+    return value;
+}
 
 document.addEventListener('DOMContentLoaded', function() {
     initSessionTimer();
@@ -12,6 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setupTeacherControls();
     setupBotmForm();
     setupChangelogForm();
+    setupReturnSearch();
 
     const btnProminentBorrow = document.getElementById('btnProminentBorrow');
     const btnProminentReturn = document.getElementById('btnProminentReturn');
@@ -175,12 +197,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert("Book added successfully.");
                 normalForm.reset();
                 closeModal('addBookModal');
-                const choiceSec = document.getElementById('addBookChoiceSection');
-                if (choiceSec) {
-                    choiceSec.style.display = 'block';
-                    document.getElementById('normalInputSection').style.display = 'none';
-                    document.getElementById('massInputSection').style.display = 'none';
-                }
             }).catch(() => {
                 alert("Book submission attempted. Please check Google Sheet.");
             });
@@ -227,12 +243,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert(books.length + " books added successfully.");
                 massForm.reset();
                 closeModal('addBookModal');
-                const choiceSec = document.getElementById('addBookChoiceSection');
-                if (choiceSec) {
-                    choiceSec.style.display = 'block';
-                    document.getElementById('normalInputSection').style.display = 'none';
-                    document.getElementById('massInputSection').style.display = 'none';
-                }
             }).catch(() => {
                 alert("Books submission attempted. Please check Google Sheet.");
             });
@@ -291,7 +301,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const btnDelAll = document.getElementById('btnDeleteAll');
     if (btnDelAll) {
         btnDelAll.addEventListener('click', () => {
-            if (confirm("Are you sure you want to delete ALL books? This requires extra confirmation and cannot be undone.")) {
+            if (confirm("Are you sure you want to delete ALL books?")) {
                 if (confirm("FINAL WARNING: Click OK to delete the entire library database.")) {
                     const payload = JSON.stringify({ action: "deleteAll", sheetTarget: "Library Catalog" });
                     Promise.all([
@@ -398,76 +408,6 @@ function setupTeacherControls() {
             }
         });
     }
-
-    setupTeacherActionButtons();
-}
-
-function setupTeacherActionButtons() {
-    const btnUpdateMonthly = document.getElementById('btnUpdateMonthlyPasswords');
-    const btnRemovePasses = document.getElementById('btnRemovePasswords');
-    const btnUpdateCurrent = document.getElementById('btnUpdateCurrentMonthPassword');
-    const btnUpdateTime = document.getElementById('btnUpdateTimePeriod');
-
-    if (btnUpdateMonthly) {
-        btnUpdateMonthly.addEventListener('click', () => {
-            openTeacherActionModal("Update Monthly Passwords", `
-                <div class="form-group">
-                    <label>Generate / Enter 5-digit PINs for calculated school periods (up to 300 days):</label>
-                    <textarea placeholder="e.g. Month 1: 12345&#10;Month 2: 67890..." rows="6"></textarea>
-                    <button type="button" onclick="alert('Monthly passwords updated for period!'); closeModal('teacherActionModal');" class="teacher-btn">Save Monthly Passwords</button>
-                </div>
-            `);
-        });
-    }
-
-    if (btnRemovePasses) {
-        btnRemovePasses.addEventListener('click', () => {
-            openTeacherActionModal("Remove Passwords", `
-                <div class="form-group">
-                    <p>Select option:</p>
-                    <button type="button" onclick="alert('All passwords cleared!'); closeModal('teacherActionModal');" class="teacher-btn" style="background-color: #dc3545; margin-bottom: 10px;">Remove All Passwords</button>
-                    <button type="button" onclick="alert('Selected passwords cleared!'); closeModal('teacherActionModal');" class="teacher-btn">Remove Selected Passwords</button>
-                </div>
-            `);
-        });
-    }
-
-    if (btnUpdateCurrent) {
-        btnUpdateCurrent.addEventListener('click', () => {
-            openTeacherActionModal("Update Current Month Password", `
-                <div class="form-group">
-                    <label>New 5-Digit Password for Current Month:</label>
-                    <input type="password" maxlength="5" pattern="\\d{5}" placeholder="e.g. 54321" style="margin-bottom: 15px;">
-                    <button type="button" onclick="alert('Current month password updated!'); closeModal('teacherActionModal');" class="teacher-btn">Update Password</button>
-                </div>
-            `);
-        });
-    }
-
-    if (btnUpdateTime) {
-        btnUpdateTime.addEventListener('click', () => {
-            openTeacherActionModal("Update Password Time-Period", `
-                <div class="form-group">
-                    <label>Select frequency for mandatory password changes (1 week to ~300 days):</label>
-                    <select style="margin-bottom: 15px;">
-                        <option value="7">Every 7 Days (1 Week)</option>
-                        <option value="30" selected>Every 30 Days (Monthly)</option>
-                        <option value="90">Every 90 Days (Quarterly)</option>
-                        <option value="300">Every 300 Days (School Year Period)</option>
-                    </select>
-                    <button type="button" onclick="alert('Time period updated successfully!'); closeModal('teacherActionModal');" class="teacher-btn">Save Time-Period Setting</button>
-                </div>
-            `);
-        });
-    }
-}
-
-function openTeacherActionModal(title, contentHtml) {
-    const titleEl = document.getElementById('teacherModalTitle');
-    const bodyEl = document.getElementById('teacherModalBody');
-    if (titleEl) titleEl.textContent = title;
-    if (bodyEl) bodyEl.innerHTML = contentHtml;
-    openModal('teacherActionModal');
 }
 
 function setupFormSubmission(formId, type, dataExtractor, modalId) {
@@ -516,26 +456,6 @@ async function fetchBookDetailsFromAPI(isbn) {
         }
     } catch(e) {}
 
-    try {
-        const response = await fetch(`https://openlibrary.org/api/books?bibkeys=ISBN:${cleanIsbn}&format=json&jscmd=data`);
-        if (response.ok) {
-            const data = await response.json();
-            const book = data[`ISBN:${cleanIsbn}`];
-            if (book) {
-                return {
-                    title: book.title || '',
-                    author: book.authors ? book.authors.map(a => a.name).join(', ') : '',
-                    genre: book.subjects ? book.subjects.map(s => s.name).join(', ') : '',
-                    synopsis: typeof book.notes === 'string' ? book.notes : '',
-                    cover: book.cover ? (book.cover.large || book.cover.medium || book.cover.small || '') : '',
-                    grade: '',
-                    msc: '',
-                    quantity: 1
-                };
-            }
-        }
-    } catch(e) {}
-
     return null;
 }
 
@@ -570,7 +490,7 @@ function submitToGoogleSheet(data, generatedId) {
         fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload })
     ]).then(() => {
         if (generatedId) {
-            alert(`Request successfully recorded! Your Return Request ID is: ${generatedId}. Please store it somewhere safe for when you return the book.`);
+            alert(`Request successfully recorded! Your Request ID is: ${generatedId}. Please save it for returning.`);
         } else {
             alert("Request successfully recorded!");
         }
@@ -584,11 +504,6 @@ function openModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
         modal.style.display = 'flex';
-        if (modalId === 'borrowIsbnModal') {
-            setTimeout(() => document.getElementById('borrowIsbnInput').focus(), 100);
-        } else if (modalId === 'returnIsbnModal') {
-            setTimeout(() => document.getElementById('returnIsbnInput').focus(), 100);
-        }
     }
 }
 
@@ -602,11 +517,9 @@ function closeModal(modalId) {
 function setupModalHandlers() {
     const openAdd = document.getElementById('openAddBookModal');
     const openDel = document.getElementById('openDeleteBookModal');
-    const openPerms = document.getElementById('openPermissions');
 
     if(openAdd) openAdd.addEventListener('click', () => openModal('addBookModal'));
     if(openDel) openDel.addEventListener('click', () => { openModal('deleteBookModal'); fetchDeleteChartData(); });
-    if(openPerms) openPerms.addEventListener('click', () => openModal('permissionsModal'));
 }
 
 function parseCSV(text) {
@@ -642,7 +555,7 @@ function renderSheetRows(container, rows) {
     rows.forEach(row => { if (row.length > maxCols) maxCols = row.length; });
 
     let returnedIndex = headers.findIndex(h => (h || '').toLowerCase().includes('returned'));
-    if (returnedIndex === -1) returnedIndex = 9;
+    if (returnedIndex === -1) returnedIndex = 8;
 
     let reqIdIndex = headers.findIndex(h => {
         const lower = (h || '').toLowerCase().trim();
@@ -667,6 +580,9 @@ function renderSheetRows(container, rows) {
         
         for (let i = 0; i < maxCols; i++) {
             let cell = rowData[i] || '';
+            if (i === 0) {
+                cell = formatTimestamp(cell);
+            }
             if (i === returnedIndex) {
                 cell = isReturned ? 'Y' : cell;
             }
@@ -677,7 +593,7 @@ function renderSheetRows(container, rows) {
         if (!isReturned) {
             tableHtml += `<td><button class="action-btn return-btn" style="padding: 5px 15px; font-size: 1rem; min-width: auto;" data-reqid="${reqId}">Mark as Returned</button></td>`;
         } else {
-            tableHtml += `<td></td>`;
+            tableHtml += `<td>Completed</td>`;
         }
         
         tableHtml += '</tr>';
@@ -691,12 +607,7 @@ function renderSheetRows(container, rows) {
         btn.addEventListener('click', function() {
             const reqId = this.getAttribute('data-reqid');
             const row = this.closest('tr');
-            const headerCells = container.querySelectorAll('thead th');
-            let detectedReturnedIndex = -1;
-            headerCells.forEach((th, idx) => {
-                if (th.textContent.toLowerCase().includes('returned')) detectedReturnedIndex = idx;
-            });
-            markAsReturned(row, reqId, detectedReturnedIndex);
+            markAsReturned(row, reqId, returnedIndex);
         });
     });
 }
@@ -709,10 +620,25 @@ async function fetchData(container) {
         const textData = await response.text();
         const rows = parseCSV(textData);
 
+        _borrowRequestsData = [];
+        if (rows.length > 1) {
+            rows.slice(1).forEach(r => {
+                _borrowRequestsData.push({
+                    timestamp: r[0] || '',
+                    requestId: r[1] || '',
+                    isbn: r[2] || '',
+                    title: r[3] || '',
+                    author: r[4] || '',
+                    name: r[5] || '',
+                    room: r[6] || ''
+                });
+            });
+        }
+
         renderSheetRows(container, rows);
     } catch (error) {
         console.error(error);
-        container.innerHTML = '<p>Could not load data.</p>';
+        if (container) container.innerHTML = '<p>Could not load data.</p>';
     }
 }
 
@@ -722,36 +648,11 @@ async function fetchReturnData(container) {
         if (!response.ok) throw new Error('Network response was not ok');
 
         const textData = await response.text();
-        if (textData.trim().startsWith('<')) {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(textData, 'text/html');
-            const table = doc.querySelector('table');
-            if (!table) {
-                container.innerHTML = '<p>Could not find sheet table in the returned HTML.</p>';
-                return;
-            }
-
-            const htmlRows = Array.from(table.querySelectorAll('tr'));
-            const rawRows = htmlRows.map(tr => {
-                const cells = Array.from(tr.querySelectorAll('th,td'));
-                return cells.map(cell => cell.textContent.trim());
-            }).filter(row => row.some(cell => cell.length > 0));
-
-            let rows = rawRows;
-            if (rows.length > 0 && rows[0].every(c => !c || /^[A-Z]+$/.test(c) || /^\d+$/.test(c))) {
-                rows = rows.slice(1);
-            }
-            if (rows.length > 0 && /^\d+$/.test(rows[0][0])) {
-                rows = rows.map(r => r.slice(1));
-            }
-            renderSheetRows(container, rows);
-        } else {
-            const rows = parseCSV(textData);
-            renderSheetRows(container, rows);
-        }
+        const rows = parseCSV(textData);
+        renderSheetRows(container, rows);
     } catch (error) {
         console.error(error);
-        container.innerHTML = '<p>Could not load return data.</p>';
+        if (container) container.innerHTML = '<p>Could not load return data.</p>';
     }
 }
 
@@ -762,8 +663,7 @@ function markAsReturned(row, reqId, returnedIndex) {
         type: "Return",
         requestID: reqId,
         requestId: reqId,
-        returned: "Y",
-        "Returned?": "Y"
+        returned: "Y"
     };
 
     const payload = JSON.stringify(data);
@@ -774,22 +674,206 @@ function markAsReturned(row, reqId, returnedIndex) {
     ]).then(() => {
         alert("Marked as returned successfully!");
     }).catch(error => {
-        console.error(error && error.message);
+        console.error(error);
     });
 
-    row.style.textDecoration = 'line-through';
-    row.style.color = 'green';
-    row.style.fontWeight = 'bold';
+    if (row) {
+        row.style.textDecoration = 'line-through';
+        row.style.color = 'green';
+        row.style.fontWeight = 'bold';
 
-    const cells = row.querySelectorAll('td');
-    if (returnedIndex >= 0 && cells[returnedIndex]) {
-        cells[returnedIndex].textContent = 'Y';
+        const cells = row.querySelectorAll('td');
+        if (returnedIndex >= 0 && cells[returnedIndex]) {
+            cells[returnedIndex].textContent = 'Y';
+        }
+
+        const actionCell = cells[cells.length - 1];
+        if (actionCell) {
+            actionCell.innerHTML = 'Completed';
+        }
+    }
+}
+
+function setupReturnSearch() {
+    const attachSearch = (inputId, dropdownId, titleId, authorId, nameId, roomId, isbnId) => {
+        const input = document.getElementById(inputId);
+        const dropdown = document.getElementById(dropdownId);
+        if (!input || !dropdown) return;
+
+        input.addEventListener('input', function() {
+            const query = this.value.trim().toLowerCase();
+            if (query.length === 0) {
+                dropdown.style.display = 'none';
+                dropdown.innerHTML = '';
+                toggleAutofillStrikethrough(false, [titleId, authorId, nameId, roomId]);
+                return;
+            }
+
+            const matches = _borrowRequestsData.filter(item => 
+                (item.requestId && item.requestId.toLowerCase().includes(query)) ||
+                (item.name && item.name.toLowerCase().includes(query)) ||
+                (item.title && item.title.toLowerCase().includes(query))
+            ).slice(0, 3);
+
+            if (matches.length === 0) {
+                dropdown.style.display = 'none';
+                return;
+            }
+
+            dropdown.innerHTML = '';
+            matches.forEach(m => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'search-item';
+                itemDiv.innerHTML = `<strong>${m.requestId}</strong> | ${m.title} | ${m.name} <br><small>${formatTimestamp(m.timestamp)}</small>`;
+                itemDiv.addEventListener('click', () => {
+                    input.value = m.requestId;
+                    if (titleId && document.getElementById(titleId)) document.getElementById(titleId).value = m.title;
+                    if (authorId && document.getElementById(authorId)) document.getElementById(authorId).value = m.author;
+                    if (nameId && document.getElementById(nameId)) document.getElementById(nameId).value = m.name;
+                    if (roomId && document.getElementById(roomId)) document.getElementById(roomId).value = m.room;
+                    if (isbnId && document.getElementById(isbnId)) document.getElementById(isbnId).value = m.isbn;
+
+                    dropdown.style.display = 'none';
+                    toggleAutofillStrikethrough(true, [titleId, authorId, nameId, roomId]);
+                });
+                dropdown.appendChild(itemDiv);
+            });
+            dropdown.style.display = 'block';
+        });
+    };
+
+    attachSearch('returnRequestId', 'returnSearchDropdown', 'returnAutoTitle', 'returnAutoAuthor', 'returnName', 'returnRoom', 'returnIsbnInput');
+    attachSearch('returnManualRequestId', 'returnManualSearchDropdown', 'returnManualTitle', 'returnManualAuthor', 'returnManualName', 'returnManualRoom', null);
+}
+
+function toggleAutofillStrikethrough(enable, fieldIds) {
+    fieldIds.forEach(id => {
+        if (!id) return;
+        const el = document.getElementById(id);
+        if (el) {
+            if (enable) el.classList.add('field-strikethrough');
+            else el.classList.remove('field-strikethrough');
+        }
+    });
+}
+
+function setupBotmForm() {
+    const form = document.getElementById('botmForm');
+    if (form) {
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const botmData = {
+                action: "updateBotm",
+                sheetTarget: "BOTM",
+                isbn: document.getElementById('botmIsbnInput').value,
+                month: document.getElementById('botmMonth').value,
+                title: document.getElementById('botmTitle').value,
+                author: document.getElementById('botmAuthor').value,
+                timestamp: new Date().getTime()
+            };
+
+            const payload = JSON.stringify(botmData);
+            try {
+                await Promise.all([
+                    fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload }),
+                    fetch(ADMIN_DB_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload })
+                ]);
+                alert("Book of the Month updated successfully!");
+                form.reset();
+                closeModal('updateBotmModal');
+            } catch(error) {
+                alert("Error updating Book of the Month.");
+            }
+        });
     }
 
-    const actionCell = cells[cells.length - 1];
-    if (actionCell) {
-        actionCell.innerHTML = '';
+    const botmLookupBtn = document.getElementById('botmLookupBtn');
+    if (botmLookupBtn) {
+        botmLookupBtn.addEventListener('click', async () => {
+            const isbn = document.getElementById('botmIsbnInput').value.trim();
+            if (!isbn) return alert("Please enter an ISBN first.");
+            const details = await fetchBookDetailsFromAPI(isbn);
+            if (details) {
+                document.getElementById('botmTitle').value = details.title;
+                document.getElementById('botmAuthor').value = details.author;
+            } else {
+                alert("Book details not found. Please enter manually.");
+            }
+        });
     }
+}
+
+async function fetchBotm() {
+    try {
+        const botmContainer = document.getElementById('botmContainer');
+        const response = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vQaTqPVndPccN9h1-RYUulv59x-Ursqed9lsoDnMfejpp8VoI1DjYFh2Cq5Xr-471I8RcKX7vJ2yJgj/pub?gid=399990247&single=true&output=csv');
+        const data = await response.text();
+        const lines = data.split('\n').filter(line => line.trim().length > 0);
+        
+        if (lines.length > 1 && botmContainer) {
+            const latest = lines[lines.length - 1].split(',');
+            botmContainer.innerHTML = `
+                <div class="botm-card">
+                    <h3>📚 Book of the Month</h3>
+                    <p><strong>${latest[2] || ''}</strong></p>
+                    <p>by ${latest[3] || ''}</p>
+                    <p>${latest[1] || ''}</p>
+                </div>
+            `;
+        }
+    } catch(error) {}
+}
+
+function setupChangelogForm() {
+    const form = document.getElementById('changelogForm');
+    if (form) {
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const msgInput = document.getElementById('changelogMessage').value;
+            const changelogData = {
+                action: "updateChangelog",
+                sheetTarget: "Changelog",
+                version: document.getElementById('changelogVersion') ? document.getElementById('changelogVersion').value : '1.0.0',
+                message: msgInput.substring(0, 300),
+                timestamp: new Date().getTime()
+            };
+
+            const payload = JSON.stringify(changelogData);
+            try {
+                await Promise.all([
+                    fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload }),
+                    fetch(ADMIN_DB_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload })
+                ]);
+                alert("Changelog updated successfully!");
+                form.reset();
+                closeModal('updateLatestModal');
+            } catch(error) {
+                alert("Error updating Changelog.");
+            }
+        });
+    }
+}
+
+async function fetchChangelog() {
+    try {
+        const changelogContainer = document.getElementById('changelogContainer');
+        const response = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vQaTqPVndPccN9h1-RYUulv59x-Ursqed9lsoDnMfejpp8VoI1DjYFh2Cq5Xr-471I8RcKX7vJ2yJgj/pub?gid=799275151&single=true&output=csv');
+        const data = await response.text();
+        const lines = data.split('\n').filter(line => line.trim().length > 0);
+        
+        if (lines.length > 1 && changelogContainer) {
+            let changelogHtml = '<div class="changelog-card"><h3>📝 Latest Updates</h3>';
+            const recentEntries = lines.slice(Math.max(1, lines.length - 6)).reverse();
+            recentEntries.forEach(line => {
+                const parts = line.split(',');
+                if (parts.length >= 2) {
+                    changelogHtml += `<div class="changelog-entry"><p><strong>v${parts[0] || ''}</strong>: ${parts[1] || ''}</p></div>`;
+                }
+            });
+            changelogHtml += '</div>';
+            changelogContainer.innerHTML = changelogHtml;
+        }
+    } catch(error) {}
 }
 
 async function fetchDeleteChartData() {
@@ -816,147 +900,5 @@ async function fetchDeleteChartData() {
         }
     } catch (error) {
         bodyEl.innerHTML = '<tr><td colspan="4" style="text-align:center;">Error loading books.</td></tr>';
-    }
-}
-
-// ==================== BOOK OF THE MONTH ====================
-
-function setupBotmForm() {
-    const form = document.getElementById('botmForm');
-    if (form) {
-        form.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const botmData = {
-                action: "updateBotm",
-                sheetTarget: "BOTM",
-                isbn: document.getElementById('botmIsbnInput').value,
-                month: document.getElementById('botmMonth').value,
-                title: document.getElementById('botmTitle').value,
-                author: document.getElementById('botmAuthor').value,
-                timestamp: new Date().getTime()
-            };
-
-            const payload = JSON.stringify(botmData);
-            
-            try {
-                await Promise.all([
-                    fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload }),
-                    fetch(ADMIN_DB_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload })
-                ]);
-                alert("Book of the Month updated successfully!");
-                form.reset();
-                closeModal('updateBotmModal');
-            } catch(error) {
-                alert("Error updating Book of the Month. Please try again.");
-                console.error(error);
-            }
-        });
-    }
-
-    const botmLookupBtn = document.getElementById('botmLookupBtn');
-    if (botmLookupBtn) {
-        botmLookupBtn.addEventListener('click', async () => {
-            const isbn = document.getElementById('botmIsbnInput').value.trim();
-            if (!isbn) {
-                alert("Please enter an ISBN first.");
-                return;
-            }
-            
-            const details = await fetchBookDetailsFromAPI(isbn);
-            if (details) {
-                document.getElementById('botmTitle').value = details.title;
-                document.getElementById('botmAuthor').value = details.author;
-            } else {
-                alert("Book details not found. Please enter manually.");
-            }
-        });
-    }
-}
-
-async function fetchBotm() {
-    try {
-        const botmContainer = document.getElementById('botmContainer');
-        if (!botmContainer) return;
-
-        const response = await fetch('YOUR_BOTM_SHEET_URL');
-        const data = await response.text();
-        const lines = data.split('\n').filter(line => line.trim().length > 0);
-        
-        if (lines.length > 1) {
-            const latest = lines[lines.length - 1].split(',');
-            botmContainer.innerHTML = `
-                <div class="botm-card">
-                    <h3>📚 Book of the Month</h3>
-                    <p><strong>${latest[2] || ''}</strong></p>
-                    <p>by ${latest[3] || ''}</p>
-                    <p>${latest[1] || ''}</p>
-                </div>
-            `;
-        }
-    } catch(error) {
-        console.error('Error fetching BOTM:', error);
-    }
-}
-
-// ==================== CHANGELOG ====================
-
-function setupChangelogForm() {
-    const form = document.getElementById('changelogForm');
-    if (form) {
-        form.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const changelogData = {
-                action: "updateChangelog",
-                sheetTarget: "Changelog",
-                version: document.getElementById('changelogVersion').value,
-                message: document.getElementById('changelogMessage').value,
-                timestamp: new Date().getTime()
-            };
-
-            const payload = JSON.stringify(changelogData);
-            
-            try {
-                await Promise.all([
-                    fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload }),
-                    fetch(ADMIN_DB_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload })
-                ]);
-                alert("Changelog updated successfully!");
-                form.reset();
-                closeModal('updateLatestModal');
-            } catch(error) {
-                alert("Error updating Changelog. Please try again.");
-                console.error(error);
-            }
-        });
-    }
-}
-
-async function fetchChangelog() {
-    try {
-        const changelogContainer = document.getElementById('changelogContainer');
-        if (!changelogContainer) return;
-
-        const response = await fetch('YOUR_CHANGELOG_SHEET_URL');
-        const data = await response.text();
-        const lines = data.split('\n').filter(line => line.trim().length > 0);
-        
-        if (lines.length > 1) {
-            let changelogHtml = '<div class="changelog-card"><h3>📝 Latest Updates</h3>';
-            
-            const recentEntries = lines.slice(Math.max(1, lines.length - 6)).reverse();
-            recentEntries.forEach(line => {
-                const parts = line.split(',');
-                if (parts.length >= 2) {
-                    changelogHtml += `<div class="changelog-entry"><p><strong>v${parts[0] || ''}</strong>: ${parts[1] || ''}</p></div>`;
-                }
-            });
-            
-            changelogHtml += '</div>';
-            changelogContainer.innerHTML = changelogHtml;
-        }
-    } catch(error) {
-        console.error('Error fetching Changelog:', error);
     }
 }
