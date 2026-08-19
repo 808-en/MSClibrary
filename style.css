@@ -251,6 +251,7 @@ th {
 .form-group {
     margin-bottom: 20px;
     text-align: left;
+    position: relative;
 }
 .form-group label {
     display: block;
@@ -368,6 +369,45 @@ button[type="submit"]:hover {
 .account-widget.active .account-dropdown {
     display: flex;
 }
+
+/* Search Dropdown Styles */
+.search-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #007bff;
+    border-radius: 6px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    z-index: 1005;
+    max-height: 200px;
+    overflow-y: auto;
+    display: none;
+}
+.search-item {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.2s;
+}
+.search-item:last-child {
+    border-bottom: none;
+}
+.search-item:hover {
+    background-color: #f0f7ff;
+}
+.search-item strong {
+    color: #007bff;
+}
+
+.field-strikethrough {
+    text-decoration: line-through;
+    color: #6c757d;
+    background-color: #e9ecef !important;
+}
+
 @media (max-width: 768px) {
     .navbar ul { display: flex; flex-direction: column; align-items: center; }
     .navbar li { margin: 5px 0; }
