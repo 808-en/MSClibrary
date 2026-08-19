@@ -12,7 +12,7 @@
 --------------------------------------------------------------------------------
  LAST UPDATED
 --------------------------------------------------------------------------------
- Date:          August 11, 2026
+ Date:          August 18, 2026
  Updated By:    Atticus Herr
 
 --------------------------------------------------------------------------------
@@ -96,6 +96,7 @@
         <ul>
             <li><a href="index.html" data-i18n="home">Home</a></li>
             <li><a href="#" id="openReturnForm" data-i18n="bookReturn">Book Return</a></li>
+            <li><a href="changelog.html">Changelog</a></li>
             <li><a href="HelpForum.html" data-i18n="help">Help</a></li>
             <li><a href="#" id="openBorrowForm" data-i18n="borrowBook">Borrow Book</a></li>
             <li><a href="login.html" id="AdminLogin" data-i18n="login">Log In<i class="fa-solid fa-user-lock"></i></a></li>
@@ -163,7 +164,7 @@
 
                 <div class="credits">
                     <h2 data-i18n="credits">Credits</h2>
-                    <p>&copy; copyright @ 2024 <span>Coding credit: Atticus Herr</span> [all rights reserved!]</p>
+                    <p>&copy; copyright @ 2024–2026 <span>Coding credit: Atticus Herr</span> [all rights reserved!]</p>
                     <p>5th grade class 2024-2025</p>
                 </div>
             </div>
@@ -250,8 +251,9 @@
             <h2>Return by ISBN</h2>
             <form id="returnIsbnForm">
                 <div class="form-group">
-                    <label>Request ID (Optional if providing Book Details)</label>
-                    <input type="text" id="returnRequestId" placeholder="e.g. REQ-ABC123XYZ">
+                    <label>Request ID or Search (Type Name / ID / Book Title)</label>
+                    <input type="text" id="returnRequestId" placeholder="e.g. REQ-ABC123XYZ or search borrower name...">
+                    <div id="returnSearchDropdown" class="search-dropdown"></div>
                 </div>
                 <div class="form-group">
                     <label>ISBN (10, 13, or Barcode)</label>
@@ -365,8 +367,9 @@
             <h2>Manual Return Input</h2>
             <form id="returnManualForm">
                 <div class="form-group">
-                    <label>Request ID (Optional if providing Book Details)</label>
-                    <input type="text" id="returnManualRequestId" placeholder="e.g. REQ-ABC123XYZ">
+                    <label>Request ID or Search (Type Name / ID / Book Title)</label>
+                    <input type="text" id="returnManualRequestId" placeholder="e.g. REQ-ABC123XYZ or search borrower name...">
+                    <div id="returnManualSearchDropdown" class="search-dropdown"></div>
                 </div>
                 <div class="form-group">
                     <label>Book Title</label>
@@ -418,7 +421,6 @@
         </div>
     </div>
 
-   
     <script src="script.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', async () => {
