@@ -112,7 +112,6 @@ function populateFilters() {
     bookData.forEach(book => {
         if(book['Genre']) genres.add(book['Genre']);
         if(book['Grade Level']) grades.add(book['Grade Level']);
-        if(book['MSC+ Grade Level']) grades.add(book['MSC+ Grade Level']);
     });
 
     const genreFilter = document.getElementById('genreFilter');
@@ -150,7 +149,6 @@ function renderBooks(books) {
         const genre = book['Genre'] || 'N/A';
         const author = book['Author'] || 'Unknown Author';
         const grade = book['Grade Level'] || 'N/A';
-        const mscGrade = book['MSC+ Grade Level'] || 'N/A';
         const synopsis = book['Synopsis'] || 'No synopsis available.';
 
         card.innerHTML = `
@@ -160,11 +158,6 @@ function renderBooks(books) {
                 <p><strong>Author:</strong> ${author}</p>
                 <p><strong>Genre:</strong> ${genre}</p>
                 <p><strong>Grade Level:</strong> ${grade}</p>
-                <p><strong>MSC+ Grade:</strong> ${mscGrade} 
-                    <span class="msc-tooltip"><i class="fas fa-question-circle"></i>
-                        <span class="tooltiptext">Custom metric for measuring the complexity and developmental level of books.</span>
-                    </span>
-                </p>
             </div>
             <div class="synopsis-container">
                 <div class="synopsis-text" id="synopsis-${index}">${synopsis}</div>
@@ -197,7 +190,7 @@ function filterBooks() {
         const matchesSearch = (book['Book Name'] && book['Book Name'].toLowerCase().includes(searchTerm)) || 
                               (book['Author'] && book['Author'].toLowerCase().includes(searchTerm));
         const matchesGenre = selectedGenre === '' || book['Genre'] === selectedGenre;
-        const matchesGrade = selectedGrade === '' || book['Grade Level'] === selectedGrade || book['MSC+ Grade Level'] === selectedGrade;
+        const matchesGrade = selectedGrade === '' || book['Grade Level'] === selectedGrade;
 
         return matchesSearch && matchesGenre && matchesGrade;
     });
