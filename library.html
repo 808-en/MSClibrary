@@ -14,9 +14,6 @@
 .book-card h3 { margin: 0 0 10px 0; font-size: 1.4em; color: #333; }
 .book-card .info { width: 100%; text-align: left; margin-bottom: 10px; font-size: 0.9em; }
 .book-card .info p { margin: 5px 0; }
-.msc-tooltip { position: relative; display: inline-block; cursor: pointer; color: #007bff; margin-left: 5px; }
-.msc-tooltip .tooltiptext { visibility: hidden; width: 200px; background-color: #555; color: #fff; text-align: center; border-radius: 6px; padding: 5px; position: absolute; z-index: 1; bottom: 125%; left: 50%; transform: translateX(-50%); opacity: 0; transition: opacity 0.3s; font-size: 0.8em; font-weight: normal; }
-.msc-tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
 .synopsis-container { width: 100%; text-align: left; font-size: 0.9em; color: #555; margin-bottom: 15px; flex-grow: 1; }
 .synopsis-text { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .synopsis-text.expanded { -webkit-line-clamp: unset; display: block; }
@@ -58,7 +55,7 @@
     <div class="control-group">
         <i class="fas fa-layer-group"></i>
         <select id="gradeFilter">
-            <option value="">All Grade Levels & MSC+</option>
+            <option value="">All Grade Levels</option>
         </select>
     </div>
 </div>
@@ -70,38 +67,7 @@
     <p>&copy; copyright @ 2024 <span>Coding credit: Atticus Herr</span> [all rights reserved!]</p>
     <p>5th grade class 2024-2025</p>
 </footer>
-
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const isLoggedIn = sessionStorage.getItem('adminLoggedIn') === 'true';
-        const pfp = document.getElementById('userPfp');
-        const nameEl = document.getElementById('userName');
-        const logoutBtn = document.getElementById('logoutBtn');
-        const loginDropdownBtn = document.getElementById('loginDropdownBtn');
-        const navLoginBtn = document.getElementById('AdminLogin');
-
-        if (isLoggedIn) {
-            if(pfp) pfp.src = 'loggedinpfp.png';
-            if(nameEl) nameEl.textContent = 'Admin';
-            if(logoutBtn) logoutBtn.style.display = 'block';
-            if(loginDropdownBtn) loginDropdownBtn.style.display = 'none';
-            if(navLoginBtn) {
-                navLoginBtn.innerHTML = 'Admin Panel <i class="fa-solid fa-lock"></i>';
-                navLoginBtn.href = 'admin.html';
-            }
-        } else {
-            if(pfp) pfp.src = 'guestpfp.png';
-            if(nameEl) nameEl.textContent = 'Guest';
-            if(logoutBtn) logoutBtn.style.display = 'none';
-            if(loginDropdownBtn) loginDropdownBtn.style.display = 'block';
-            if(navLoginBtn) {
-                navLoginBtn.innerHTML = 'Log In <i class="fa-solid fa-user-lock"></i>';
-                navLoginBtn.href = 'login.html';
-            }
-        }
-    });
-</script>
-
+    
 <script>
 const SHEET_ID = '1ZfFEooX7fWIMA9tMZlxcUndPfw2ebSHGJMLRIoyzyO0';
 const SHEET_NAME = 'Library Catalog';
