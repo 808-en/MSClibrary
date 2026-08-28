@@ -144,7 +144,7 @@ function renderBooks(books) {
         const card = document.createElement('div');
         card.className = 'book-card';
 
-        const imgSrc = book['Cover Image'] || 'ERR_Cover_Image.gif';
+        const imgSrc = book['Cover Image'] || 'ERR_Cover_Image.jpeg';
         const title = book['Book Name'] || 'Unknown Title';
         const genre = book['Genre'] || 'N/A';
         const author = book['Author'] || 'Unknown Author';
@@ -152,7 +152,7 @@ function renderBooks(books) {
         const synopsis = book['Synopsis'] || 'No synopsis available.';
 
         card.innerHTML = `
-            <img src="${imgSrc}" alt="${title}" onerror="this.onerror=null; this.src='ERR_Cover_Image.gif';">
+            <img src="${imgSrc}" alt="${title}" onerror="this.onerror=null; this.src='ERR_Cover_Image.jpeg';">
             <h3>${title}</h3>
             <div class="info">
                 <p><strong>Author:</strong> ${author}</p>
