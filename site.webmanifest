@@ -1,0 +1,16 @@
+{
+  "name": "MSC Library Book Collection",
+  "short_name": "App",
+  "description": "Welcome, Merryhill School Calvine students, to the MSC Online Library! This month's featured book is...",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#007bff",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "Prepared Cooper.ico",
+      "type": "image/png"
+    }
+  ]
+}
