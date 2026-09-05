@@ -1,10 +1,9 @@
 # robots.txt for https://808-en.github.io/MSClibrary
-# Allow all crawlers except admin/login pages and internal folders
+# Allow all crawlers except admin/ pages and internal folders
 
 User-agent: *
 Disallow: /admin.html
-Disallow: /login.html
 Disallow: /functions/
 Allow: /
 
-Sitemap: https://808-en.github.io/MSClibrary/sitemap.xml
+Sitemap: https://msclibrary.pages.dev/sitemap.xml
