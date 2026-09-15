@@ -77,33 +77,32 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
- <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <link rel="manifest" href="site.webmanifest">
-
-  <link rel="canonical" href="https://msclibrary.pages.dev/">
+    <link rel="manifest" href="site.webmanifest">
+    <link rel="canonical" href="https://msclibrary.pages.dev/">
  
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://msclibrary.pages.dev">
-  <meta property="og:title" content="MSC Library Book Collection">
-  <meta property="og:description" content="A catchy summary optimized to make people click when shared on social feeds.">
-  <meta property="og:image" content="https://msclibrary.pages.dev/Header-IMG.jpg">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://msclibrary.pages.dev">
+    <meta property="og:title" content="MSC Library Book Collection">
+    <meta property="og:description" content="A catchy summary optimized to make people click when shared on social feeds.">
+    <meta property="og:image" content="https://msclibrary.pages.dev/Header-IMG.jpg">
 
- <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "name": "MSC Library",
-  "url": "https://msclibrary.pages.dev/"
-}
-</script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "MSC Library",
+      "url": "https://msclibrary.pages.dev/"
+    }
+    </script>
  
     <meta charset="UTF-8">
     <title data-i18n="pageTitle">MSC Book Collection</title>
-    <meta name="description" content='Welcome to the MSC School Library website! This month's featured book is BBB by AAA.'>
+    <meta name="description" content="Welcome to the MSC School Library website!">
     <meta name="robots" content="index, follow">
- <!-- CSS/Icons -->
+
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <script src="https://kit.fontawesome.com/cd38709ddf.js" crossorigin="anonymous"></script>
@@ -125,7 +124,7 @@
         <ul>
             <li><a href="index.html" data-i18n="home">Home</a></li>
             <li><a href="#" id="openReturnForm" data-i18n="bookReturn">Book Return</a></li>
-            <li><a href="changelog.html">Changelog</a></li>
+            <li><a href="changelog.html" data-i18n="changelog">Changelog</a></li>
             <li><a href="HelpForum.html" data-i18n="help">Help</a></li>
             <li><a href="#" id="openBorrowForm" data-i18n="borrowBook">Borrow Book</a></li>
             <li><a href="login.html" id="AdminLogin" data-i18n="login">Log In<i class="fa-solid fa-user-lock"></i></a></li>
@@ -134,9 +133,9 @@
 
     <div id="mainContent">
         <div class="prominent-actions">
-                <button id="btnProminentBorrow" class="action-btn borrow-btn"><i class="fa-solid fa-book-open"></i> Borrow a Book</button>
-                <button id="btnProminentReturn" class="action-btn return-btn"><i class="fa-solid fa-hand-holding-hand"></i> Return a Book</button>
-            </div>
+            <button id="btnProminentBorrow" class="action-btn borrow-btn"><i class="fa-solid fa-book-open"></i> Borrow a Book</button>
+            <button id="btnProminentReturn" class="action-btn return-btn"><i class="fa-solid fa-hand-holding-hand"></i> Return a Book</button>
+        </div>
         <section>
             <div class="container">
                 <img src="Header-IMG.jpg" alt="Welcome to MSC School Library" class="responsive">
@@ -145,23 +144,27 @@
 
             <div class="body-containers-items">
                 <div class="latest-update">
-                    <h2 data-i18n="latestUpdate">Latest Update<i class="fa-solid fa-download"></i></h2>
+                    <h2 data-i18n="latestUpdate">Latest Update <i class="fa-solid fa-download"></i></h2>
                     <p id="latestUpdateDisplay" data-i18n="welcomeText">Welcome to the MSC School Library website!</p>
+                    <div style="margin-top: 15px;">
+                        <a href="changelog.html" class="changelog-link-btn"><i class="fa-solid fa-list"></i> View Full Changelog</a>
+                    </div>
                 </div>
 
                 <div class="book-of-the-month">
-                    <h2 data-i18n="bookOfTheMonth">Book of the Month<i class="fa-solid fa-book"></i></h2>
+                    <h2 data-i18n="bookOfTheMonth">Book of the Month <i class="fa-solid fa-book"></i></h2>
                     <article>
                         <p data-i18n="featuredBook">This month's featured book is:</p>
                         <ul>
-                            <li id="botmTitleDisplay" data-i18n="harryPotterTitle"><strong>Title:</strong> Harry Potter and the Deathly Hallows</li>
-                            <li id="botmAuthorDisplay" data-i18n="jkRowling"><strong>Author:</strong> JK Rowling</li>
+                            <li id="botmMonthDisplay"><strong>Month:</strong> Loading...</li>
+                            <li id="botmTitleDisplay"><strong>Title:</strong> Loading...</li>
+                            <li id="botmAuthorDisplay"><strong>Author:</strong> Loading...</li>
                         </ul>
                     </article>
                 </div>
 
                 <div class="delivery-chart">
-                    <h2 data-i18n="borrowingGuidelines">Borrowing Guidelines<i class="fa-solid fa-hand-holding-hand"></i></h2>
+                    <h2 data-i18n="borrowingGuidelines">Borrowing Guidelines <i class="fa-solid fa-hand-holding-hand"></i></h2>
                     <p data-i18n="borrowingInfo">Please see the chart below for information on borrowing periods for different user types:</p>
                     <table>
                         <thead>
@@ -187,7 +190,7 @@
                 </div>
 
                 <div class="explore-section">
-                    <h2 data-i18n="exploreCollection">Explore Our Collection<i class="fa fa-Search"></i></h2>
+                    <h2 data-i18n="exploreCollection">Explore Our Collection <i class="fa fa-Search"></i></h2>
                     <a href="library.html" class="explore-button" data-i18n="exploreBooks">Explore Books</a>
                 </div>
 
@@ -459,15 +462,15 @@
         try {
             const botmResponse = await fetch(botmCsvUrl);
             const botmText = await botmResponse.text();
-            const botmRows = botmText.split('\n').filter(row => row.trim() !== ''); 
+            const botmRows = parseCSV(botmText);
             
-            if (botmRows.length > 0) {
-                const latestBotm = botmRows[botmRows.length - 1].split(','); 
-
+            if (botmRows.length > 1) {
+                const latestBotm = botmRows[botmRows.length - 1]; 
+                const month = latestBotm[0] ? latestBotm[0].trim() : 'N/A';
                 const title = latestBotm[1] ? latestBotm[1].trim() : 'Unknown Title';
                 const author = latestBotm[2] ? latestBotm[2].trim() : 'Unknown Author';
 
-                if (document.getElementById('botmMonthDisplay')) document.getElementById('botmMonthDisplay').innerHTML = `<strong>Month:</strong> ${title}`;
+                if (document.getElementById('botmMonthDisplay')) document.getElementById('botmMonthDisplay').innerHTML = `<strong>Month:</strong> ${month}`;
                 if (document.getElementById('botmTitleDisplay')) document.getElementById('botmTitleDisplay').innerHTML = `<strong>Title:</strong> ${title}`;
                 if (document.getElementById('botmAuthorDisplay')) document.getElementById('botmAuthorDisplay').innerHTML = `<strong>Author:</strong> ${author}`;
             }
@@ -478,19 +481,21 @@
         try {
             const updateResponse = await fetch(changelogCsvUrl);
             const updateText = await updateResponse.text();
-            const updateRows = updateText.split('\n').filter(row => row.trim() !== '');
+            const updateRows = parseCSV(updateText);
 
-            if (updateRows.length > 0) {
-                const latestUpdateRow = updateRows[updateRows.length - 1].split(',');
-                const updateMessage = latestUpdateRow.slice(1).join(',').trim();
+            if (updateRows.length > 1) {
+                const latestUpdateRow = updateRows[updateRows.length - 1];
+                const version = latestUpdateRow[0] ? latestUpdateRow[0].trim() : '';
+                const updateMessage = latestUpdateRow[1] ? latestUpdateRow[1].trim() : '';
+                const timeStr = formatTimestamp(latestUpdateRow[2]);
+
                 if (updateMessage && document.getElementById('latestUpdateDisplay')) {
-                    document.getElementById('latestUpdateDisplay').textContent = updateMessage;
+                    document.getElementById('latestUpdateDisplay').textContent = `[${timeStr}] v${version}: ${updateMessage}`;
                 }
             }
         } catch (error) {
             console.error('Error fetching Changelog:', error);
         }
-
     });
     </script>
     <script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "082695a43f814cc7871a76922df6162e"}'></script>
