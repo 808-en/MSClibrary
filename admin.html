@@ -895,42 +895,65 @@
     </div>
 </div>
 
+<!-- Update BOTM Modal with Month Dropdown & Upcoming Preview -->
 <div id="updateBotmModal" class="modal">
-    <div class="modal-content">
+    <div class="modal-content" style="max-width: 600px;">
 
-        <span
-            class="close-button"
-            onclick="closeModal('updateBotmModal')">
-            &times;
-        </span>
+        <span class="close-button" onclick="closeModal('updateBotmModal')">&times;</span>
 
         <h2>Update Book of the Month</h2>
 
         <form id="botmForm">
 
             <div class="form-group">
-                <label>Month</label>
-                <input type="text" id="botmMonth" required>
+                <label for="botmMonth">Month</label>
+                <select id="botmMonth" class="code-mgmt-input" required>
+                    <option value="" disabled selected>Select Month...</option>
+                    <option value="January">January</option>
+                    <option value="February">February</option>
+                    <option value="March">March</option>
+                    <option value="April">April</option>
+                    <option value="May">May</option>
+                    <option value="June">June</option>
+                    <option value="July">July</option>
+                    <option value="August">August</option>
+                    <option value="September">September</option>
+                    <option value="October">October</option>
+                    <option value="November">November</option>
+                    <option value="December">December</option>
+                </select>
             </div>
 
             <div class="form-group">
-                <label>Book Title</label>
-                <input type="text" id="botmTitle" required>
+                <label for="botmTitle">Book Title</label>
+                <input type="text" id="botmTitle" class="code-mgmt-input" required placeholder="e.g. The Great Gatsby">
             </div>
 
             <div class="form-group">
-                <label>Author</label>
-                <input type="text" id="botmAuthor" required>
+                <label for="botmAuthor">Author</label>
+                <input type="text" id="botmAuthor" class="code-mgmt-input" required placeholder="e.g. F. Scott Fitzgerald">
             </div>
 
             <div class="form-group">
-                <label>ISBN / Barcode (Optional)</label>
-                <input type="text" id="botmIsbn" placeholder="Scan or enter ISBN/Barcode">
+                <label for="botmIsbn">ISBN / Barcode (Optional)</label>
+                <input type="text" id="botmIsbn" class="code-mgmt-input" placeholder="Scan or enter ISBN/Barcode">
             </div>
 
-            <button type="submit">Update</button>
+            <button type="submit" class="code-mgmt-btn" style="background-color:#007bff; margin-top: 10px;">
+                Save BOTM
+            </button>
 
         </form>
+
+        <hr style="margin: 25px 0 15px 0; border: 0; border-top: 1px solid #dee2e6;">
+
+        <h3>Upcoming Books of the Month</h3>
+        <div id="botmUpcomingPreview" style="max-height: 200px; overflow-y: auto; background: #f8f9fa; border: 1px solid #ced4da; border-radius: 6px; padding: 10px;">
+            <p style="color:#6c757d; text-align:center; margin: 0; font-size: 0.9rem;">
+                Loading upcoming schedule...
+            </p>
+        </div>
+
     </div>
 </div>
 
