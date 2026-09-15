@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <title>Customer Service</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help & Guidance — MSC Book Collection</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="Prepared Cooper.ico" type="image/x-icon">
 
     <style>
         body {
@@ -30,22 +31,20 @@
             font-weight: 600;
         }
 
-        .email{
-            color:#ef4444;
+        .email {
+            color: #ef4444;
             font-weight: 600;
             display: inline-block;
             margin-left: .25rem;
         }
 
-        .fade-enter { opacity: 0; transform: translateY(6px); }
         .fade-enter-active { transition: opacity .28s ease, transform .28s ease; opacity: 1; transform: translateY(0); }
-        .fade-exit { opacity: 1; }
         .fade-exit-active { transition: opacity .18s ease; opacity: 0; }
 
         main { padding-bottom: 5.5rem; }
 
         .Forum {
-            background-color: f8f8f8;
+            background-color: #ffffff;
             padding: 1.25rem;
             margin: 1.25rem auto;
             width: 90%;
@@ -59,37 +58,32 @@
 <body class="antialiased">
 
     <header>
-        <h1 class="text-2xl md:text-3xl font-extrabold">Help</h1>
+        <h1 class="text-2xl md:text-3xl font-extrabold flex items-center justify-center gap-2">
+            <img src="Prepared Cooper.ico" alt="Logo" class="w-8 h-8">
+            MSC Book Collection — Help
+        </h1>
     </header>
 
     <div class="navbar bg-gray-200 py-3">
-        <ul class="flex items-center justify-center gap-6">
+        <ul class="flex items-center justify-center gap-6 flex-wrap">
             <li><a href="index.html" class="px-3 py-1 rounded hover:bg-gray-300"><i class="fa-solid fa-house mr-1"></i>Home</a></li>
-            <li>
-                <select class="genre-choice rounded px-3 py-1 border border-gray-300">
-                    <option selected>Genres</option>
-                    <option>Action-Adventure</option>
-                    <option>Science Fiction</option>
-                    <option>Mystery-Horror</option>
-                    <option>Fantasy</option>
-                    <option>Historical Fiction</option>
-                    <option>Informational Text</option>
-                    <option>Biography</option>
-                </select>
-            </li>
-            <li><a href="BookReturn.html" class="px-3 py-1 rounded hover:bg-gray-300"><i class="fa-solid fa-rotate-left mr-1"></i>Book Return</a></li>
+            <li><a href="library.html" class="px-3 py-1 rounded hover:bg-gray-300"><i class="fa-solid fa-book-open mr-1"></i>Explore Books</a></li>
+            <li><a href="changelog.html" class="px-3 py-1 rounded hover:bg-gray-300"><i class="fa-solid fa-list mr-1"></i>Changelog</a></li>
             <li><a href="HelpForum.html" class="px-3 py-1 rounded bg-white shadow-sm"><i class="fa-solid fa-circle-question mr-1"></i>Help</a></li>
-            <li><a href="LoginFork.html" id="ForkedLogin" class="px-3 py-1 rounded hover:bg-gray-300"><i class="fa-solid fa-right-to-bracket mr-1"></i>Login</a></li>
+            <li><a href="login.html" id="ForkedLogin" class="px-3 py-1 rounded hover:bg-gray-300"><i class="fa-solid fa-right-to-bracket mr-1"></i>Login</a></li>
         </ul>
     </div>
 
     <main class="max-w-6xl mx-auto">
 
         <div class="Forum">
-            <h2 class="text-xl font-bold mb-2"><i class="fa-solid fa-hands-helping text-yellow-500 mr-2"></i>How To Request Help</h2>
-            <p class="text-gray-700 mb-4">Encountered a bug? Can't find your book? We can help! If you need help, you can contact
-                <span class="email">atticusherr@gmail.com</span> (Site owner and developer)
-            </p>
+            <h2 class="text-xl font-bold mb-2"><i class="fa-solid fa-hands-helping text-yellow-500 mr-2"></i>How To Request Assistance</h2>
+            <p class="text-gray-700">Encountered a bug or can't find your book? Contact <span class="email">atticusherr@gmail.com</span> (Site Developer).</p>
+        </div>
+
+        <div class="Forum">
+            <label for="topicSearch" class="block font-semibold mb-2 text-sm text-gray-700"><i class="fa-solid fa-magnifying-glass mr-1"></i>Search Help Topics:</label>
+            <input type="text" id="topicSearch" placeholder="Type keyword (e.g. ISBN, return, borrowing, admin)..." class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-600">
         </div>
 
         <section class="Forum" aria-labelledby="forum-title">
@@ -104,19 +98,16 @@
                 </div>
 
                 <div class="hidden sm:flex items-center space-x-2 text-sm text-gray-600">
-                   
                     <span class="flex items-center gap-2 px-3 py-1 rounded bg-gray-100">
-                        <i class="fa-solid fa-clock-rotate-left text-gray-500"></i> Updated 2026 -- W.I.P.
+                        <i class="fa-solid fa-clock-rotate-left text-gray-500"></i> Updated 2026
                     </span>
                 </div>
             </div>
 
-            <article id="page-content" class="mt-6 text-gray-800 leading-relaxed">
-            </article>
+            <article id="page-content" class="mt-6 text-gray-800 leading-relaxed"></article>
 
             <nav aria-label="Forum pagination" class="mt-6 flex items-center justify-between gap-4">
-                <button id="prev-btn" class="flex-1 sm:flex-none inline-flex items-center gap-3 px-3 py-2 rounded-lg text-left bg-gray-100 hover:bg-gray-200 disabled:opacity-40"
-                        aria-label="Previous document">
+                <button id="prev-btn" class="flex-1 sm:flex-none inline-flex items-center gap-3 px-3 py-2 rounded-lg text-left bg-gray-100 hover:bg-gray-200 disabled:opacity-40" aria-label="Previous document">
                     <i class="fa-solid fa-chevron-left text-lg"></i>
                     <div class="text-sm">
                         <div class="text-xs text-gray-500">Previous</div>
@@ -125,19 +116,14 @@
                 </button>
 
                 <div class="flex-1 text-center">
-                    <div class="inline-flex items-center gap-3 bg-white px-4 py-2 rounded-lg shadow-sm">
-                        <button id="first-btn" class="px-2 py-1 text-sm text-indigo-600 hover:underline" title="Go to first"><i class="fa-solid fa-backward-step mr-2"></i>First</button>
-                        <button id="jump-prev" class="px-2 py-1 text-sm text-gray-600 hidden" title="Jump back"><i class="fa-solid fa-ellipsis"></i></button>
-
+                    <div class="inline-flex items-center gap-3 bg-white px-4 py-2 rounded-lg shadow-sm flex-wrap justify-center">
+                        <button id="first-btn" class="px-2 py-1 text-sm text-indigo-600 hover:underline"><i class="fa-solid fa-backward-step mr-2"></i>First</button>
                         <div id="page-dots" class="flex items-center gap-2"></div>
-
-                        <button id="jump-next" class="px-2 py-1 text-sm text-gray-600 hidden" title="Jump forward"><i class="fa-solid fa-ellipsis"></i></button>
-                        <button id="last-btn" class="px-2 py-1 text-sm text-indigo-600 hover:underline" title="Go to last">Last <i class="fa-solid fa-forward-step ml-2"></i></button>
+                        <button id="last-btn" class="px-2 py-1 text-sm text-indigo-600 hover:underline">Last <i class="fa-solid fa-forward-step ml-2"></i></button>
                     </div>
                 </div>
 
-                <button id="next-btn" class="flex-1 sm:flex-none inline-flex items-center gap-3 px-3 py-2 rounded-lg justify-end bg-gray-100 hover:bg-gray-200 disabled:opacity-40"
-                        aria-label="Next document">
+                <button id="next-btn" class="flex-1 sm:flex-none inline-flex items-center gap-3 px-3 py-2 rounded-lg justify-end bg-gray-100 hover:bg-gray-200 disabled:opacity-40" aria-label="Next document">
                     <div class="text-sm text-right">
                         <div class="text-xs text-gray-500">Next</div>
                         <div id="next-label" class="font-medium text-gray-800">—</div>
@@ -155,23 +141,81 @@
     </main>
 
     <footer class="bg-gray-900 text-white text-center py-3 fixed bottom-0 left-0 right-0">
-        <p>&copy; 2024 <span>coding credit: Atticus Herr</span></p>
+        <p>&copy; 2024–2026 <span>coding credit: Atticus Herr</span> [All Rights Reserved]</p>
     </footer>
 
     <script>
         const pages = [
             {
-                title: "Forums Coming Soon",
-                icon: "fa-solid fa-rocket",
-                subtitle: "Subtitle",
+                title: "What is MSC Library?",
+                icon: "fa-solid fa-book-open",
+                subtitle: "Overview of the school library system.",
                 content: `
-                    <h4 class="text-lg font-semibold mb-2"><i class="fa-solid fa-book-open mr-2 text-indigo-500"></i>Header</h4>
-                    <p>Body Text</p>
-                    <ul class="list-disc pl-5 mt-3 text-gray-700">
-                        <li>List 1</li>
-                        <li>List 2</li>
-                        <li>List 3</li>
+                    <h4 class="text-lg font-semibold mb-2 text-indigo-600">Welcome to MSC Library</h4>
+                    <p>MSC Book Collection is a digital catalog and request manager for the school library. It allows students and staff to search for available books, request borrowing, and process returns digitally.</p>
+                `
+            },
+            {
+                title: "How to Borrow Books",
+                icon: "fa-solid fa-hand-holding-hand",
+                subtitle: "Step-by-step borrowing guide.",
+                content: `
+                    <h4 class="text-lg font-semibold mb-2 text-indigo-600">Borrowing Process</h4>
+                    <ol class="list-decimal pl-5 space-y-2">
+                        <li>Click <strong>Borrow a Book</strong> on the homepage.</li>
+                        <li>Choose <strong>By ISBN/Barcode</strong> or <strong>Manual Input</strong>.</li>
+                        <li>Enter or scan the book's ISBN number or title.</li>
+                        <li>Fill out your name, room number, and signature, then submit.</li>
+                        <li>Save your generated <strong>Request ID</strong> for tracking.</li>
+                    </ol>
+                `
+            },
+            {
+                title: "How to Return Books",
+                icon: "fa-solid fa-rotate-left",
+                subtitle: "Returning borrowed titles.",
+                content: `
+                    <h4 class="text-lg font-semibold mb-2 text-indigo-600">Return Instructions</h4>
+                    <p>To return a book, select <strong>Return a Book</strong> from the menu or main page. You can look up your record using your Request ID or Name, choose pickup or drop-off, and submit your return request.</p>
+                `
+            },
+            {
+                title: "Borrowing Rules & Limits",
+                icon: "fa-solid fa-clock",
+                subtitle: "Time Limits and Policies.",
+                content: `
+                    <h4 class="text-lg font-semibold mb-2 text-indigo-600">Borrowing Guidelines</h4>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li><strong>Students:</strong> Up to 2 weeks per book. One renewal permitted.</li>
+                        <li><strong>Faculty:</strong> Flexible borrowing windows; prompt return encouraged.</li>
                     </ul>
+                `
+            },
+            {
+                title: "Searching the Catalog",
+                icon: "fa-solid fa-magnifying-glass",
+                subtitle: "Locating specific titles and genres.",
+                content: `
+                    <h4 class="text-lg font-semibold mb-2 text-indigo-600">Catalog Search Options</h4>
+                    <p>Navigate to <strong>Explore Collection</strong> to browse all titles by title, author, genre, grade level, or availability.</p>
+                `
+            },
+            {
+                title: "Teacher & Admin Controls",
+                icon: "fa-solid fa-user-shield",
+                subtitle: "Management features for authorized staff.",
+                content: `
+                    <h4 class="text-lg font-semibold mb-2 text-indigo-600">Staff Access</h4>
+                    <p>Staff members with authorization can manage requests, update the Book of the Month, modify changelog records, and manage inventory.</p>
+                `
+            },
+            {
+                title: "Troubleshooting & Support",
+                icon: "fa-solid fa-triangle-exclamation",
+                subtitle: "Resolving common issues.",
+                content: `
+                    <h4 class="text-lg font-semibold mb-2 text-indigo-600">Need Help?</h4>
+                    <p>If an ISBN lookup fails or a request is missing, try submitting via Manual Input or contact support at <span class="email">atticusherr@gmail.com</span>.</p>
                 `
             }
         ];
@@ -198,23 +242,21 @@
             pageContent.classList.add('fade-exit-active');
             setTimeout(() => {
                 pageTitle.textContent = p.title || 'Untitled';
-                pageIcon.className = p.icon || 'fa-solid fa-file';
+                pageIcon.className = (p.icon || 'fa-solid fa-file') + ' text-indigo-600';
                 pageSub.innerHTML = `<i class="fa-solid fa-info-circle mr-1"></i>${p.subtitle || ''}`;
                 pageContent.innerHTML = p.content;
                 pageNum.textContent = i + 1;
 
                 const prevIndex = i - 1;
                 const nextIndex = i + 1;
-                prevLabel.textContent = (prevIndex >= 0 && pages[prevIndex].title) ? pages[prevIndex].title : (prevIndex >= 0 ? 'Untitled' : '—');
-                nextLabel.textContent = (nextIndex < pages.length && pages[nextIndex].title) ? pages[nextIndex].title : (nextIndex < pages.length ? 'Untitled' : '—');
+                prevLabel.textContent = (prevIndex >= 0 && pages[prevIndex].title) ? pages[prevIndex].title : '—';
+                nextLabel.textContent = (nextIndex < pages.length && pages[nextIndex].title) ? pages[nextIndex].title : '—';
 
                 prevBtn.disabled = prevIndex < 0;
                 nextBtn.disabled = nextIndex >= pages.length;
 
                 renderDots(i);
-
                 pageContent.classList.remove('fade-exit-active');
-
             }, 140);
         }
 
@@ -222,29 +264,30 @@
             pageDots.innerHTML = '';
             pages.forEach((p, i) => {
                 const btn = document.createElement('button');
-                btn.className = 'w-8 h-8 rounded-full text-sm flex items-center justify-center ' + (i === activeIndex ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200');
-                btn.innerHTML = `<span class="sr-only">Page ${i+1}</span>${i+1}`;
+                btn.className = 'w-8 h-8 rounded-full text-sm flex items-center justify-center ' + (i === activeIndex ? 'bg-indigo-600 text-white font-bold' : 'bg-gray-100 text-gray-700 hover:bg-gray-200');
+                btn.innerHTML = `${i+1}`;
                 btn.onclick = () => { idx = i; renderPage(idx); };
                 pageDots.appendChild(btn);
             });
         }
 
-        prevBtn.addEventListener('click', () => {
-            if (idx > 0) { idx--; renderPage(idx); }
-        });
-
-        nextBtn.addEventListener('click', () => {
-            if (idx < pages.length - 1) { idx++; renderPage(idx); }
-        });
-
+        prevBtn.addEventListener('click', () => { if (idx > 0) { idx--; renderPage(idx); } });
+        nextBtn.addEventListener('click', () => { if (idx < pages.length - 1) { idx++; renderPage(idx); } });
         firstBtn.addEventListener('click', () => { idx = 0; renderPage(idx); });
         lastBtn.addEventListener('click', () => { idx = pages.length - 1; renderPage(idx); });
 
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowLeft') {
-                if (idx > 0) { idx--; renderPage(idx); }
-            } else if (e.key === 'ArrowRight') {
-                if (idx < pages.length - 1) { idx++; renderPage(idx); }
+            if (e.key === 'ArrowLeft' && idx > 0) { idx--; renderPage(idx); }
+            else if (e.key === 'ArrowRight' && idx < pages.length - 1) { idx++; renderPage(idx); }
+        });
+
+        document.getElementById('topicSearch').addEventListener('input', function() {
+            const query = this.value.toLowerCase().trim();
+            if (!query) return;
+            const matchIndex = pages.findIndex(p => p.title.toLowerCase().includes(query) || p.subtitle.toLowerCase().includes(query) || p.content.toLowerCase().includes(query));
+            if (matchIndex !== -1 && matchIndex !== idx) {
+                idx = matchIndex;
+                renderPage(idx);
             }
         });
 
