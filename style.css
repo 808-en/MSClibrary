@@ -188,6 +188,19 @@ th {
     background-color: #e07b00;
     transform: translateY(-2px);
 }
+.changelog-link-btn {
+    display: inline-block;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: bold;
+    transition: background-color 0.2s ease;
+}
+.changelog-link-btn:hover {
+    background-color: #0056b3;
+}
 .choice-modal-content {
     text-align: center;
 }
