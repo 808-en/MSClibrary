@@ -2,9 +2,6 @@
 // Secure 5-digit code management API for msclibrary
 // Codes are stored as SHA-256 hashes in KV — never in plaintext.
 // Each code has metadata: { label, page, startDate, endDate, created }
-// page: "admin" (admin/librarian) or "teacher" (teacher controls)
-// startDate: ISO string or null (activation start; null = always active from now)
-// endDate: ISO string or null (activation end; null = never expires)
 
 const CODE_REGEX = /^\d{5}$/;
 const VALID_PAGES = ["admin", "teacher"];
@@ -120,9 +117,6 @@ export async function onRequestGet(context) {
   return json({ codes });
 }
 
-// POST /api/codes → add a code (admin only)
-// Body: { "code": "12345", "label": "optional", "page": "admin"|"teacher",
-//         "startDate": "2026-08-12" | null, "endDate": "2026-12-31" | null }
 export async function onRequestPost(context) {
   const { request, env } = context;
 
@@ -150,7 +144,6 @@ export async function onRequestPost(context) {
     return json({ error: "Page must be 'admin' or 'teacher'." }, 400);
   }
 
-  // Validate date format if provided
   if (startDate && isNaN(new Date(startDate).getTime())) {
     return json({ error: "Invalid start date." }, 400);
   }
@@ -174,10 +167,6 @@ export async function onRequestPost(context) {
   return json({ success: true, message: "Code added." });
 }
 
-// DELETE /api/codes?delete_id=HASH     → remove by hash ID
-// DELETE /api/codes  body: { "code": "12345" }            → remove by code
-// DELETE /api/codes  body: { "delete_ids": ["hash1",...] } → batch delete
-// DELETE /api/codes  body: { "delete_all": true }          → delete all
 export async function onRequestDelete(context) {
   const { request, env } = context;
 
@@ -188,7 +177,6 @@ export async function onRequestDelete(context) {
   const url = new URL(request.url);
   const deleteId = url.searchParams.get("delete_id");
 
-  // Delete by hash ID (from admin panel list)
   if (deleteId) {
     const existing = await env.MSC_CODES.get(deleteId);
     if (existing === null) {
@@ -205,7 +193,6 @@ export async function onRequestDelete(context) {
     return json({ error: "Invalid JSON body." }, 400);
   }
 
-  // Delete all codes
   if (body.delete_all === true) {
     const keys = await env.MSC_CODES.list();
     for (const key of keys.keys) {
@@ -214,7 +201,6 @@ export async function onRequestDelete(context) {
     return json({ success: true, message: `Deleted ${keys.keys.length} code(s).` });
   }
 
-  // Batch delete by IDs
   if (Array.isArray(body.delete_ids) && body.delete_ids.length > 0) {
     for (const id of body.delete_ids) {
       await env.MSC_CODES.delete(id);
@@ -222,7 +208,6 @@ export async function onRequestDelete(context) {
     return json({ success: true, message: `Deleted ${body.delete_ids.length} code(s).` });
   }
 
-  // Delete by original code value
   const code = String(body.code || "").trim();
   if (!CODE_REGEX.test(code)) {
     return json({ error: "Code must be exactly 5 digits (0-9)." }, 400);
