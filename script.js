@@ -15,13 +15,11 @@ function formatTimestamp(value) {
         if (num < 10000000000) num = num * 1000;
         let d = new Date(num);
         if (!isNaN(d.getTime())) {
-            let m = d.getMonth() + 1;
-            let day = d.getDate();
-            let y = d.getFullYear();
-            let h = d.getHours();
+            let m = String(d.getMonth() + 1).padStart(2, '0');
+            let day = String(d.getDate()).padStart(2, '0');
+            let h = String(d.getHours()).padStart(2, '0');
             let min = String(d.getMinutes()).padStart(2, '0');
-            let sec = String(d.getSeconds()).padStart(2, '0');
-            return `${m}/${day}/${y} ${h}:${min}:${sec}`;
+            return `${m}/${day} ${h}:${min}`;
         }
     }
     return value;
@@ -765,10 +763,10 @@ function setupBotmForm() {
             const botmData = {
                 action: "updateBotm",
                 sheetTarget: "BOTM",
-                isbn: document.getElementById('botmIsbnInput').value,
-                month: document.getElementById('botmMonth').value,
-                title: document.getElementById('botmTitle').value,
-                author: document.getElementById('botmAuthor').value,
+                isbn: document.getElementById('botmIsbnInput') ? document.getElementById('botmIsbnInput').value : '',
+                month: document.getElementById('botmMonth') ? document.getElementById('botmMonth').value : '',
+                title: document.getElementById('botmTitle') ? document.getElementById('botmTitle').value : '',
+                author: document.getElementById('botmAuthor') ? document.getElementById('botmAuthor').value : '',
                 timestamp: new Date().getTime()
             };
 
@@ -794,8 +792,8 @@ function setupBotmForm() {
             if (!isbn) return alert("Please enter an ISBN first.");
             const details = await fetchBookDetailsFromAPI(isbn);
             if (details) {
-                document.getElementById('botmTitle').value = details.title;
-                document.getElementById('botmAuthor').value = details.author;
+                if (document.getElementById('botmTitle')) document.getElementById('botmTitle').value = details.title;
+                if (document.getElementById('botmAuthor')) document.getElementById('botmAuthor').value = details.author;
             } else {
                 alert("Book details not found. Please enter manually.");
             }
@@ -807,17 +805,17 @@ async function fetchBotm() {
     try {
         const botmContainer = document.getElementById('botmContainer');
         const response = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vQaTqPVndPccN9h1-RYUulv59x-Ursqed9lsoDnMfejpp8VoI1DjYFh2Cq5Xr-471I8RcKX7vJ2yJgj/pub?gid=399990247&single=true&output=csv');
-        const data = await response.text();
-        const lines = data.split('\n').filter(line => line.trim().length > 0);
+        const textData = await response.text();
+        const rows = parseCSV(textData);
         
-        if (lines.length > 1 && botmContainer) {
-            const latest = lines[lines.length - 1].split(',');
+        if (rows.length > 1 && botmContainer) {
+            const latest = rows[rows.length - 1];
             botmContainer.innerHTML = `
                 <div class="botm-card">
                     <h3>📚 Book of the Month</h3>
-                    <p><strong>${latest[2] || ''}</strong></p>
-                    <p>by ${latest[3] || ''}</p>
-                    <p>${latest[1] || ''}</p>
+                    <p><strong>Month:</strong> ${latest[0] || 'N/A'}</p>
+                    <p><strong>Title:</strong> ${latest[1] || 'Unknown Title'}</p>
+                    <p><strong>Author:</strong> ${latest[2] || 'Unknown Author'}</p>
                 </div>
             `;
         }
@@ -858,17 +856,17 @@ async function fetchChangelog() {
     try {
         const changelogContainer = document.getElementById('changelogContainer');
         const response = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vQaTqPVndPccN9h1-RYUulv59x-Ursqed9lsoDnMfejpp8VoI1DjYFh2Cq5Xr-471I8RcKX7vJ2yJgj/pub?gid=799275151&single=true&output=csv');
-        const data = await response.text();
-        const lines = data.split('\n').filter(line => line.trim().length > 0);
+        const textData = await response.text();
+        const rows = parseCSV(textData);
         
-        if (lines.length > 1 && changelogContainer) {
+        if (rows.length > 1 && changelogContainer) {
             let changelogHtml = '<div class="changelog-card"><h3>📝 Latest Updates</h3>';
-            const recentEntries = lines.slice(Math.max(1, lines.length - 6)).reverse();
-            recentEntries.forEach(line => {
-                const parts = line.split(',');
-                if (parts.length >= 2) {
-                    changelogHtml += `<div class="changelog-entry"><p><strong>v${parts[0] || ''}</strong>: ${parts[1] || ''}</p></div>`;
-                }
+            const recentEntries = rows.slice(Math.max(1, rows.length - 6)).reverse();
+            recentEntries.forEach(r => {
+                const version = r[0] || '';
+                const msg = r[1] || '';
+                const timeStr = formatTimestamp(r[2]);
+                changelogHtml += `<div class="changelog-entry"><p><small>${timeStr}</small> — <strong>v${version}</strong>: ${msg}</p></div>`;
             });
             changelogHtml += '</div>';
             changelogContainer.innerHTML = changelogHtml;
