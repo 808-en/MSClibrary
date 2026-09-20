@@ -377,7 +377,6 @@ function setupTeacherControls() {
     const btnTeacher = document.getElementById('btnTeacherControls');
     const unlockedSec = document.getElementById('unlockedTeacherControls');
     const authForm = document.getElementById('teacherAuthForm');
-    const errDiv = document.getElementById('teacherAuthError');
 
     if (sessionStorage.getItem('teacherUnlocked') === 'true' && unlockedSec) {
         unlockedSec.style.display = 'block';
@@ -388,7 +387,6 @@ function setupTeacherControls() {
             if (sessionStorage.getItem('teacherUnlocked') === 'true') {
                 unlockedSec.style.display = unlockedSec.style.display === 'none' ? 'block' : 'none';
             } else {
-                if (errDiv) errDiv.style.display = 'none';
                 openModal('teacherAuthModal');
             }
         });
@@ -398,40 +396,24 @@ function setupTeacherControls() {
         authForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const code = document.getElementById('teacherPinInput').value.trim();
-            if (errDiv) errDiv.style.display = 'none';
-
+            
             try {
-                const response = await fetch(`/api/codes?code=${encodeURIComponent(code)}`);
-                const data = await response.json();
+                const res = await fetch(`/api/codes?teacherCode=${encodeURIComponent(code)}`);
+                const data = await res.json();
 
-                if (data.valid && data.active) {
-                    if (data.page === 'teacher') {
-                        sessionStorage.setItem('teacherUnlocked', 'true');
-                        closeModal('teacherAuthModal');
-                        if (unlockedSec) unlockedSec.style.display = 'block';
-                        alert("Teacher Controls Unlocked!");
-                    } else if (data.page === 'admin') {
-                        if (errDiv) {
-                            errDiv.textContent = "Those credentials are not authorized to view that part of the site.";
-                            errDiv.style.display = 'block';
-                        }
-                    } else {
-                        if (errDiv) {
-                            errDiv.textContent = "Those credentials are not authorized to view that part of the site.";
-                            errDiv.style.display = 'block';
-                        }
-                    }
+                if (res.ok && data.codes) {
+                    sessionStorage.setItem('teacherUnlocked', 'true');
+                    sessionStorage.setItem('teacherCode', code);
+                    closeModal('teacherAuthModal');
+                    if (unlockedSec) unlockedSec.style.display = 'block';
+                    alert("Teacher Controls Unlocked!");
+                } else if (res.status === 403 && data.error) {
+                    alert(data.error);
                 } else {
-                    if (errDiv) {
-                        errDiv.textContent = "Invalid or inactive teacher code.";
-                        errDiv.style.display = 'block';
-                    }
+                    alert(data.error || "Incorrect teacher code.");
                 }
             } catch (err) {
-                if (errDiv) {
-                    errDiv.textContent = "Error verifying teacher credential.";
-                    errDiv.style.display = 'block';
-                }
+                alert("Error authenticating teacher code.");
             }
         });
     }
@@ -792,10 +774,10 @@ function setupBotmForm() {
             const botmData = {
                 action: "updateBotm",
                 sheetTarget: "BOTM",
+                isbn: document.getElementById('botmIsbnInput') ? document.getElementById('botmIsbnInput').value : '',
                 month: document.getElementById('botmMonth') ? document.getElementById('botmMonth').value : '',
                 title: document.getElementById('botmTitle') ? document.getElementById('botmTitle').value : '',
                 author: document.getElementById('botmAuthor') ? document.getElementById('botmAuthor').value : '',
-                isbn: document.getElementById('botmIsbnInput') ? document.getElementById('botmIsbnInput').value : '',
                 timestamp: new Date().getTime()
             };
 
@@ -833,21 +815,27 @@ function setupBotmForm() {
 
 async function fetchBotm() {
     try {
-        const botmMonthDisplay = document.getElementById('botmMonthDisplay');
-        const botmTitleDisplay = document.getElementById('botmTitleDisplay');
-        const botmAuthorDisplay = document.getElementById('botmAuthorDisplay');
-        
         const response = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vQaTqPVndPccN9h1-RYUulv59x-Ursqed9lsoDnMfejpp8VoI1DjYFh2Cq5Xr-471I8RcKX7vJ2yJgj/pub?gid=399990247&single=true&output=csv');
         const textData = await response.text();
         const rows = parseCSV(textData);
         
         if (rows.length > 1) {
             const latest = rows[rows.length - 1];
-            if (botmMonthDisplay) botmMonthDisplay.innerHTML = `<strong>Month:</strong> ${latest[0] || 'N/A'}`;
-            if (botmTitleDisplay) botmTitleDisplay.innerHTML = `<strong>Title:</strong> ${latest[1] || 'Unknown Title'}`;
-            if (botmAuthorDisplay) botmAuthorDisplay.innerHTML = `<strong>Author:</strong> ${latest[2] || 'Unknown Author'}`;
+            const month = latest[0] || 'N/A';
+            const title = latest[1] || 'Unknown Title';
+            const author = latest[2] || 'Unknown Author';
+
+            const mEl = document.getElementById('botmMonthDisplay');
+            const tEl = document.getElementById('botmTitleDisplay');
+            const aEl = document.getElementById('botmAuthorDisplay');
+
+            if (mEl) mEl.innerHTML = `<strong>Month:</strong> ${month}`;
+            if (tEl) tEl.innerHTML = `<strong>Title:</strong> ${title}`;
+            if (aEl) aEl.innerHTML = `<strong>Author:</strong> ${author}`;
         }
-    } catch(error) {}
+    } catch(error) {
+        console.error('Error fetching Book of the Month:', error);
+    }
 }
 
 function setupChangelogForm() {
@@ -883,32 +871,23 @@ function setupChangelogForm() {
 
 async function fetchChangelog() {
     try {
-        const changelogContainer = document.getElementById('changelogContainer');
-        const latestUpdateDisplay = document.getElementById('latestUpdateDisplay');
         const response = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vQaTqPVndPccN9h1-RYUulv59x-Ursqed9lsoDnMfejpp8VoI1DjYFh2Cq5Xr-471I8RcKX7vJ2yJgj/pub?gid=799275151&single=true&output=csv');
         const textData = await response.text();
         const rows = parseCSV(textData);
         
         if (rows.length > 1) {
             const latest = rows[rows.length - 1];
-            if (latestUpdateDisplay) {
-                latestUpdateDisplay.textContent = `[${formatTimestamp(latest[2])}] v${latest[0] || ''}: ${latest[1] || ''}`;
-            }
-
-            if (changelogContainer) {
-                let changelogHtml = '<div class="changelog-card"><h3>📝 Latest Updates</h3>';
-                const recentEntries = rows.slice(Math.max(1, rows.length - 6)).reverse();
-                recentEntries.forEach(r => {
-                    const version = r[0] || '';
-                    const msg = r[1] || '';
-                    const timeStr = formatTimestamp(r[2]);
-                    changelogHtml += `<div class="changelog-entry"><p><small>${timeStr}</small> — <strong>v${version}</strong>: ${msg}</p></div>`;
-                });
-                changelogHtml += '</div>';
-                changelogContainer.innerHTML = changelogHtml;
+            const version = latest[0] || '';
+            const msg = latest[1] || '';
+            const timeStr = formatTimestamp(latest[2]);
+            const displayEl = document.getElementById('latestUpdateDisplay');
+            if (displayEl) {
+                displayEl.textContent = `[${timeStr}] v${version}: ${msg}`;
             }
         }
-    } catch(error) {}
+    } catch(error) {
+        console.error('Error fetching Changelog:', error);
+    }
 }
 
 async function fetchDeleteChartData() {
