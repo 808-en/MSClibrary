@@ -1,3 +1,8 @@
+// functions/api/codes.js
+// Secure 5-digit code management API for msclibrary
+// Codes are stored as SHA-256 hashes in KV — never in plaintext.
+// Each code has metadata: { label, page, startDate, endDate, created }
+
 const CODE_REGEX = /^\d{5}$/;
 const VALID_PAGES = ["admin", "teacher"];
 
@@ -18,7 +23,7 @@ function json(data, status = 200) {
       "Content-Type": "application/json",
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type, X-Admin-Key",
+      "Access-Control-Allow-Headers": "Content-Type, X-Admin-Key, X-Teacher-Code",
     },
   });
 }
@@ -45,7 +50,7 @@ export async function onRequestOptions() {
     headers: {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type, X-Admin-Key",
+      "Access-Control-Allow-Headers": "Content-Type, X-Admin-Key, X-Teacher-Code",
     },
   });
 }
@@ -91,6 +96,42 @@ export async function onRequestGet(context) {
     });
   }
 
+  const teacherCode = request.headers.get("X-Teacher-Code") || url.searchParams.get("teacherCode");
+
+  if (!teacherCode) {
+    return json({ error: "Re-entry of teacher credential code required." }, 401);
+  }
+
+  if (!CODE_REGEX.test(teacherCode)) {
+    return json({ error: "Teacher code must be exactly 5 digits." }, 400);
+  }
+
+  const teacherHash = await sha256(teacherCode);
+  let teacherRecord;
+  try {
+    teacherRecord = await env.MSC_CODES.getWithMetadata(teacherHash);
+  } catch (e) {
+    return json({ error: "Invalid teacher credential code." }, 403);
+  }
+
+  if (!teacherRecord || teacherRecord.value === null) {
+    return json({ error: "Teacher credential code not found." }, 403);
+  }
+
+  const teacherMeta = teacherRecord.metadata || {};
+  
+  if (teacherMeta.page === "admin") {
+    return json({ error: "Admin credentials are not authorized to view that part of the site." }, 403);
+  }
+
+  if (teacherMeta.page !== "teacher") {
+    return json({ error: "Those credentials are not authorized to view that part of the site." }, 403);
+  }
+
+  if (!isCurrentlyActive(teacherMeta)) {
+    return json({ error: "Your teacher credential code has expired or is inactive." }, 403);
+  }
+
   const keys = await env.MSC_CODES.list();
   const codes = keys.keys.map((k) => {
     const m = k.metadata || {};
@@ -109,6 +150,10 @@ export async function onRequestGet(context) {
 
 export async function onRequestPost(context) {
   const { request, env } = context;
+
+  if (!(await isAdmin(request, env))) {
+    return json({ error: "Unauthorized" }, 401);
+  }
 
   let body;
   try {
@@ -156,6 +201,10 @@ export async function onRequestPost(context) {
 export async function onRequestDelete(context) {
   const { request, env } = context;
 
+  if (!(await isAdmin(request, env))) {
+    return json({ error: "Unauthorized" }, 401);
+  }
+
   const url = new URL(request.url);
   const deleteId = url.searchParams.get("delete_id");
 
@@ -190,17 +239,5 @@ export async function onRequestDelete(context) {
     return json({ success: true, message: `Deleted ${body.delete_ids.length} code(s).` });
   }
 
-  const code = String(body.code || "").trim();
-  if (!CODE_REGEX.test(code)) {
-    return json({ error: "Code must be exactly 5 digits (0-9)." }, 400);
-  }
-
-  const hash = await sha256(code);
-  const existing = await env.MSC_CODES.get(hash);
-  if (existing === null) {
-    return json({ error: "Code not found." }, 404);
-  }
-
-  await env.MSC_CODES.delete(hash);
-  return json({ success: true, message: "Code removed." });
+  return json({ error: "Invalid delete payload." }, 400);
 }
