@@ -23,11 +23,6 @@ function json(data, status = 200) {
   });
 }
 
-async function isAdmin(request, env) {
-  const key = request.headers.get("X-Admin-Key");
-  return !!(key && env.ADMIN_SECRET && key === env.ADMIN_SECRET);
-}
-
 function isCurrentlyActive(metadata) {
   if (!metadata) return true;
   const now = Date.now();
@@ -37,6 +32,35 @@ function isCurrentlyActive(metadata) {
   if (start && now < start) return false;
   if (end && now > end + 86_400_000) return false;
   return true;
+}
+
+// Verifies if the request header contains a valid, active Teacher or Admin code
+async function isAdmin(request, env) {
+  const key = request.headers.get("X-Admin-Key");
+  if (!key) return false;
+
+  // Option 1: Backwards compatibility fallback if ADMIN_SECRET is still set
+  if (env.ADMIN_SECRET && key === env.ADMIN_SECRET) {
+    return true;
+  }
+
+  // Option 2: Validate against KV storage as a 5-digit active Teacher Code
+  if (!CODE_REGEX.test(key)) return false;
+
+  try {
+    const hash = await sha256(key);
+    const result = await env.MSC_CODES.getWithMetadata(hash);
+
+    if (!result || !result.value) return false;
+
+    const metadata = result.metadata || {};
+    const active = isCurrentlyActive(metadata);
+
+    // Require code to be active and have teacher or admin page privileges
+    return active && (metadata.page === "teacher" || metadata.page === "admin");
+  } catch (e) {
+    return false;
+  }
 }
 
 export async function onRequestOptions() {
