@@ -377,6 +377,7 @@ function setupTeacherControls() {
     const btnTeacher = document.getElementById('btnTeacherControls');
     const unlockedSec = document.getElementById('unlockedTeacherControls');
     const authForm = document.getElementById('teacherAuthForm');
+    const errDiv = document.getElementById('teacherAuthError');
 
     if (sessionStorage.getItem('teacherUnlocked') === 'true' && unlockedSec) {
         unlockedSec.style.display = 'block';
@@ -387,22 +388,50 @@ function setupTeacherControls() {
             if (sessionStorage.getItem('teacherUnlocked') === 'true') {
                 unlockedSec.style.display = unlockedSec.style.display === 'none' ? 'block' : 'none';
             } else {
+                if (errDiv) errDiv.style.display = 'none';
                 openModal('teacherAuthModal');
             }
         });
     }
 
     if (authForm) {
-        authForm.addEventListener('submit', (e) => {
+        authForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const code = document.getElementById('teacherPinInput').value.trim();
-            if (code === "54321") {
-                sessionStorage.setItem('teacherUnlocked', 'true');
-                closeModal('teacherAuthModal');
-                if (unlockedSec) unlockedSec.style.display = 'block';
-                alert("Teacher Controls Unlocked!");
-            } else {
-                alert("Incorrect teacher password.");
+            if (errDiv) errDiv.style.display = 'none';
+
+            try {
+                const response = await fetch(`/api/codes?code=${encodeURIComponent(code)}`);
+                const data = await response.json();
+
+                if (data.valid && data.active) {
+                    if (data.page === 'teacher') {
+                        sessionStorage.setItem('teacherUnlocked', 'true');
+                        closeModal('teacherAuthModal');
+                        if (unlockedSec) unlockedSec.style.display = 'block';
+                        alert("Teacher Controls Unlocked!");
+                    } else if (data.page === 'admin') {
+                        if (errDiv) {
+                            errDiv.textContent = "Those credentials are not authorized to view that part of the site.";
+                            errDiv.style.display = 'block';
+                        }
+                    } else {
+                        if (errDiv) {
+                            errDiv.textContent = "Those credentials are not authorized to view that part of the site.";
+                            errDiv.style.display = 'block';
+                        }
+                    }
+                } else {
+                    if (errDiv) {
+                        errDiv.textContent = "Invalid or inactive teacher code.";
+                        errDiv.style.display = 'block';
+                    }
+                }
+            } catch (err) {
+                if (errDiv) {
+                    errDiv.textContent = "Error verifying teacher credential.";
+                    errDiv.style.display = 'block';
+                }
             }
         });
     }
@@ -763,10 +792,10 @@ function setupBotmForm() {
             const botmData = {
                 action: "updateBotm",
                 sheetTarget: "BOTM",
-                isbn: document.getElementById('botmIsbnInput') ? document.getElementById('botmIsbnInput').value : '',
                 month: document.getElementById('botmMonth') ? document.getElementById('botmMonth').value : '',
                 title: document.getElementById('botmTitle') ? document.getElementById('botmTitle').value : '',
                 author: document.getElementById('botmAuthor') ? document.getElementById('botmAuthor').value : '',
+                isbn: document.getElementById('botmIsbnInput') ? document.getElementById('botmIsbnInput').value : '',
                 timestamp: new Date().getTime()
             };
 
@@ -779,6 +808,7 @@ function setupBotmForm() {
                 alert("Book of the Month updated successfully!");
                 form.reset();
                 closeModal('updateBotmModal');
+                fetchBotm();
             } catch(error) {
                 alert("Error updating Book of the Month.");
             }
@@ -803,21 +833,19 @@ function setupBotmForm() {
 
 async function fetchBotm() {
     try {
-        const botmContainer = document.getElementById('botmContainer');
+        const botmMonthDisplay = document.getElementById('botmMonthDisplay');
+        const botmTitleDisplay = document.getElementById('botmTitleDisplay');
+        const botmAuthorDisplay = document.getElementById('botmAuthorDisplay');
+        
         const response = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vQaTqPVndPccN9h1-RYUulv59x-Ursqed9lsoDnMfejpp8VoI1DjYFh2Cq5Xr-471I8RcKX7vJ2yJgj/pub?gid=399990247&single=true&output=csv');
         const textData = await response.text();
         const rows = parseCSV(textData);
         
-        if (rows.length > 1 && botmContainer) {
+        if (rows.length > 1) {
             const latest = rows[rows.length - 1];
-            botmContainer.innerHTML = `
-                <div class="botm-card">
-                    <h3>📚 Book of the Month</h3>
-                    <p><strong>Month:</strong> ${latest[0] || 'N/A'}</p>
-                    <p><strong>Title:</strong> ${latest[1] || 'Unknown Title'}</p>
-                    <p><strong>Author:</strong> ${latest[2] || 'Unknown Author'}</p>
-                </div>
-            `;
+            if (botmMonthDisplay) botmMonthDisplay.innerHTML = `<strong>Month:</strong> ${latest[0] || 'N/A'}`;
+            if (botmTitleDisplay) botmTitleDisplay.innerHTML = `<strong>Title:</strong> ${latest[1] || 'Unknown Title'}`;
+            if (botmAuthorDisplay) botmAuthorDisplay.innerHTML = `<strong>Author:</strong> ${latest[2] || 'Unknown Author'}`;
         }
     } catch(error) {}
 }
@@ -845,6 +873,7 @@ function setupChangelogForm() {
                 alert("Changelog updated successfully!");
                 form.reset();
                 closeModal('updateLatestModal');
+                fetchChangelog();
             } catch(error) {
                 alert("Error updating Changelog.");
             }
@@ -855,21 +884,29 @@ function setupChangelogForm() {
 async function fetchChangelog() {
     try {
         const changelogContainer = document.getElementById('changelogContainer');
+        const latestUpdateDisplay = document.getElementById('latestUpdateDisplay');
         const response = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vQaTqPVndPccN9h1-RYUulv59x-Ursqed9lsoDnMfejpp8VoI1DjYFh2Cq5Xr-471I8RcKX7vJ2yJgj/pub?gid=799275151&single=true&output=csv');
         const textData = await response.text();
         const rows = parseCSV(textData);
         
-        if (rows.length > 1 && changelogContainer) {
-            let changelogHtml = '<div class="changelog-card"><h3>📝 Latest Updates</h3>';
-            const recentEntries = rows.slice(Math.max(1, rows.length - 6)).reverse();
-            recentEntries.forEach(r => {
-                const version = r[0] || '';
-                const msg = r[1] || '';
-                const timeStr = formatTimestamp(r[2]);
-                changelogHtml += `<div class="changelog-entry"><p><small>${timeStr}</small> — <strong>v${version}</strong>: ${msg}</p></div>`;
-            });
-            changelogHtml += '</div>';
-            changelogContainer.innerHTML = changelogHtml;
+        if (rows.length > 1) {
+            const latest = rows[rows.length - 1];
+            if (latestUpdateDisplay) {
+                latestUpdateDisplay.textContent = `[${formatTimestamp(latest[2])}] v${latest[0] || ''}: ${latest[1] || ''}`;
+            }
+
+            if (changelogContainer) {
+                let changelogHtml = '<div class="changelog-card"><h3>📝 Latest Updates</h3>';
+                const recentEntries = rows.slice(Math.max(1, rows.length - 6)).reverse();
+                recentEntries.forEach(r => {
+                    const version = r[0] || '';
+                    const msg = r[1] || '';
+                    const timeStr = formatTimestamp(r[2]);
+                    changelogHtml += `<div class="changelog-entry"><p><small>${timeStr}</small> — <strong>v${version}</strong>: ${msg}</p></div>`;
+                });
+                changelogHtml += '</div>';
+                changelogContainer.innerHTML = changelogHtml;
+            }
         }
     } catch(error) {}
 }
