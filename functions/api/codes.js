@@ -1,195 +1,218 @@
-function doGet(e) {
-  try {
-    var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Library Catalog");
-    if (!sheet) {
-      return ContentService.createTextOutput(JSON.stringify([])).setMimeType(ContentService.MimeType.JSON);
-    }
-    var data = sheet.getDataRange().getValues();
-    if (data.length <= 1) {
-      return ContentService.createTextOutput(JSON.stringify([])).setMimeType(ContentService.MimeType.JSON);
-    }
-    var headers = data[0];
-    var books = [];
-    for (var i = 1; i < data.length; i++) {
-      var row = data[i];
-      var book = { row: i + 1 };
-      for (var j = 0; j < headers.length; j++) {
-        book[headers[j]] = row[j];
-      }
-      books.push(book);
-    }
-    return ContentService.createTextOutput(JSON.stringify(books)).setMimeType(ContentService.MimeType.JSON);
-  } catch (err) {
-    return ContentService.createTextOutput(JSON.stringify({ error: err.toString() })).setMimeType(ContentService.MimeType.JSON);
-  }
+const CODE_REGEX = /^\d{5}$/;
+const VALID_PAGES = ["admin", "teacher"];
+
+const INACTIVE_MESSAGE = "Your password is not currently active, meaning your period of activity has either ended or your librarian duties and privileges have been revoked. If you believe this is a mistake, talk to your teacher or submit the form on the help page.";
+const HELP_URL = "https://msclibrary.pages.dev/helpForum";
+
+async function sha256(text) {
+  const data = new TextEncoder().encode(text);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-function doPost(e) {
-  var lock = LockService.getScriptLock();
-  lock.tryLock(10000);
-  try {
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
-    var postData = JSON.parse(e.postData.contents);
-    var action = postData.action || postData.type;
+function json(data, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, X-Admin-Key",
+    },
+  });
+}
 
-    if (action === "Borrow") {
-      var sheet = ss.getSheetByName("Borrow Requests") || ss.insertSheet("Borrow Requests");
-      if (sheet.getLastRow() === 0) {
-        sheet.appendRow(["Timestamp", "Request ID", "ISBN", "Title", "Author", "Name", "Room Number", "Signature", "Returned"]);
-      }
-      sheet.appendRow([
-        postData.timestamp ? new Date(postData.timestamp) : new Date(),
-        postData.requestId || postData.requestID,
-        postData.isbn,
-        postData.title,
-        postData.author,
-        postData.name,
-        postData.roomNumber,
-        postData.signature,
-        "N"
-      ]);
-      return ContentService.createTextOutput(JSON.stringify({ result: "success" })).setMimeType(ContentService.MimeType.JSON);
+async function isAdmin(request, env) {
+  const key = request.headers.get("X-Admin-Key");
+  return !!(key && env.ADMIN_SECRET && key === env.ADMIN_SECRET);
+}
+
+function isCurrentlyActive(metadata) {
+  if (!metadata) return true;
+  const now = Date.now();
+  const start = metadata.startDate ? new Date(metadata.startDate).getTime() : null;
+  const end = metadata.endDate ? new Date(metadata.endDate).getTime() : null;
+
+  if (start && now < start) return false;
+  if (end && now > end + 86_400_000) return false;
+  return true;
+}
+
+export async function onRequestOptions() {
+  return new Response(null, {
+    status: 204,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, X-Admin-Key",
+    },
+  });
+}
+
+export async function onRequestGet(context) {
+  const { request, env } = context;
+  const url = new URL(request.url);
+  const codeParam = url.searchParams.get("code");
+
+  if (codeParam) {
+    if (!CODE_REGEX.test(codeParam)) {
+      return json({ valid: false, error: "Code must be exactly 5 digits." }, 400);
+    }
+    const hash = await sha256(codeParam);
+    
+    let result;
+    try {
+      result = await env.MSC_CODES.getWithMetadata(hash);
+    } catch (e) {
+      return json({ valid: false });
     }
 
-    if (action === "Return") {
-      var sheet = ss.getSheetByName("Return Requests") || ss.insertSheet("Return Requests");
-      if (sheet.getLastRow() === 0) {
-        sheet.appendRow(["Timestamp", "Request ID", "ISBN", "Title", "Author", "Name", "Room Number", "Return Method", "Returned"]);
-      }
-      sheet.appendRow([
-        postData.timestamp ? new Date(postData.timestamp) : new Date(),
-        postData.requestId || postData.requestID,
-        postData.isbn,
-        postData.title,
-        postData.author,
-        postData.name,
-        postData.roomNumber,
-        postData.returnMethod,
-        "Y"
-      ]);
-      
-      var borrowSheet = ss.getSheetByName("Borrow Requests");
-      if (borrowSheet) {
-        var bData = borrowSheet.getDataRange().getValues();
-        for (var i = 1; i < bData.length; i++) {
-          if (String(bData[i][1]).trim() === String(postData.requestId || postData.requestID).trim()) {
-            borrowSheet.getRange(i + 1, 9).setValue("Y");
-            break;
-          }
-        }
-      }
-      return ContentService.createTextOutput(JSON.stringify({ result: "success" })).setMimeType(ContentService.MimeType.JSON);
+    if (!result || result.value === null || result.value === undefined) {
+      return json({ valid: false });
     }
 
-    if (action === "markReturned") {
-      var borrowSheet = ss.getSheetByName("Borrow Requests");
-      if (borrowSheet) {
-        var bData = borrowSheet.getDataRange().getValues();
-        for (var i = 1; i < bData.length; i++) {
-          if (String(bData[i][1]).trim() === String(postData.requestId || postData.requestID).trim()) {
-            borrowSheet.getRange(i + 1, 9).setValue("Y");
-            break;
-          }
-        }
-      }
-      return ContentService.createTextOutput(JSON.stringify({ result: "success" })).setMimeType(ContentService.MimeType.JSON);
+    const metadata = result.metadata || {};
+    const active = isCurrentlyActive(metadata);
+
+    if (!active) {
+      return json({
+        valid: true,
+        active: false,
+        message: INACTIVE_MESSAGE,
+        helpUrl: HELP_URL,
+      });
     }
 
-    if (action === "addBook") {
-      var sheet = ss.getSheetByName("Library Catalog") || ss.insertSheet("Library Catalog");
-      if (sheet.getLastRow() === 0) {
-        sheet.appendRow(["ISBN", "Title", "Author", "Genre", "Grade Level", "MSC+ Grade Level", "Synopsis", "Cover Image Link", "Quantity"]);
-      }
-      sheet.appendRow([
-        postData.isbn,
-        postData.title,
-        postData.author,
-        postData.genre,
-        postData.grade,
-        postData.msc,
-        postData.synopsis,
-        postData.cover,
-        postData.quantity || 1
-      ]);
-      return ContentService.createTextOutput(JSON.stringify({ result: "success" })).setMimeType(ContentService.MimeType.JSON);
-    }
-
-    if (action === "addMass") {
-      var sheet = ss.getSheetByName("Library Catalog") || ss.insertSheet("Library Catalog");
-      if (sheet.getLastRow() === 0) {
-        sheet.appendRow(["ISBN", "Title", "Author", "Genre", "Grade Level", "MSC+ Grade Level", "Synopsis", "Cover Image Link", "Quantity"]);
-      }
-      var books = postData.books || [];
-      for (var k = 0; k < books.length; k++) {
-        var b = books[k];
-        sheet.appendRow([
-          b.isbn,
-          b.title,
-          b.author,
-          b.genre || "",
-          b.grade || "",
-          b.msc || "",
-          b.synopsis || "",
-          b.cover || "",
-          b.quantity || 1
-        ]);
-      }
-      return ContentService.createTextOutput(JSON.stringify({ result: "success" })).setMimeType(ContentService.MimeType.JSON);
-    }
-
-    if (action === "deleteSelected") {
-      var sheet = ss.getSheetByName("Library Catalog");
-      if (sheet) {
-        var rows = postData.rows || [];
-        rows.sort(function(a, b) { return b - a; });
-        for (var r = 0; r < rows.length; r++) {
-          sheet.deleteRow(rows[r]);
-        }
-      }
-      return ContentService.createTextOutput(JSON.stringify({ result: "success" })).setMimeType(ContentService.MimeType.JSON);
-    }
-
-    if (action === "deleteAll") {
-      var sheet = ss.getSheetByName("Library Catalog");
-      if (sheet) {
-        sheet.clear();
-        sheet.appendRow(["ISBN", "Title", "Author", "Genre", "Grade Level", "MSC+ Grade Level", "Synopsis", "Cover Image Link", "Quantity"]);
-      }
-      return ContentService.createTextOutput(JSON.stringify({ result: "success" })).setMimeType(ContentService.MimeType.JSON);
-    }
-
-    if (action === "updateBotm") {
-      var sheet = ss.getSheetByName("BOTM") || ss.insertSheet("BOTM");
-      if (sheet.getLastRow() === 0) {
-        sheet.appendRow(["Month", "Title", "Author", "ISBN", "Timestamp"]);
-      }
-      sheet.appendRow([
-        postData.month,
-        postData.title,
-        postData.author,
-        postData.isbn || "",
-        postData.timestamp ? new Date(postData.timestamp) : new Date()
-      ]);
-      return ContentService.createTextOutput(JSON.stringify({ result: "success" })).setMimeType(ContentService.MimeType.JSON);
-    }
-
-    if (action === "updateChangelog") {
-      var sheet = ss.getSheetByName("Changelog") || ss.insertSheet("Changelog");
-      if (sheet.getLastRow() === 0) {
-        sheet.appendRow(["Version", "Message", "Timestamp"]);
-      }
-      sheet.appendRow([
-        postData.version,
-        postData.message,
-        postData.timestamp ? new Date(postData.timestamp) : new Date()
-      ]);
-      return ContentService.createTextOutput(JSON.stringify({ result: "success" })).setMimeType(ContentService.MimeType.JSON);
-    }
-
-    return ContentService.createTextOutput(JSON.stringify({ result: "error", message: "Unknown action" })).setMimeType(ContentService.MimeType.JSON);
-  } catch (err) {
-    return ContentService.createTextOutput(JSON.stringify({ result: "error", error: err.toString() })).setMimeType(ContentService.MimeType.JSON);
-  } finally {
-    lock.releaseLock();
+    return json({
+      valid: true,
+      active: true,
+      page: metadata.page || "admin",
+    });
   }
+
+  if (!(await isAdmin(request, env))) {
+    return json({ error: "Unauthorized" }, 401);
+  }
+
+  const keys = await env.MSC_CODES.list();
+  const codes = keys.keys.map((k) => {
+    const m = k.metadata || {};
+    return {
+      id: k.name,
+      label: m.label || null,
+      page: m.page || "admin",
+      startDate: m.startDate || null,
+      endDate: m.endDate || null,
+      created: m.created || null,
+      active: isCurrentlyActive(m),
+    };
+  });
+  return json({ codes });
+}
+
+export async function onRequestPost(context) {
+  const { request, env } = context;
+
+  if (!(await isAdmin(request, env))) {
+    return json({ error: "Unauthorized" }, 401);
+  }
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return json({ error: "Invalid JSON body." }, 400);
+  }
+
+  const code = String(body.code || "").trim();
+  const label = body.label ? String(body.label).trim().slice(0, 100) : null;
+  const page = String(body.page || "admin").trim();
+  const startDate = body.startDate ? String(body.startDate).trim() : null;
+  const endDate = body.endDate ? String(body.endDate).trim() : null;
+
+  if (!CODE_REGEX.test(code)) {
+    return json({ error: "Code must be exactly 5 digits (0-9)." }, 400);
+  }
+  if (!VALID_PAGES.includes(page)) {
+    return json({ error: "Page must be 'admin' or 'teacher'." }, 400);
+  }
+
+  if (startDate && isNaN(new Date(startDate).getTime())) {
+    return json({ error: "Invalid start date." }, 400);
+  }
+  if (endDate && isNaN(new Date(endDate).getTime())) {
+    return json({ error: "Invalid end date." }, 400);
+  }
+  if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+    return json({ error: "Start date cannot be after end date." }, 400);
+  }
+
+  const hash = await sha256(code);
+  const existing = await env.MSC_CODES.get(hash);
+  if (existing !== null) {
+    return json({ error: "This code already exists." }, 409);
+  }
+
+  await env.MSC_CODES.put(hash, "1", {
+    metadata: { label, page, startDate, endDate, created: new Date().toISOString() },
+  });
+
+  return json({ success: true, message: "Code added." });
+}
+
+export async function onRequestDelete(context) {
+  const { request, env } = context;
+
+  if (!(await isAdmin(request, env))) {
+    return json({ error: "Unauthorized" }, 401);
+  }
+
+  const url = new URL(request.url);
+  const deleteId = url.searchParams.get("delete_id");
+
+  if (deleteId) {
+    const existing = await env.MSC_CODES.get(deleteId);
+    if (existing === null) {
+      return json({ error: "Code not found." }, 404);
+    }
+    await env.MSC_CODES.delete(deleteId);
+    return json({ success: true, message: "Code removed." });
+  }
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return json({ error: "Invalid JSON body." }, 400);
+  }
+
+  if (body.delete_all === true) {
+    const keys = await env.MSC_CODES.list();
+    for (const key of keys.keys) {
+      await env.MSC_CODES.delete(key.name);
+    }
+    return json({ success: true, message: `Deleted ${keys.keys.length} code(s).` });
+  }
+
+  if (Array.isArray(body.delete_ids) && body.delete_ids.length > 0) {
+    for (const id of body.delete_ids) {
+      await env.MSC_CODES.delete(id);
+    }
+    return json({ success: true, message: `Deleted ${body.delete_ids.length} code(s).` });
+  }
+
+  const code = String(body.code || "").trim();
+  if (!CODE_REGEX.test(code)) {
+    return json({ error: "Code must be exactly 5 digits (0-9)." }, 400);
+  }
+
+  const hash = await sha256(code);
+  const existing = await env.MSC_CODES.get(hash);
+  if (existing === null) {
+    return json({ error: "Code not found." }, 404);
+  }
+
+  await env.MSC_CODES.delete(hash);
+  return json({ success: true, message: "Code removed." });
 }
