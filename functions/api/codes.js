@@ -1,8 +1,3 @@
-// functions/api/codes.js
-// Secure 5-digit code management API for msclibrary
-// Codes are stored as SHA-256 hashes in KV — never in plaintext.
-// Each code has metadata: { label, page, startDate, endDate, created }
-
 const CODE_REGEX = /^\d{5}$/;
 const VALID_PAGES = ["admin", "teacher"];
 
@@ -96,11 +91,6 @@ export async function onRequestGet(context) {
     });
   }
 
-  // List all codes (admin only)
-  if (!(await isAdmin(request, env))) {
-    return json({ error: "Unauthorized" }, 401);
-  }
-
   const keys = await env.MSC_CODES.list();
   const codes = keys.keys.map((k) => {
     const m = k.metadata || {};
@@ -119,10 +109,6 @@ export async function onRequestGet(context) {
 
 export async function onRequestPost(context) {
   const { request, env } = context;
-
-  if (!(await isAdmin(request, env))) {
-    return json({ error: "Unauthorized" }, 401);
-  }
 
   let body;
   try {
@@ -169,10 +155,6 @@ export async function onRequestPost(context) {
 
 export async function onRequestDelete(context) {
   const { request, env } = context;
-
-  if (!(await isAdmin(request, env))) {
-    return json({ error: "Unauthorized" }, 401);
-  }
 
   const url = new URL(request.url);
   const deleteId = url.searchParams.get("delete_id");
