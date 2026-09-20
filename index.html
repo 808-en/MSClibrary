@@ -454,50 +454,6 @@
     </div>
 
     <script src="script.js"></script>
-    <script>
-    document.addEventListener('DOMContentLoaded', async () => {
-        const botmCsvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQaTqPVndPccN9h1-RYUulv59x-Ursqed9lsoDnMfejpp8VoI1DjYFh2Cq5Xr-471I8RcKX7vJ2yJgj/pub?gid=399990247&single=true&output=csv'; 
-        const changelogCsvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQaTqPVndPccN9h1-RYUulv59x-Ursqed9lsoDnMfejpp8VoI1DjYFh2Cq5Xr-471I8RcKX7vJ2yJgj/pub?gid=799275151&single=true&output=csv';
-
-        try {
-            const botmResponse = await fetch(botmCsvUrl);
-            const botmText = await botmResponse.text();
-            const botmRows = parseCSV(botmText);
-            
-            if (botmRows.length > 1) {
-                const latestBotm = botmRows[botmRows.length - 1]; 
-                const month = latestBotm[0] ? latestBotm[0].trim() : 'N/A';
-                const title = latestBotm[1] ? latestBotm[1].trim() : 'Unknown Title';
-                const author = latestBotm[2] ? latestBotm[2].trim() : 'Unknown Author';
-
-                if (document.getElementById('botmMonthDisplay')) document.getElementById('botmMonthDisplay').innerHTML = `<strong>Month:</strong> ${month}`;
-                if (document.getElementById('botmTitleDisplay')) document.getElementById('botmTitleDisplay').innerHTML = `<strong>Title:</strong> ${title}`;
-                if (document.getElementById('botmAuthorDisplay')) document.getElementById('botmAuthorDisplay').innerHTML = `<strong>Author:</strong> ${author}`;
-            }
-        } catch (error) {
-            console.error('Error fetching Book of the Month:', error);
-        }
-
-        try {
-            const updateResponse = await fetch(changelogCsvUrl);
-            const updateText = await updateResponse.text();
-            const updateRows = parseCSV(updateText);
-
-            if (updateRows.length > 1) {
-                const latestUpdateRow = updateRows[updateRows.length - 1];
-                const version = latestUpdateRow[0] ? latestUpdateRow[0].trim() : '';
-                const updateMessage = latestUpdateRow[1] ? latestUpdateRow[1].trim() : '';
-                const timeStr = formatTimestamp(latestUpdateRow[2]);
-
-                if (updateMessage && document.getElementById('latestUpdateDisplay')) {
-                    document.getElementById('latestUpdateDisplay').textContent = `[${timeStr}] v${version}: ${updateMessage}`;
-                }
-            }
-        } catch (error) {
-            console.error('Error fetching Changelog:', error);
-        }
-    });
-    </script>
     <script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "082695a43f814cc7871a76922df6162e"}'></script>
 </body>
 </html>
