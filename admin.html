@@ -276,12 +276,14 @@
 
         <div id="codeMgmtLocked">
             <div class="form-group">
-                <label>Admin Key (for code management)</label>
+                <label>Re-enter Teacher Code (for code management)</label>
                 <input
                     type="password"
                     id="codeAdminKey"
                     class="code-mgmt-input"
-                    placeholder="Enter admin key">
+                    maxlength="5"
+                    inputmode="numeric"
+                    placeholder="Re-enter 5-digit teacher code">
             </div>
             <button
                 onclick="unlockCodeMgmt()"
@@ -516,12 +518,14 @@
                         ⚠ Teacher codes require double-authorization
                     </p>
                     <div class="form-group">
-                        <label>Confirm Admin Key</label>
+                        <label>Confirm Teacher Code</label>
                         <input
                             type="password"
                             id="singleConfirmKey"
                             class="code-mgmt-input"
-                            placeholder="Re-enter admin key">
+                            maxlength="5"
+                            inputmode="numeric"
+                            placeholder="Re-enter teacher code">
                     </div>
                 </div>
             </div>
@@ -583,12 +587,14 @@
                         ⚠ Teacher codes require double-authorization
                     </p>
                     <div class="form-group">
-                        <label>Confirm Admin Key</label>
+                        <label>Confirm Teacher Code</label>
                         <input
                             type="password"
                             id="massConfirmKey"
                             class="code-mgmt-input"
-                            placeholder="Re-enter admin key">
+                            maxlength="5"
+                            inputmode="numeric"
+                            placeholder="Re-enter teacher code">
                     </div>
                 </div>
             </div>
@@ -630,12 +636,14 @@
         </p>
 
         <div class="form-group" style="text-align:left;">
-            <label>Confirm Admin Key</label>
+            <label>Confirm Teacher Code</label>
             <input
                 type="password"
                 id="deleteAllConfirmKey"
                 class="code-mgmt-input"
-                placeholder="Re-enter admin key">
+                maxlength="5"
+                inputmode="numeric"
+                placeholder="Re-enter teacher code">
         </div>
 
         <div class="form-group" style="text-align:left;">
@@ -1104,26 +1112,35 @@
         el.style.color = color || '#333';
     }
 
-    function unlockCodeMgmt() {
+    async function unlockCodeMgmt() {
         codeMgmtKey = document.getElementById('codeAdminKey').value.trim();
 
-        if (!codeMgmtKey) {
-            showCodeMgmtMsg("Please enter the admin key.", "#dc3545");
+        if (!/^\d{5}$/.test(codeMgmtKey)) {
+            showCodeMgmtMsg("Please enter a valid 5-digit teacher code.", "#dc3545");
             return;
         }
 
-        sessionStorage.setItem("msc_code_key", codeMgmtKey);
+        try {
+            const res = await fetch(`/api/codes?code=${encodeURIComponent(codeMgmtKey)}`);
+            const data = await res.json();
 
-        loadCodes().then(ok => {
-            if (ok) {
-                document.getElementById('codeMgmtLocked').style.display = 'none';
-                document.getElementById('codeMgmtUnlocked').style.display = 'block';
-                showCodeMgmtMsg("", "");
+            if (data.valid && data.active) {
+                sessionStorage.setItem("msc_code_key", codeMgmtKey);
+                const loaded = await loadCodes();
+                if (loaded) {
+                    document.getElementById('codeMgmtLocked').style.display = 'none';
+                    document.getElementById('codeMgmtUnlocked').style.display = 'block';
+                    showCodeMgmtMsg("", "");
+                } else {
+                    showCodeMgmtMsg("Unable to load code list.", "#dc3545");
+                }
             } else {
-                showCodeMgmtMsg("Invalid admin key.", "#dc3545");
+                showCodeMgmtMsg("Invalid or inactive teacher code.", "#dc3545");
                 sessionStorage.removeItem("msc_code_key");
             }
-        });
+        } catch {
+            showCodeMgmtMsg("Verification error.", "#dc3545");
+        }
     }
 
     function formatDate(isoStr) {
@@ -1263,13 +1280,13 @@
         const msgEl = document.getElementById('deleteAllMsg');
 
         if (!confirmKey) {
-            msgEl.innerText = "Please enter your admin key.";
+            msgEl.innerText = "Please enter your teacher code.";
             msgEl.style.color = "#dc3545";
             return;
         }
 
         if (confirmKey !== codeMgmtKey) {
-            msgEl.innerText = "Admin key does not match.";
+            msgEl.innerText = "Teacher code does not match.";
             msgEl.style.color = "#dc3545";
             return;
         }
@@ -1376,12 +1393,12 @@
         if (page === 'teacher') {
             const confirmKey = document.getElementById('singleConfirmKey').value.trim();
             if (!confirmKey) {
-                msgEl.innerText = "Please confirm admin key for teacher code.";
+                msgEl.innerText = "Please confirm teacher code for teacher page creation.";
                 msgEl.style.color = "#dc3545";
                 return;
             }
             if (confirmKey !== codeMgmtKey) {
-                msgEl.innerText = "Admin key confirmation does not match.";
+                msgEl.innerText = "Teacher code confirmation does not match.";
                 msgEl.style.color = "#dc3545";
                 return;
             }
@@ -1463,12 +1480,12 @@
         if (defaultPage === 'teacher') {
             const confirmKey = document.getElementById('massConfirmKey').value.trim();
             if (!confirmKey) {
-                msgEl.innerText = "Please confirm admin key for teacher codes.";
+                msgEl.innerText = "Please confirm teacher code for teacher codes.";
                 msgEl.style.color = "#dc3545";
                 return;
             }
             if (confirmKey !== codeMgmtKey) {
-                msgEl.innerText = "Admin key confirmation does not match.";
+                msgEl.innerText = "Teacher code confirmation does not match.";
                 msgEl.style.color = "#dc3545";
                 return;
             }
