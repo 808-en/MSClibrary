@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication Required - MSC Book Collection</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 60px 40px;
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .auth-header {
+            margin-bottom: 40px;
+        }
+
+        .auth-header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .auth-header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        /* Radar/Crosshair Timer */
+        .radar-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 40px 0;
+            perspective: 1000px;
+        }
+
+        .radar-circle {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            border: 3px solid #667eea;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .radar-circle::before {
+            content: '';
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            border: 2px solid #e0e0e0;
+            border-radius: 50%;
+        }
+
+        .radar-circle::after {
+            content: '';
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border: 2px solid #f0f0f0;
+            border-radius: 50%;
+        }
+
+        .crosshair {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .crosshair-vertical {
+            position: absolute;
+            width: 2px;
+            height: 100%;
+            background: #667eea;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .crosshair-horizontal {
+            position: absolute;
+            height: 2px;
+            width: 100%;
+            background: #667eea;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .radar-arm {
+            position: absolute;
+            width: 4px;
+            height: 85px;
+            background: linear-gradient(to top, #667eea, transparent);
+            bottom: 50%;
+            left: 50%;
+            transform-origin: bottom center;
+            transform: translateX(-50%) rotate(0deg);
+            animation: radarSweep 5s linear forwards;
+        }
+
+        @keyframes radarSweep {
+            0% {
+                transform: translateX(-50%) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateX(-50%) rotate(360deg);
+                opacity: 1;
+            }
+        }
+
+        .countdown-number {
+            font-size: 72px;
+            font-weight: bold;
+            color: #667eea;
+            position: relative;
+            z-index: 10;
+            min-width: 80px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .auth-message {
+            background: #e8f4f8;
+            border-left: 4px solid #667eea;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 30px 0;
+            color: #333;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .auth-message strong {
+            color: #667eea;
+        }
+
+        .redirect-button {
+            background-color: #667eea;
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            font-weight: 600;
+            margin-top: 20px;
+        }
+
+        .redirect-button:hover {
+            background-color: #764ba2;
+        }
+
+        .redirect-button:active {
+            transform: scale(0.98);
+        }
+
+        .status-text {
+            color: #666;
+            font-size: 14px;
+            margin-top: 15px;
+            font-weight: 500;
+        }
+
+        .status-text.countdown {
+            color: #667eea;
+        }
+
+        footer {
+            margin-top: 40px;
+            border-top: 1px solid #e0e0e0;
+            padding-top: 20px;
+            color: #999;
+            font-size: 12px;
+        }
+
+        @media (max-width: 600px) {
+            .auth-container {
+                padding: 40px 25px;
+            }
+
+            .radar-circle {
+                width: 150px;
+                height: 150px;
+                border-width: 2px;
+            }
+
+            .countdown-number {
+                font-size: 56px;
+            }
+
+            .radar-arm {
+                height: 65px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="auth-container">
+    <div class="auth-header">
+        <h1>🔐 Authentication Required</h1>
+        <p>MSC Book Collection</p>
+    </div>
+
+    <div class="auth-message">
+        <strong>⚠ Secure Access</strong><br>
+        You are being redirected to an authorized resource. This countdown will automatically redirect you when complete.
+    </div>
+
+    <div class="radar-container">
+        <div class="radar-circle">
+            <div class="crosshair">
+                <div class="crosshair-vertical"></div>
+                <div class="crosshair-horizontal"></div>
+            </div>
+            <div class="radar-arm"></div>
+            <div class="countdown-number" id="countdownDisplay">5</div>
+        </div>
+    </div>
+
+    <div class="status-text countdown" id="statusText">
+        Redirecting in <span id="countdownTimer">5</span> seconds...
+    </div>
+
+    <button class="redirect-button" onclick="redirectNow()">
+        → Access Spreadsheet Now
+    </button>
+
+    <footer>
+        <p>&copy; 2026 MSC Book Collection - Secure Portal</p>
+    </footer>
+</div>
+
+<script>
+    const REDIRECT_URL = 'https://docs.google.com/spreadsheets/d/1zE341XwZWD1xjZ1xaOrkeTv81Qgs0ORaVJwd37ZCUT8/edit?pli=1&gid=799275151#gid=799275151';
+    let timeRemaining = 5;
+
+    function updateCountdown() {
+        document.getElementById('countdownDisplay').textContent = timeRemaining;
+        document.getElementById('countdownTimer').textContent = timeRemaining;
+
+        if (timeRemaining <= 0) {
+            redirectNow();
+        } else {
+            timeRemaining--;
+            setTimeout(updateCountdown, 1000);
+        }
+    }
+
+    function redirectNow() {
+        window.location.href = REDIRECT_URL;
+    }
+
+    // Start countdown on page load
+    window.addEventListener('load', () => {
+        updateCountdown();
+    });
+</script>
+
+</body>
+</html>
