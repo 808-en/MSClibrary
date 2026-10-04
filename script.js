@@ -46,10 +46,8 @@ document.addEventListener('DOMContentLoaded', function() {
     setupChangelogForm();
     setupReturnSearch();
     
-    
     fetchBotm();
     fetchChangelog();
-    
     handleQueryParams();
 });
 
@@ -495,24 +493,28 @@ async function fetchBookDetailsFromAPI(isbn) {
     if (!cleanIsbn) return null;
 
     try {
-        const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${cleanIsbn}`);
+        const response = await fetch(`https://openlibrary.org/api/books?bibkeys=ISBN:${cleanIsbn}&jscmd=data&format=json`);
         if (response.ok) {
             const data = await response.json();
-            if (data.items && data.items.length > 0) {
-                const vol = data.items[0].volumeInfo;
+            const key = Object.keys(data)[0];
+            if (key && data[key]) {
+                const book = data[key];
+
                 return {
-                    title: vol.title || '',
-                    author: vol.authors ? vol.authors.join(', ') : '',
-                    genre: vol.categories ? vol.categories.join(', ') : '',
-                    synopsis: vol.description || '',
-                    cover: vol.imageLinks ? (vol.imageLinks.thumbnail || vol.imageLinks.smallThumbnail || '').replace('http:', 'https:') : '',
+                    title: book.title || '',
+                    author: book.authors ? book.authors.map(a => a.name).join(', ') : '',
+                    genre: book.subjects ? book.subjects.slice(0, 3).join(', ') : '',
+                    synopsis: typeof book.description === 'string' ? book.description : (book.description && book.description.value) || '',
+                    cover: book.cover ? (book.cover.large || book.cover.medium || book.cover.small || '') : '',
                     grade: '',
                     msc: '',
                     quantity: 1
                 };
             }
         }
-    } catch(e) {}
+    } catch (e) {
+        console.error('Error fetching from Open Library:', e);
+    }
 
     return null;
 }
