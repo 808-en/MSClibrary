@@ -4,6 +4,55 @@ const TOKEN_VALUE = "loggedInIdentifierRNBN480H39A=";
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyvHlxSf3NoF8MBZQYiHvJrBmBhYVE6V_GcGhr8iSK6AeKs5SISoUN_Ho4owsjjV0_5Fw/exec';
 const ADMIN_DB_URL = 'https://script.google.com/macros/s/AKfycbyvHlxSf3NoF8MBZQYiHvJrBmBhYVE6V_GcGhr8iSK6AeKs5SISoUN_Ho4owsjjV0_5Fw/exec';
 
+function handleQueryParams() {
+    const params = new URLSearchParams(window.location.search);
+    const bookISBN = params.get('bookISBN');
+    const type = params.get('type');
+    
+    if (!bookISBN) return;
+    
+    setTimeout(async () => {
+        const details = await fetchBookDetailsFromAPI(bookISBN);
+        
+        if (type === 'borrow' || type === null) {
+            if (details) {
+                document.getElementById('borrowIsbnInput').value = bookISBN;
+                document.getElementById('borrowAutoTitle').value = details.title || '';
+                document.getElementById('borrowAutoAuthor').value = details.author || '';
+            } else {
+                document.getElementById('borrowIsbnInput').value = bookISBN;
+                alert("Book details could not be auto-filled. Please fill in the remaining fields.");
+            }
+            openModal('borrowIsbnModal');
+        } else if (type === 'return') {
+            if (details) {
+                document.getElementById('returnIsbnInput').value = bookISBN;
+                document.getElementById('returnAutoTitle').value = details.title || '';
+                document.getElementById('returnAutoAuthor').value = details.author || '';
+            } else {
+                document.getElementById('returnIsbnInput').value = bookISBN;
+                alert("Book details could not be auto-filled. Please fill in the remaining fields.");
+            }
+            openModal('returnIsbnModal');
+        }
+    }, 500);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    initSessionTimer();
+    setupModalHandlers();
+    setupTeacherControls();
+    setupBotmForm();
+    setupChangelogForm();
+    setupReturnSearch();
+    
+    
+    fetchBotm();
+    fetchChangelog();
+    
+    handleQueryParams();
+});
+
 let _sessionInterval = null;
 let _borrowRequestsData = [];
 
