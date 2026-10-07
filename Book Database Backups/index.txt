@@ -1,1 +1,4 @@
-#
+# Info
+
+Sample path: Book Database Backups/Oct6-2026-18:50.csv
+             |Mandatory           |Date/year |Time 24hr
