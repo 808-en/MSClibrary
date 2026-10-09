@@ -4,6 +4,75 @@ const TOKEN_VALUE = "loggedInIdentifierRNBN480H39A=";
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyvHlxSf3NoF8MBZQYiHvJrBmBhYVE6V_GcGhr8iSK6AeKs5SISoUN_Ho4owsjjV0_5Fw/exec';
 const ADMIN_DB_URL = 'https://script.google.com/macros/s/AKfycbyvHlxSf3NoF8MBZQYiHvJrBmBhYVE6V_GcGhr8iSK6AeKs5SISoUN_Ho4owsjjV0_5Fw/exec';
 
+let libraryCatalogCache = null;
+
+async function fetchLibraryCatalog() {
+    if (libraryCatalogCache) return libraryCatalogCache;
+    try {
+        const SHEET_ID = '1ZfFEooX7fWIMA9tMZlxcUndPfw2ebSHGJMLRIoyzyO0';
+        const SHEET_NAME = 'Library Catalog';
+        const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${SHEET_NAME}`;
+        const res = await fetch(CSV_URL);
+        const text = await res.text();
+        const rows = parseCSV(text);
+        if (rows.length < 2) return [];
+        const headers = rows[0].map(h => h.trim());
+        const data = rows.slice(1).map(row => {
+            const obj = {};
+            headers.forEach((h, i) => {
+                obj[h] = row[i] ? row[i].trim() : '';
+            });
+            return obj;
+        });
+        libraryCatalogCache = data;
+        return data;
+    } catch (e) {
+        return [];
+    }
+}
+
+async function findBookInSpreadsheet(isbn) {
+    if (!isbn) return null;
+    const cleanIsbn = isbn.replace(/[^0-9X]/gi, '').toLowerCase();
+    const catalog = await fetchLibraryCatalog();
+    const found = catalog.find(b => {
+        const bIsbn = (b['ISBN'] || b['isbn'] || '').replace(/[^0-9X]/gi, '').toLowerCase();
+        return bIsbn && bIsbn === cleanIsbn;
+    });
+    if (found) {
+        return {
+            title: found['Book Name'] || found['Title'] || '',
+            author: found['Author'] || '',
+            genre: found['Genre'] || '',
+            grade: found['Grade Level'] || '',
+            msc: found['MSC'] || '',
+            synopsis: found['Synopsis'] || '',
+            cover: found['Cover Image'] || '',
+            quantity: found['Quantity'] || 1
+        };
+    }
+    return null;
+}
+
+async function getBookDetailsWithFallback(isbn) {
+    if (!isbn) return null;
+    const apiDetails = await fetchBookDetailsFromAPI(isbn);
+    const sheetDetails = await findBookInSpreadsheet(isbn);
+
+    if (!apiDetails && !sheetDetails) return null;
+
+    return {
+        title: (apiDetails && apiDetails.title) ? apiDetails.title : (sheetDetails ? sheetDetails.title : ''),
+        author: (apiDetails && apiDetails.author) ? apiDetails.author : (sheetDetails ? sheetDetails.author : ''),
+        genre: (apiDetails && apiDetails.genre) ? apiDetails.genre : (sheetDetails ? sheetDetails.genre : ''),
+        synopsis: (apiDetails && apiDetails.synopsis) ? apiDetails.synopsis : (sheetDetails ? sheetDetails.synopsis : ''),
+        cover: (apiDetails && apiDetails.cover) ? apiDetails.cover : (sheetDetails ? sheetDetails.cover : ''),
+        grade: (sheetDetails ? sheetDetails.grade : ''),
+        msc: (sheetDetails ? sheetDetails.msc : ''),
+        quantity: (sheetDetails ? sheetDetails.quantity : 1)
+    };
+}
+
 function handleQueryParams() {
     const params = new URLSearchParams(window.location.search);
     const bookISBN = params.get('bookISBN');
@@ -12,7 +81,7 @@ function handleQueryParams() {
     if (!bookISBN) return;
     
     setTimeout(async () => {
-        const details = await fetchBookDetailsFromAPI(bookISBN);
+        const details = await getBookDetailsWithFallback(bookISBN);
         
         if (type === 'borrow' || type === null) {
             if (details) {
@@ -521,13 +590,13 @@ async function fetchBookDetailsFromAPI(isbn) {
 
 async function lookupIsbn(isbn, titleInputId, authorInputId) {
     if (!isbn) return;
-    const details = await fetchBookDetailsFromAPI(isbn);
+    const details = await getBookDetailsWithFallback(isbn);
     if (details) {
         if (titleInputId && document.getElementById(titleInputId)) {
-            document.getElementById(titleInputId).value = details.title;
+            document.getElementById(titleInputId).value = details.title || '';
         }
         if (authorInputId && document.getElementById(authorInputId)) {
-            document.getElementById(authorInputId).value = details.author;
+            document.getElementById(authorInputId).value = details.author || '';
         }
     } else {
         alert("Book details not found automatically. You can proceed with standard text entry.");
@@ -853,10 +922,10 @@ function setupBotmForm() {
         botmLookupBtn.addEventListener('click', async () => {
             const isbn = document.getElementById('botmIsbnInput').value.trim();
             if (!isbn) return alert("Please enter an ISBN first.");
-            const details = await fetchBookDetailsFromAPI(isbn);
+            const details = await getBookDetailsWithFallback(isbn);
             if (details) {
-                if (document.getElementById('botmTitle')) document.getElementById('botmTitle').value = details.title;
-                if (document.getElementById('botmAuthor')) document.getElementById('botmAuthor').value = details.author;
+                if (document.getElementById('botmTitle')) document.getElementById('botmTitle').value = details.title || '';
+                if (document.getElementById('botmAuthor')) document.getElementById('botmAuthor').value = details.author || '';
             } else {
                 alert("Book details not found. Please enter manually.");
             }
