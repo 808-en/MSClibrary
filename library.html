@@ -22,6 +22,8 @@
 .control-group { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 200px; }
 .control-group input, .control-group select { width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 6px; font-size: 1em; box-sizing: border-box; }
 .control-group input:focus, .control-group select:focus { border-color: #007bff; outline: none; }
+.borrow-btn { background-color: #28a745; color: white; border: none; padding: 10px 15px; border-radius: 5px; font-weight: bold; cursor: pointer; width: 100%; transition: background-color 0.2s ease; margin-top: auto; }
+.borrow-btn:hover { background-color: #218838; }
 @media (max-width: 1024px) { .library-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 768px) { .library-grid { grid-template-columns: 1fr; } }
 </style>
@@ -87,7 +89,7 @@ async function fetchBookData() {
 
 function parseCSV(csvText) {
     const rows = csvText.split('\n');
-    const headers = rows[0].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g).map(h => h.replace(/(^"|"$)/g, '').trim());
+    const headers = rows[0].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g).map(h => h.replace(/(^"\vert{}"$)/g, '').trim());
     
     for (let i = 1; i < rows.length; i++) {
         if (!rows[i].trim()) continue;
@@ -150,6 +152,11 @@ function renderBooks(books) {
         const author = book['Author'] || 'Unknown Author';
         const grade = book['Grade Level'] || 'N/A';
         const synopsis = book['Synopsis'] || 'No synopsis available.';
+        const isbn = book['ISBN'] || book['isbn'] || '';
+
+        const borrowUrl = isbn 
+            ? `https://msclibrary.pages.dev/?bookISBN=${encodeURIComponent(isbn)}&type=borrow`
+            : `index.html#openBorrowForm`;
 
         card.innerHTML = `
             <img src="${imgSrc}" alt="${title}" onerror="this.onerror=null; this.src='ERR_Cover_Image.jpeg';">
@@ -163,7 +170,7 @@ function renderBooks(books) {
                 <div class="synopsis-text" id="synopsis-${index}">${synopsis}</div>
                 <button class="more-btn" onclick="toggleSynopsis(${index})">more...</button>
             </div>
-            <button class="borrow-btn" onclick="window.location.href='index.html#openBorrowForm'"><i class="fa-solid fa-book-open"></i> BORROW THIS BOOK</button>
+            <button class="borrow-btn" onclick="window.location.href='${borrowUrl}'"><i class="fa-solid fa-book-open"></i> BORROW THIS BOOK</button>
         `;
         grid.appendChild(card);
     });
